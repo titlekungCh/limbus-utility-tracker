@@ -1962,7 +1962,7 @@
   ],
   "ids": [
     {
-      "name": "[LCB Sinner] Yi Sang",
+      "name": "LCB Sinner",
       "sinner": "Yi Sang",
       "tier": "★",
       "tierStars": 1,
@@ -1977,7 +1977,7 @@
       "uptie": 3
     },
     {
-      "name": "[LCB Sinner] Faust",
+      "name": "LCB Sinner",
       "sinner": "Faust",
       "tier": "★",
       "tierStars": 1,
@@ -1992,7 +1992,7 @@
       "uptie": 3
     },
     {
-      "name": "[LCB Sinner] Don Quixote",
+      "name": "LCB Sinner",
       "sinner": "Don Quixote",
       "tier": "★",
       "tierStars": 1,
@@ -2007,7 +2007,7 @@
       "uptie": 3
     },
     {
-      "name": "[LCB Sinner] Ryoshu",
+      "name": "LCB Sinner",
       "sinner": "Ryoshu",
       "tier": "★",
       "tierStars": 1,
@@ -2022,7 +2022,7 @@
       "uptie": 3
     },
     {
-      "name": "[LCB Sinner] Meursault",
+      "name": "LCB Sinner",
       "sinner": "Meursault",
       "tier": "★",
       "tierStars": 1,
@@ -2037,7 +2037,7 @@
       "uptie": 3
     },
     {
-      "name": "[LCB Sinner] Hong Lu",
+      "name": "LCB Sinner",
       "sinner": "Hong Lu",
       "tier": "★",
       "tierStars": 1,
@@ -2052,7 +2052,7 @@
       "uptie": 3
     },
     {
-      "name": "[LCB Sinner] Heathcliff",
+      "name": "LCB Sinner",
       "sinner": "Heathcliff",
       "tier": "★",
       "tierStars": 1,
@@ -2067,7 +2067,7 @@
       "uptie": 3
     },
     {
-      "name": "[LCB Sinner] Ishmael",
+      "name": "LCB Sinner",
       "sinner": "Ishmael",
       "tier": "★",
       "tierStars": 1,
@@ -2082,7 +2082,7 @@
       "uptie": 3
     },
     {
-      "name": "[LCB Sinner] Rodion",
+      "name": "LCB Sinner",
       "sinner": "Rodion",
       "tier": "★",
       "tierStars": 1,
@@ -2097,7 +2097,7 @@
       "uptie": 3
     },
     {
-      "name": "[LCB Sinner] Sinclair",
+      "name": "LCB Sinner",
       "sinner": "Sinclair",
       "tier": "★",
       "tierStars": 1,
@@ -2112,7 +2112,7 @@
       "uptie": 3
     },
     {
-      "name": "[LCB Sinner] Outis",
+      "name": "LCB Sinner",
       "sinner": "Outis",
       "tier": "★",
       "tierStars": 1,
@@ -2127,7 +2127,7 @@
       "uptie": 3
     },
     {
-      "name": "[LCB Sinner] Gregor",
+      "name": "LCB Sinner",
       "sinner": "Gregor",
       "tier": "★",
       "tierStars": 1,
@@ -2142,7 +2142,7 @@
       "uptie": 3
     },
     {
-      "name": "[Seven Assoc. South Section 6] Yi Sang",
+      "name": "Seven Assoc. South Section 6",
       "sinner": "Yi Sang",
       "tier": "★★",
       "tierStars": 2,
@@ -2157,7 +2157,7 @@
       "uptie": 3
     },
     {
-      "name": "[Blade Lineage Salsu] Yi Sang",
+      "name": "Blade Lineage Salsu",
       "sinner": "Yi Sang",
       "tier": "★★★",
       "tierStars": 3,
@@ -2172,7 +2172,7 @@
       "uptie": 3
     },
     {
-      "name": "[W Corp. L2 Cleanup Agent] Faust",
+      "name": "W Corp. L2 Cleanup Agent",
       "sinner": "Faust",
       "tier": "★★",
       "tierStars": 2,
@@ -2187,7 +2187,7 @@
       "uptie": 3
     },
     {
-      "name": "[Lobotomy Corp. Remnant] Faust",
+      "name": "Lobotomy Corp. Remnant",
       "sinner": "Faust",
       "tier": "★★",
       "tierStars": 2,
@@ -2217,7 +2217,7 @@
       "uptie": null
     },
     {
-      "name": "[Shi Assoc. South Section 5 Director] Don Quixote",
+      "name": "Shi Assoc. South Section 5 Director",
       "sinner": "Don Quixote",
       "tier": "★★",
       "tierStars": 2,
@@ -2232,7 +2232,7 @@
       "uptie": 1
     },
     {
-      "name": "[Seven Assoc. South Section 6] Ryoshu",
+      "name": "Seven Assoc. South Section 6",
       "sinner": "Ryoshu",
       "tier": "★★",
       "tierStars": 2,
@@ -2247,7 +2247,7 @@
       "uptie": 3
     },
     {
-      "name": "[Kurokumo Clan Wakashu] Ryoshu",
+      "name": "Kurokumo Clan Wakashu",
       "sinner": "Ryoshu",
       "tier": "★★★",
       "tierStars": 3,
@@ -2262,7 +2262,7 @@
       "uptie": 1
     },
     {
-      "name": "[Liu Assoc. South Section 6] Meursault",
+      "name": "Liu Assoc. South Section 6",
       "sinner": "Meursault",
       "tier": "★★",
       "tierStars": 2,
@@ -2277,7 +2277,7 @@
       "uptie": 3
     },
     {
-      "name": "[W Corp. L2 Cleanup Agent] Meursault",
+      "name": "W Corp. L2 Cleanup Agent",
       "sinner": "Meursault",
       "tier": "★★★",
       "tierStars": 3,
@@ -2292,7 +2292,7 @@
       "uptie": 3
     },
     {
-      "name": "[Kurokumo Clan Wakashu] Hong Lu",
+      "name": "Kurokumo Clan Wakashu",
       "sinner": "Hong Lu",
       "tier": "★★",
       "tierStars": 2,
@@ -2307,7 +2307,7 @@
       "uptie": 3
     },
     {
-      "name": "[Tingtang Gang Gangleader] Hong Lu",
+      "name": "Tingtang Gang Gangleader",
       "sinner": "Hong Lu",
       "tier": "★★★",
       "tierStars": 3,
@@ -2322,7 +2322,7 @@
       "uptie": 3
     },
     {
-      "name": "[Shi Assoc. South Section 5] Heathcliff",
+      "name": "Shi Assoc. South Section 5",
       "sinner": "Heathcliff",
       "tier": "★★",
       "tierStars": 2,
@@ -2352,7 +2352,7 @@
       "uptie": null
     },
     {
-      "name": "[LCCB Assistant Manager] Ishmael",
+      "name": "LCCB Assistant Manager",
       "sinner": "Ishmael",
       "tier": "★★",
       "tierStars": 2,
@@ -2367,7 +2367,7 @@
       "uptie": 3
     },
     {
-      "name": "[Shi Assoc. South Section 5] Ishmael",
+      "name": "Shi Assoc. South Section 5",
       "sinner": "Ishmael",
       "tier": "★★",
       "tierStars": 2,
@@ -2397,7 +2397,7 @@
       "uptie": null
     },
     {
-      "name": "[LCCB Assistant Manager] Rodion",
+      "name": "LCCB Assistant Manager",
       "sinner": "Rodion",
       "tier": "★★",
       "tierStars": 2,
@@ -2412,7 +2412,7 @@
       "uptie": 3
     },
     {
-      "name": "[Kurokumo Clan Wakashu] Rodion",
+      "name": "Kurokumo Clan Wakashu",
       "sinner": "Rodion",
       "tier": "★★★",
       "tierStars": 3,
@@ -2427,7 +2427,7 @@
       "uptie": 3
     },
     {
-      "name": "[Zwei Assoc. South Section 6] Sinclair",
+      "name": "Zwei Assoc. South Section 6",
       "sinner": "Sinclair",
       "tier": "★★",
       "tierStars": 2,
@@ -2442,7 +2442,7 @@
       "uptie": 1
     },
     {
-      "name": "[Los Mariachis Jefe] Sinclair",
+      "name": "Los Mariachis Jefe",
       "sinner": "Sinclair",
       "tier": "★★",
       "tierStars": 2,
@@ -2472,7 +2472,7 @@
       "uptie": null
     },
     {
-      "name": "[Blade Lineage Salsu] Outis",
+      "name": "Blade Lineage Salsu",
       "sinner": "Outis",
       "tier": "★★",
       "tierStars": 2,
@@ -2487,7 +2487,7 @@
       "uptie": 3
     },
     {
-      "name": "[G Corp. Head Manager] Outis",
+      "name": "G Corp. Head Manager",
       "sinner": "Outis",
       "tier": "★★",
       "tierStars": 2,
@@ -2502,7 +2502,7 @@
       "uptie": 3
     },
     {
-      "name": "[Liu Assoc. South Section 6] Gregor",
+      "name": "Liu Assoc. South Section 6",
       "sinner": "Gregor",
       "tier": "★★",
       "tierStars": 2,
@@ -2517,7 +2517,7 @@
       "uptie": 3
     },
     {
-      "name": "[G Corp. Manager Corporal] Gregor",
+      "name": "G Corp. Manager Corporal",
       "sinner": "Gregor",
       "tier": "★★★",
       "tierStars": 3,
@@ -2547,7 +2547,7 @@
       "uptie": null
     },
     {
-      "name": "[N Corp. Mittelhammer] Rodion",
+      "name": "N Corp. Mittelhammer",
       "sinner": "Rodion",
       "tier": "★★",
       "tierStars": 2,
@@ -2562,7 +2562,7 @@
       "uptie": 1
     },
     {
-      "name": "[The One Who Grips] Faust",
+      "name": "The One Who Grips",
       "sinner": "Faust",
       "tier": "★★★",
       "tierStars": 3,
@@ -2577,7 +2577,7 @@
       "uptie": 4
     },
     {
-      "name": "[N Corp. Kleinhammer] Heathcliff",
+      "name": "N Corp. Kleinhammer",
       "sinner": "Heathcliff",
       "tier": "★★",
       "tierStars": 2,
@@ -2592,7 +2592,7 @@
       "uptie": 3
     },
     {
-      "name": "[Liu Assoc. South Section 5] Hong Lu",
+      "name": "Liu Assoc. South Section 5",
       "sinner": "Hong Lu",
       "tier": "★★",
       "tierStars": 2,
@@ -2622,7 +2622,7 @@
       "uptie": null
     },
     {
-      "name": "[R.B. Chef de Cuisine] Ryoshu",
+      "name": "R.B. Chef de Cuisine",
       "sinner": "Ryoshu",
       "tier": "★★★",
       "tierStars": 3,
@@ -2652,7 +2652,7 @@
       "uptie": null
     },
     {
-      "name": "[N Corp. Mittelhammer] Don Quixote",
+      "name": "N Corp. Mittelhammer",
       "sinner": "Don Quixote",
       "tier": "★★",
       "tierStars": 2,
@@ -2667,7 +2667,7 @@
       "uptie": 3
     },
     {
-      "name": "[The One Who Shall Grip] Sinclair",
+      "name": "The One Who Shall Grip",
       "sinner": "Sinclair",
       "tier": "★★★",
       "tierStars": 3,
@@ -2682,7 +2682,7 @@
       "uptie": 3
     },
     {
-      "name": "[Rosespanner Workshop Fixer] Meursault",
+      "name": "Rosespanner Workshop Fixer",
       "sinner": "Meursault",
       "tier": "★★",
       "tierStars": 2,
@@ -2727,7 +2727,7 @@
       "uptie": null
     },
     {
-      "name": "[Rosespanner Workshop Fixer] Gregor",
+      "name": "Rosespanner Workshop Fixer",
       "sinner": "Gregor",
       "tier": "★★",
       "tierStars": 2,
@@ -2757,7 +2757,7 @@
       "uptie": null
     },
     {
-      "name": "[Lobotomy E.G.O::Sloshing] Ishmael",
+      "name": "Lobotomy E.G.O::Sloshing",
       "sinner": "Ishmael",
       "tier": "★★",
       "tierStars": 2,
@@ -2772,7 +2772,7 @@
       "uptie": 2
     },
     {
-      "name": "[K Corp. Class 3 Excision Staff] Hong Lu",
+      "name": "K Corp. Class 3 Excision Staff",
       "sinner": "Hong Lu",
       "tier": "★★★",
       "tierStars": 3,
@@ -2787,7 +2787,7 @@
       "uptie": 3
     },
     {
-      "name": "[Lobotomy E.G.O::Red Sheet] Sinclair",
+      "name": "Lobotomy E.G.O::Red Sheet",
       "sinner": "Sinclair",
       "tier": "★★",
       "tierStars": 2,
@@ -2802,7 +2802,7 @@
       "uptie": 3
     },
     {
-      "name": "[Liu Assoc. South Section 4] Ishmael",
+      "name": "Liu Assoc. South Section 4",
       "sinner": "Ishmael",
       "tier": "★★★",
       "tierStars": 3,
@@ -2832,7 +2832,7 @@
       "uptie": null
     },
     {
-      "name": "[Zwei Assoc. South Section 5] Rodion",
+      "name": "Zwei Assoc. South Section 5",
       "sinner": "Rodion",
       "tier": "★★",
       "tierStars": 2,
@@ -2862,7 +2862,7 @@
       "uptie": null
     },
     {
-      "name": "[Molar Boatworks Fixer] Ishmael",
+      "name": "Molar Boatworks Fixer",
       "sinner": "Ishmael",
       "tier": "★★★",
       "tierStars": 3,
@@ -2892,7 +2892,7 @@
       "uptie": null
     },
     {
-      "name": "[Zwei Assoc. South Section 4] Faust",
+      "name": "Zwei Assoc. South Section 4",
       "sinner": "Faust",
       "tier": "★★",
       "tierStars": 2,
@@ -2937,7 +2937,7 @@
       "uptie": null
     },
     {
-      "name": "[W Corp. L2 Cleanup Agent] Hong Lu",
+      "name": "W Corp. L2 Cleanup Agent",
       "sinner": "Hong Lu",
       "tier": "★★",
       "tierStars": 2,
@@ -2967,7 +2967,7 @@
       "uptie": null
     },
     {
-      "name": "[Seven Assoc. South Section 4] Heathcliff",
+      "name": "Seven Assoc. South Section 4",
       "sinner": "Heathcliff",
       "tier": "★★",
       "tierStars": 2,
@@ -2997,7 +2997,7 @@
       "uptie": null
     },
     {
-      "name": "[Dieci Assoc. South Section 4] Rodion",
+      "name": "Dieci Assoc. South Section 4",
       "sinner": "Rodion",
       "tier": "★★★",
       "tierStars": 3,
@@ -3042,7 +3042,7 @@
       "uptie": null
     },
     {
-      "name": "[Hook Office Fixer] Hong Lu",
+      "name": "Hook Office Fixer",
       "sinner": "Hong Lu",
       "tier": "★★",
       "tierStars": 2,
@@ -3057,7 +3057,7 @@
       "uptie": 3
     },
     {
-      "name": "[W Corp. L3 Cleanup Agent] Yi Sang",
+      "name": "W Corp. L3 Cleanup Agent",
       "sinner": "Yi Sang",
       "tier": "★★★",
       "tierStars": 3,
@@ -3087,7 +3087,7 @@
       "uptie": null
     },
     {
-      "name": "[LCCB Assistant Manager] Ryoshu",
+      "name": "LCCB Assistant Manager",
       "sinner": "Ryoshu",
       "tier": "★★",
       "tierStars": 2,
@@ -3102,7 +3102,7 @@
       "uptie": 3
     },
     {
-      "name": "[The Middle Little Sister] Don Quixote",
+      "name": "The Middle Little Sister",
       "sinner": "Don Quixote",
       "tier": "★★★",
       "tierStars": 3,
@@ -3117,7 +3117,7 @@
       "uptie": 4
     },
     {
-      "name": "[The Middle Little Brother] Meursault",
+      "name": "The Middle Little Brother",
       "sinner": "Meursault",
       "tier": "★★",
       "tierStars": 2,
@@ -3147,7 +3147,7 @@
       "uptie": null
     },
     {
-      "name": "[The Pequod First Mate] Yi Sang",
+      "name": "The Pequod First Mate",
       "sinner": "Yi Sang",
       "tier": "★★",
       "tierStars": 2,
@@ -3162,7 +3162,7 @@
       "uptie": 3
     },
     {
-      "name": "[Cinq Assoc. South Section 4] Outis",
+      "name": "Cinq Assoc. South Section 4",
       "sinner": "Outis",
       "tier": "★★",
       "tierStars": 2,
@@ -3192,7 +3192,7 @@
       "uptie": null
     },
     {
-      "name": "[Lobotomy E.G.O::Lantern] Don Quixote",
+      "name": "Lobotomy E.G.O::Lantern",
       "sinner": "Don Quixote",
       "tier": "★★",
       "tierStars": 2,
@@ -3222,7 +3222,7 @@
       "uptie": null
     },
     {
-      "name": "[Dieci Assoc. South Section 4] Yi Sang",
+      "name": "Dieci Assoc. South Section 4",
       "sinner": "Yi Sang",
       "tier": "★★",
       "tierStars": 2,
@@ -3267,7 +3267,7 @@
       "uptie": null
     },
     {
-      "name": "[Blade Lineage Mentor] Meursault",
+      "name": "Blade Lineage Mentor",
       "sinner": "Meursault",
       "tier": "★★★",
       "tierStars": 3,
@@ -3282,7 +3282,7 @@
       "uptie": 4
     },
     {
-      "name": "[Blade Lineage Salsu] Faust",
+      "name": "Blade Lineage Salsu",
       "sinner": "Faust",
       "tier": "★★★",
       "tierStars": 3,
@@ -3297,7 +3297,7 @@
       "uptie": 4
     },
     {
-      "name": "[Blade Lineage Salsu] Don Quixote",
+      "name": "Blade Lineage Salsu",
       "sinner": "Don Quixote",
       "tier": "★★",
       "tierStars": 2,
@@ -3327,7 +3327,7 @@
       "uptie": null
     },
     {
-      "name": "[Liu Assoc. South Section 4] Ryoshu",
+      "name": "Liu Assoc. South Section 4",
       "sinner": "Ryoshu",
       "tier": "★★",
       "tierStars": 2,
@@ -3342,7 +3342,7 @@
       "uptie": 3
     },
     {
-      "name": "[Liu Assoc. South Section 4 Director] Rodion",
+      "name": "Liu Assoc. South Section 4 Director",
       "sinner": "Rodion",
       "tier": "★★★",
       "tierStars": 3,
@@ -3372,7 +3372,7 @@
       "uptie": null
     },
     {
-      "name": "[Wuthering Heights Chief Butler] Outis",
+      "name": "Wuthering Heights Chief Butler",
       "sinner": "Outis",
       "tier": "★★★",
       "tierStars": 3,
@@ -3387,7 +3387,7 @@
       "uptie": 4
     },
     {
-      "name": "[Dead Rabbits Boss] Meursault",
+      "name": "Dead Rabbits Boss",
       "sinner": "Meursault",
       "tier": "★★",
       "tierStars": 2,
@@ -3402,7 +3402,7 @@
       "uptie": 1
     },
     {
-      "name": "[Wuthering Heights Butler] Faust",
+      "name": "Wuthering Heights Butler",
       "sinner": "Faust",
       "tier": "★★",
       "tierStars": 2,
@@ -3432,7 +3432,7 @@
       "uptie": null
     },
     {
-      "name": "[Edgar Family Butler] Ishmael",
+      "name": "Edgar Family Butler",
       "sinner": "Ishmael",
       "tier": "★★",
       "tierStars": 2,
@@ -3462,7 +3462,7 @@
       "uptie": null
     },
     {
-      "name": "[Dawn Office Fixer] Sinclair",
+      "name": "Dawn Office Fixer",
       "sinner": "Sinclair",
       "tier": "★★★",
       "tierStars": 3,
@@ -3477,7 +3477,7 @@
       "uptie": 3
     },
     {
-      "name": "[The Ring Pointillist Student] Outis",
+      "name": "The Ring Pointillist Student",
       "sinner": "Outis",
       "tier": "★★",
       "tierStars": 2,
@@ -3492,7 +3492,7 @@
       "uptie": 3
     },
     {
-      "name": "[The Ring Pointillist Student] Yi Sang",
+      "name": "The Ring Pointillist Student",
       "sinner": "Yi Sang",
       "tier": "★★★",
       "tierStars": 3,
@@ -3507,7 +3507,7 @@
       "uptie": 4
     },
     {
-      "name": "[District 20 Yurodivy] Ryoshu",
+      "name": "District 20 Yurodivy",
       "sinner": "Ryoshu",
       "tier": "★★",
       "tierStars": 2,
@@ -3522,7 +3522,7 @@
       "uptie": 3
     },
     {
-      "name": "[District 20 Yurodivy] Hong Lu",
+      "name": "District 20 Yurodivy",
       "sinner": "Hong Lu",
       "tier": "★★★",
       "tierStars": 3,
@@ -3537,7 +3537,7 @@
       "uptie": 4
     },
     {
-      "name": "[T Corp. Class 2 Collection Staff] Rodion",
+      "name": "T Corp. Class 2 Collection Staff",
       "sinner": "Rodion",
       "tier": "★★",
       "tierStars": 2,
@@ -3552,7 +3552,7 @@
       "uptie": 3
     },
     {
-      "name": "[T Corp. Class 3 Collection Staff] Don Quixote",
+      "name": "T Corp. Class 3 Collection Staff",
       "sinner": "Don Quixote",
       "tier": "★★★",
       "tierStars": 3,
@@ -3612,7 +3612,7 @@
       "uptie": null
     },
     {
-      "name": "[MultiCrack Office Fixer] Heathcliff",
+      "name": "MultiCrack Office Fixer",
       "sinner": "Heathcliff",
       "tier": "★★",
       "tierStars": 2,
@@ -3627,7 +3627,7 @@
       "uptie": 4
     },
     {
-      "name": "[Wild Hunt] Heathcliff",
+      "name": "Wild Hunt",
       "sinner": "Heathcliff",
       "tier": "★★★",
       "tierStars": 3,
@@ -3657,7 +3657,7 @@
       "uptie": null
     },
     {
-      "name": "[Lobotomy E.G.O::Solemn Lament] Yi Sang",
+      "name": "Lobotomy E.G.O::Solemn Lament",
       "sinner": "Yi Sang",
       "tier": "★★★",
       "tierStars": 3,
@@ -3702,7 +3702,7 @@
       "uptie": null
     },
     {
-      "name": "[Cinq Assoc. West Section 3] Meursault",
+      "name": "Cinq Assoc. West Section 3",
       "sinner": "Meursault",
       "tier": "★★★",
       "tierStars": 3,
@@ -3717,7 +3717,7 @@
       "uptie": 4
     },
     {
-      "name": "[Zwei Assoc. West Section 3] Sinclair",
+      "name": "Zwei Assoc. West Section 3",
       "sinner": "Sinclair",
       "tier": "★★",
       "tierStars": 2,
@@ -3747,7 +3747,7 @@
       "uptie": null
     },
     {
-      "name": "[Fanghunt Office Fixer] Hong Lu",
+      "name": "Fanghunt Office Fixer",
       "sinner": "Hong Lu",
       "tier": "★★",
       "tierStars": 2,
@@ -3777,7 +3777,7 @@
       "uptie": null
     },
     {
-      "name": "[The Princess of La Manchaland] Rodion",
+      "name": "The Princess of La Manchaland",
       "sinner": "Rodion",
       "tier": "★★★",
       "tierStars": 3,
@@ -3807,7 +3807,7 @@
       "uptie": null
     },
     {
-      "name": "[The Manager of La Manchaland] Don Quixote",
+      "name": "The Manager of La Manchaland",
       "sinner": "Don Quixote",
       "tier": "★★★",
       "tierStars": 3,
@@ -3837,7 +3837,7 @@
       "uptie": null
     },
     {
-      "name": "[Full-Stop Office Rep] Hong Lu",
+      "name": "Full-Stop Office Rep",
       "sinner": "Hong Lu",
       "tier": "★★★",
       "tierStars": 3,
@@ -3852,7 +3852,7 @@
       "uptie": 3
     },
     {
-      "name": "[LCE E.G.O::Lantern] Yi Sang",
+      "name": "LCE E.G.O::Lantern",
       "sinner": "Yi Sang",
       "tier": "★★",
       "tierStars": 2,
@@ -3867,7 +3867,7 @@
       "uptie": 3
     },
     {
-      "name": "[LCE E.G.O::Ardor Blossom Star] Faust",
+      "name": "LCE E.G.O::Ardor Blossom Star",
       "sinner": "Faust",
       "tier": "★★★",
       "tierStars": 3,
@@ -3957,7 +3957,7 @@
       "uptie": null
     },
     {
-      "name": "[Heishou Pack - Mao Branch] Ryoshu",
+      "name": "Heishou Pack - Mao Branch",
       "sinner": "Ryoshu",
       "tier": "★★★",
       "tierStars": 3,
@@ -3972,7 +3972,7 @@
       "uptie": 4
     },
     {
-      "name": "[Heishou Pack - Mao Branch] Outis",
+      "name": "Heishou Pack - Mao Branch",
       "sinner": "Outis",
       "tier": "★★★",
       "tierStars": 3,
@@ -3987,7 +3987,7 @@
       "uptie": 4
     },
     {
-      "name": "[The Middle Little Brother] Sinclair",
+      "name": "The Middle Little Brother",
       "sinner": "Sinclair",
       "tier": "★★★",
       "tierStars": 3,
@@ -4002,7 +4002,7 @@
       "uptie": 4
     },
     {
-      "name": "[R Corp. 4th Pack Reindeer] Hong Lu",
+      "name": "R Corp. 4th Pack Reindeer",
       "sinner": "Hong Lu",
       "tier": "★★★",
       "tierStars": 3,
@@ -4017,7 +4017,7 @@
       "uptie": 3
     },
     {
-      "name": "[Heishou Pack - Si Branch] Rodion",
+      "name": "Heishou Pack - Si Branch",
       "sinner": "Rodion",
       "tier": "★★★",
       "tierStars": 3,
@@ -4032,7 +4032,7 @@
       "uptie": 4
     },
     {
-      "name": "[Heishou Pack - Si Branch] Gregor",
+      "name": "Heishou Pack - Si Branch",
       "sinner": "Gregor",
       "tier": "★★★",
       "tierStars": 3,
@@ -4047,7 +4047,7 @@
       "uptie": 4
     },
     {
-      "name": "[Heishou Pack - Mao Branch Adept] Faust",
+      "name": "Heishou Pack - Mao Branch Adept",
       "sinner": "Faust",
       "tier": "★★★",
       "tierStars": 3,
@@ -4062,7 +4062,7 @@
       "uptie": 4
     },
     {
-      "name": "[Family Hierarch Candidate] Ishmael",
+      "name": "Family Hierarch Candidate",
       "sinner": "Ishmael",
       "tier": "★★★",
       "tierStars": 3,
@@ -4077,7 +4077,7 @@
       "uptie": 4
     },
     {
-      "name": "[The Thumb East Soldato ||] Sinclair",
+      "name": "The Thumb East Soldato ||",
       "sinner": "Sinclair",
       "tier": "★★★",
       "tierStars": 3,
@@ -4092,7 +4092,7 @@
       "uptie": 4
     },
     {
-      "name": "[The Thumb East Capo ||||] Meursault",
+      "name": "The Thumb East Capo ||||",
       "sinner": "Meursault",
       "tier": "★★★",
       "tierStars": 3,
@@ -4107,7 +4107,7 @@
       "uptie": 4
     },
     {
-      "name": "[N Corp. E.G.O::Fell Bullet] Yi Sang",
+      "name": "N Corp. E.G.O::Fell Bullet",
       "sinner": "Yi Sang",
       "tier": "★★★",
       "tierStars": 3,
@@ -4122,7 +4122,7 @@
       "uptie": 3
     },
     {
-      "name": "[Lobotomy E.G.O::In the Name of Love and Hate] Don Quixote",
+      "name": "Lobotomy E.G.O::In the Name of Love and Hate",
       "sinner": "Don Quixote",
       "tier": "★★★",
       "tierStars": 3,
@@ -4137,7 +4137,7 @@
       "uptie": 3
     },
     {
-      "name": "[Lobotomy E.G.O:: The Sword Sharpened with Tears] Rodion",
+      "name": "Lobotomy E.G.O:: The Sword Sharpened with Tears",
       "sinner": "Rodion",
       "tier": "★★★",
       "tierStars": 3,
@@ -4152,7 +4152,7 @@
       "uptie": 4
     },
     {
-      "name": "[T Corp. Class 3 VDCU Staff] Outis",
+      "name": "T Corp. Class 3 VDCU Staff",
       "sinner": "Outis",
       "tier": "★★★",
       "tierStars": 3,
@@ -4167,7 +4167,7 @@
       "uptie": 4
     },
     {
-      "name": "[The Lord of Hongyuan] Hong Lu",
+      "name": "The Lord of Hongyuan",
       "sinner": "Hong Lu",
       "tier": "★★★",
       "tierStars": 3,
@@ -4182,7 +4182,7 @@
       "uptie": 4
     },
     {
-      "name": "[Heishou Pack - You Branch Adept] Sinclair",
+      "name": "Heishou Pack - You Branch Adept",
       "sinner": "Sinclair",
       "tier": "★★★",
       "tierStars": 3,
@@ -4197,7 +4197,7 @@
       "uptie": 4
     },
     {
-      "name": "[Heishou Pack - Wu Branch Adept] Yi Sang",
+      "name": "Heishou Pack - Wu Branch Adept",
       "sinner": "Yi Sang",
       "tier": "★★★",
       "tierStars": 3,
@@ -4212,7 +4212,7 @@
       "uptie": 4
     },
     {
-      "name": "[N Corp. E.G.O:: Contempt, Awe] Ryoshu",
+      "name": "N Corp. E.G.O:: Contempt, Awe",
       "sinner": "Ryoshu",
       "tier": "★★★",
       "tierStars": 3,
@@ -4242,7 +4242,7 @@
       "uptie": null
     },
     {
-      "name": "[W Corp. L4 Cleanup Agent - CCA] Heathcliff",
+      "name": "W Corp. L4 Cleanup Agent - CCA",
       "sinner": "Heathcliff",
       "tier": "★★★",
       "tierStars": 3,
@@ -4257,7 +4257,7 @@
       "uptie": 4
     },
     {
-      "name": "[The Prince of La Manchaland] Meursault",
+      "name": "The Prince of La Manchaland",
       "sinner": "Meursault",
       "tier": "★★★",
       "tierStars": 3,
@@ -4272,7 +4272,7 @@
       "uptie": 4
     },
     {
-      "name": "[Jeong's Office Rep] Ishmael",
+      "name": "Jeong's Office Rep",
       "sinner": "Ishmael",
       "tier": "★★★",
       "tierStars": 3,
@@ -4287,7 +4287,7 @@
       "uptie": 4
     },
     {
-      "name": "[Night Awl Capitano] Gregor",
+      "name": "Night Awl Capitano",
       "sinner": "Gregor",
       "tier": "★★★",
       "tierStars": 3,
@@ -4302,7 +4302,7 @@
       "uptie": 4
     },
     {
-      "name": "[Heishou Pack - Wei Branch] Don Quixote",
+      "name": "Heishou Pack - Wei Branch",
       "sinner": "Don Quixote",
       "tier": "★★★",
       "tierStars": 3,
@@ -4317,7 +4317,7 @@
       "uptie": 4
     },
     {
-      "name": "[Heishou Pack - You Branch Adept] Heathcliff",
+      "name": "Heishou Pack - You Branch Adept",
       "sinner": "Heathcliff",
       "tier": "★★★",
       "tierStars": 3,
@@ -4332,7 +4332,7 @@
       "uptie": 4
     },
     {
-      "name": "[Drifting Blade of Hongyuan] Ryoshu",
+      "name": "Drifting Blade of Hongyuan",
       "sinner": "Ryoshu",
       "tier": "★★★",
       "tierStars": 3,
@@ -4377,7 +4377,7 @@
       "uptie": null
     },
     {
-      "name": "[LCA Udjat Vanguard Team 3 Leader] Outis",
+      "name": "LCA Udjat Vanguard Team 3 Leader",
       "sinner": "Outis",
       "tier": "★★★",
       "tierStars": 3,
@@ -4392,7 +4392,7 @@
       "uptie": 3
     },
     {
-      "name": "[The Index Proxy - Effloresced E.G.O::Procuration] Don Quixote",
+      "name": "The Index Proxy - Effloresced E.G.O::Procuration",
       "sinner": "Don Quixote",
       "tier": "★★★",
       "tierStars": 3,
@@ -4407,7 +4407,7 @@
       "uptie": 4
     },
     {
-      "name": "[The House of Spiders: The Middle Apprentice] Ishmael",
+      "name": "The House of Spiders: The Middle Apprentice",
       "sinner": "Ishmael",
       "tier": "★★★",
       "tierStars": 3,
@@ -4437,7 +4437,7 @@
       "uptie": null
     },
     {
-      "name": "[Lobotomy E.G.O::Lamp] Gregor",
+      "name": "Lobotomy E.G.O::Lamp",
       "sinner": "Gregor",
       "tier": "★★★",
       "tierStars": 3,
@@ -4452,7 +4452,7 @@
       "uptie": 4
     },
     {
-      "name": "[The House of Spiders: The Index Nursefather] Yi Sang",
+      "name": "The House of Spiders: The Index Nursefather",
       "sinner": "Yi Sang",
       "tier": "★★★",
       "tierStars": 3,
@@ -4467,7 +4467,7 @@
       "uptie": 4
     },
     {
-      "name": "[Lobotomy E.G.O:: Hornet [Alteration]] Meursault",
+      "name": "Lobotomy E.G.O:: Hornet [Alteration]",
       "sinner": "Meursault",
       "tier": "★★★",
       "tierStars": 3,
@@ -4482,7 +4482,7 @@
       "uptie": 4
     },
     {
-      "name": "[Lobotomy E.G.O::Faint Aroma & Solitude] Ryoshu",
+      "name": "Lobotomy E.G.O::Faint Aroma & Solitude",
       "sinner": "Ryoshu",
       "tier": "★★★",
       "tierStars": 3,
@@ -4497,7 +4497,7 @@
       "uptie": 4
     },
     {
-      "name": "[LCE E.G.O::AEDD] Gregor",
+      "name": "LCE E.G.O::AEDD",
       "sinner": "Gregor",
       "tier": "★★★",
       "tierStars": 3,
@@ -4527,7 +4527,7 @@
       "uptie": null
     },
     {
-      "name": "[The House of Spiders: The Ring Nursefather] Hong Lu",
+      "name": "The House of Spiders: The Ring Nursefather",
       "sinner": "Hong Lu",
       "tier": "★★★",
       "tierStars": 3,
@@ -4542,7 +4542,7 @@
       "uptie": 4
     },
     {
-      "name": "[The Ring Fauvist Student] Meursault",
+      "name": "The Ring Fauvist Student",
       "sinner": "Meursault",
       "tier": "★★★",
       "tierStars": 3,
@@ -4557,7 +4557,7 @@
       "uptie": 4
     },
     {
-      "name": "[The Ring Fauvist Docent] Rodion",
+      "name": "The Ring Fauvist Docent",
       "sinner": "Rodion",
       "tier": "★★★",
       "tierStars": 3,
@@ -4572,7 +4572,7 @@
       "uptie": 4
     },
     {
-      "name": "[The Middle Big Brother] Heathcliff",
+      "name": "The Middle Big Brother",
       "sinner": "Heathcliff",
       "tier": "★★★",
       "tierStars": 3,
@@ -4617,7 +4617,7 @@
       "uptie": null
     },
     {
-      "name": "[S Corp. Ch'unokkun] Hong Lu",
+      "name": "S Corp. Ch'unokkun",
       "sinner": "Hong Lu",
       "tier": "★★★",
       "tierStars": 3,
@@ -4859,7 +4859,7 @@
   ],
   "egos": [
     {
-      "name": "[Crow’s Eye View] Yi Sang",
+      "name": "Crow’s Eye View",
       "sinner": "Yi Sang",
       "sin": "Sloth",
       "tier": "ZAYIN",
@@ -4872,7 +4872,7 @@
       "threadspin": 3
     },
     {
-      "name": "[Representation Emitter] Faust",
+      "name": "Representation Emitter",
       "sinner": "Faust",
       "sin": "Pride",
       "tier": "ZAYIN",
@@ -4885,7 +4885,7 @@
       "threadspin": 3
     },
     {
-      "name": "[La Sangre de Sancho] Don Quixote",
+      "name": "La Sangre de Sancho",
       "sinner": "Don Quixote",
       "sin": "Lust",
       "tier": "ZAYIN",
@@ -4898,7 +4898,7 @@
       "threadspin": 3
     },
     {
-      "name": "[Forest for the Flames] Ryoshu",
+      "name": "Forest for the Flames",
       "sinner": "Ryoshu",
       "sin": "Lust",
       "tier": "ZAYIN",
@@ -4911,7 +4911,7 @@
       "threadspin": 4
     },
     {
-      "name": "[Chains of Others] Meursault",
+      "name": "Chains of Others",
       "sinner": "Meursault",
       "sin": "Pride",
       "tier": "ZAYIN",
@@ -4924,7 +4924,7 @@
       "threadspin": 3
     },
     {
-      "name": "[Land of Illusion] Hong Lu",
+      "name": "Land of Illusion",
       "sinner": "Hong Lu",
       "sin": "Gloom",
       "tier": "ZAYIN",
@@ -4937,7 +4937,7 @@
       "threadspin": 3
     },
     {
-      "name": "[Bodysack] Heathcliff",
+      "name": "Bodysack",
       "sinner": "Heathcliff",
       "sin": "Envy",
       "tier": "ZAYIN",
@@ -4950,7 +4950,7 @@
       "threadspin": 3
     },
     {
-      "name": "[Snagharpoon] Ishmael",
+      "name": "Snagharpoon",
       "sinner": "Ishmael",
       "sin": "Gloom",
       "tier": "ZAYIN",
@@ -4963,7 +4963,7 @@
       "threadspin": 3
     },
     {
-      "name": "[What is Cast] Rodion",
+      "name": "What is Cast",
       "sinner": "Rodion",
       "sin": "Pride",
       "tier": "ZAYIN",
@@ -4976,7 +4976,7 @@
       "threadspin": 3
     },
     {
-      "name": "[Branch of Knowledge] Sinclair",
+      "name": "Branch of Knowledge",
       "sinner": "Sinclair",
       "sin": "Gluttony",
       "tier": "ZAYIN",
@@ -4989,7 +4989,7 @@
       "threadspin": 3
     },
     {
-      "name": "[To Páthos Máthos] Outis",
+      "name": "To Páthos Máthos",
       "sinner": "Outis",
       "sin": "Pride",
       "tier": "ZAYIN",
@@ -5002,7 +5002,7 @@
       "threadspin": 3
     },
     {
-      "name": "[Suddenly, One Day] Gregor",
+      "name": "Suddenly, One Day",
       "sinner": "Gregor",
       "sin": "Sloth",
       "tier": "ZAYIN",
@@ -5028,7 +5028,7 @@
       "threadspin": null
     },
     {
-      "name": "[Wishing Cairn] Yi Sang",
+      "name": "Wishing Cairn",
       "sinner": "Yi Sang",
       "sin": "Sloth",
       "tier": "TETH",
@@ -5041,7 +5041,7 @@
       "threadspin": 3
     },
     {
-      "name": "[Fluid Sac] Faust",
+      "name": "Fluid Sac",
       "sinner": "Faust",
       "sin": "Gloom",
       "tier": "HE",
@@ -5158,7 +5158,7 @@
       "threadspin": null
     },
     {
-      "name": "[Ardor Blossom Star] Ishmael",
+      "name": "Ardor Blossom Star",
       "sinner": "Ishmael",
       "sin": "Wrath",
       "tier": "HE",
@@ -5184,7 +5184,7 @@
       "threadspin": null
     },
     {
-      "name": "[Rime Shank] Rodion",
+      "name": "Rime Shank",
       "sinner": "Rodion",
       "sin": "Gloom",
       "tier": "TETH",
@@ -5223,7 +5223,7 @@
       "threadspin": null
     },
     {
-      "name": "[Ya Śūnyatā Tad Rūpam] Outis",
+      "name": "Ya Śūnyatā Tad Rūpam",
       "sinner": "Outis",
       "sin": "Lust",
       "tier": "TETH",
@@ -5249,7 +5249,7 @@
       "threadspin": null
     },
     {
-      "name": "[Lantern] Gregor",
+      "name": "Lantern",
       "sinner": "Gregor",
       "sin": "Gluttony",
       "tier": "TETH",
@@ -5275,7 +5275,7 @@
       "threadspin": null
     },
     {
-      "name": "[Telepole] Faust",
+      "name": "Telepole",
       "sinner": "Faust",
       "sin": "Envy",
       "tier": "HE",
@@ -5314,7 +5314,7 @@
       "threadspin": null
     },
     {
-      "name": "[Dimension Shredder] Yi Sang",
+      "name": "Dimension Shredder",
       "sinner": "Yi Sang",
       "sin": "Pride",
       "tier": "HE",
@@ -5392,7 +5392,7 @@
       "threadspin": null
     },
     {
-      "name": "[Sunshower] Yi Sang",
+      "name": "Sunshower",
       "sinner": "Yi Sang",
       "sin": "Sloth",
       "tier": "WAW",
@@ -5496,7 +5496,7 @@
       "threadspin": null
     },
     {
-      "name": "[Regret] Meursault",
+      "name": "Regret",
       "sinner": "Meursault",
       "sin": "Wrath",
       "tier": "TETH",
@@ -5574,7 +5574,7 @@
       "threadspin": null
     },
     {
-      "name": "[Blind Obsession] Ishmael",
+      "name": "Blind Obsession",
       "sinner": "Ishmael",
       "sin": "Pride",
       "tier": "WAW",
@@ -5626,7 +5626,7 @@
       "threadspin": null
     },
     {
-      "name": "[Wishing Cairn] Don Quixote",
+      "name": "Wishing Cairn",
       "sinner": "Don Quixote",
       "sin": "Sloth",
       "tier": "TETH",
@@ -5678,7 +5678,7 @@
       "threadspin": null
     },
     {
-      "name": "[Binds] Outis",
+      "name": "Binds",
       "sinner": "Outis",
       "sin": "Pride",
       "tier": "WAW",
@@ -5691,7 +5691,7 @@
       "threadspin": 3
     },
     {
-      "name": "[Binds] Heathcliff",
+      "name": "Binds",
       "sinner": "Heathcliff",
       "sin": "Gloom",
       "tier": "WAW",
@@ -5730,7 +5730,7 @@
       "threadspin": null
     },
     {
-      "name": "[Sanguine Desire] Rodion",
+      "name": "Sanguine Desire",
       "sinner": "Rodion",
       "sin": "Lust",
       "tier": "WAW",
@@ -5769,7 +5769,7 @@
       "threadspin": null
     },
     {
-      "name": "[Cavernous Wailing] Hong Lu",
+      "name": "Cavernous Wailing",
       "sinner": "Hong Lu",
       "sin": "Sloth",
       "tier": "TETH",
@@ -5782,7 +5782,7 @@
       "threadspin": 4
     },
     {
-      "name": "[Everlasting] Faust",
+      "name": "Everlasting",
       "sinner": "Faust",
       "sin": "Sloth",
       "tier": "WAW",
@@ -5795,7 +5795,7 @@
       "threadspin": 3
     },
     {
-      "name": "[Fell Bullet] Heathcliff",
+      "name": "Fell Bullet",
       "sinner": "Heathcliff",
       "sin": "Pride",
       "tier": "TETH",
@@ -5886,7 +5886,7 @@
       "threadspin": null
     },
     {
-      "name": "[Hex Nail] Rodion",
+      "name": "Hex Nail",
       "sinner": "Rodion",
       "sin": "Envy",
       "tier": "HE",
@@ -5925,7 +5925,7 @@
       "threadspin": null
     },
     {
-      "name": "[Yearning-Mircalla] Don Quixote",
+      "name": "Yearning-Mircalla",
       "sinner": "Don Quixote",
       "sin": "Lust",
       "tier": "WAW",
@@ -5951,7 +5951,7 @@
       "threadspin": null
     },
     {
-      "name": "[Asymmetrical Inertia] Heathcliff",
+      "name": "Asymmetrical Inertia",
       "sinner": "Heathcliff",
       "sin": "Sloth",
       "tier": "HE",
@@ -5977,7 +5977,7 @@
       "threadspin": null
     },
     {
-      "name": "[Christmas Nightmare] Ishmael",
+      "name": "Christmas Nightmare",
       "sinner": "Ishmael",
       "sin": "Lust",
       "tier": "HE",
@@ -5990,7 +5990,7 @@
       "threadspin": 3
     },
     {
-      "name": "[Magic Bullet] Outis",
+      "name": "Magic Bullet",
       "sinner": "Outis",
       "sin": "Pride",
       "tier": "HE",
@@ -6003,7 +6003,7 @@
       "threadspin": 3
     },
     {
-      "name": "[Thoracalgia] Ryoshu",
+      "name": "Thoracalgia",
       "sinner": "Ryoshu",
       "sin": "Pride",
       "tier": "HE",
@@ -6016,7 +6016,7 @@
       "threadspin": 3
     },
     {
-      "name": "[Thoracalgia] Faust",
+      "name": "Thoracalgia",
       "sinner": "Faust",
       "sin": "Pride",
       "tier": "HE",
@@ -6029,7 +6029,7 @@
       "threadspin": 3
     },
     {
-      "name": "[Indicant's Trial] Rodion",
+      "name": "Indicant's Trial",
       "sinner": "Rodion",
       "sin": "Wrath",
       "tier": "WAW",
@@ -6042,7 +6042,7 @@
       "threadspin": 3
     },
     {
-      "name": "[Red Sheet] Don Quixote",
+      "name": "Red Sheet",
       "sinner": "Don Quixote",
       "sin": "Gluttony",
       "tier": "HE",
@@ -6055,7 +6055,7 @@
       "threadspin": 3
     },
     {
-      "name": "[Hundred-Footed Death Maggot 【螂蛆殺】] Ishmael",
+      "name": "Hundred-Footed Death Maggot 【螂蛆殺】",
       "sinner": "Ishmael",
       "sin": "Gloom",
       "tier": "ZAYIN",
@@ -6068,7 +6068,7 @@
       "threadspin": 3
     },
     {
-      "name": "[Tears of the Tarnished Blood 【汚血泣淚】] Hong Lu",
+      "name": "Tears of the Tarnished Blood 【汚血泣淚】",
       "sinner": "Hong Lu",
       "sin": "Gluttony",
       "tier": "WAW",
@@ -6081,7 +6081,7 @@
       "threadspin": 4
     },
     {
-      "name": "[Tears of the Tarnished Blood 【汚血泣淚】] Sinclair",
+      "name": "Tears of the Tarnished Blood 【汚血泣淚】",
       "sinner": "Sinclair",
       "sin": "Gluttony",
       "tier": "WAW",
@@ -6107,7 +6107,7 @@
       "threadspin": null
     },
     {
-      "name": "[Crushbound Past] Meursault",
+      "name": "Crushbound Past",
       "sinner": "Meursault",
       "sin": "Sloth",
       "tier": "WAW",
@@ -6120,7 +6120,7 @@
       "threadspin": 4
     },
     {
-      "name": "[Tidal Elegy] Ishmael",
+      "name": "Tidal Elegy",
       "sinner": "Ishmael",
       "sin": "Gloom",
       "tier": "HE",
@@ -6133,7 +6133,7 @@
       "threadspin": 3
     },
     {
-      "name": "[To Remain Oneself 【宁作吾】] Hong Lu",
+      "name": "To Remain Oneself 【宁作吾】",
       "sinner": "Hong Lu",
       "sin": "Pride",
       "tier": "HE",
@@ -6146,7 +6146,7 @@
       "threadspin": 4
     },
     {
-      "name": "[Command: Meltdown] Faust",
+      "name": "Command: Meltdown",
       "sinner": "Faust",
       "sin": "Gluttony",
       "tier": "HE",
@@ -6159,7 +6159,7 @@
       "threadspin": 4
     },
     {
-      "name": "[Unbrilliant Glory] Gregor",
+      "name": "Unbrilliant Glory",
       "sinner": "Gregor",
       "sin": "Sloth",
       "tier": "WAW",
@@ -6172,7 +6172,7 @@
       "threadspin": 4
     },
     {
-      "name": "[I'll Go fer Scissors. How 'Bout You?] Outis",
+      "name": "I'll Go fer Scissors. How 'Bout You?",
       "sinner": "Outis",
       "sin": "Envy",
       "tier": "ZAYIN",
@@ -6185,7 +6185,7 @@
       "threadspin": 3
     },
     {
-      "name": "[Move-in Reg.] Heathcliff",
+      "name": "Move-in Reg.",
       "sinner": "Heathcliff",
       "sin": "Envy",
       "tier": "TETH",
@@ -6198,7 +6198,7 @@
       "threadspin": 3
     },
     {
-      "name": "[Great Trichiliocosm 【三千大世界】] Yi Sang",
+      "name": "Great Trichiliocosm 【三千大世界】",
       "sinner": "Yi Sang",
       "sin": "Wrath",
       "tier": "WAW",
@@ -6211,7 +6211,7 @@
       "threadspin": 3
     },
     {
-      "name": "[Great Trichiliocosm 【三千大世界】] Ryoshu",
+      "name": "Great Trichiliocosm 【三千大世界】",
       "sinner": "Ryoshu",
       "sin": "Wrath",
       "tier": "WAW",
@@ -6224,7 +6224,7 @@
       "threadspin": 3
     },
     {
-      "name": "[Harmony] Sinclair",
+      "name": "Harmony",
       "sinner": "Sinclair",
       "sin": "Wrath",
       "tier": "HE",
@@ -6237,7 +6237,7 @@
       "threadspin": 3
     },
     {
-      "name": "[Ardor Blossom Star] Faust",
+      "name": "Ardor Blossom Star",
       "sinner": "Faust",
       "sin": "Wrath",
       "tier": "HE",

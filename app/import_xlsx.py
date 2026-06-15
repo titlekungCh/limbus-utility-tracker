@@ -218,7 +218,9 @@ def main():
         tier_raw = idl.cell(r, 3).value
         stars = str(tier_raw).count("Ø") if tier_raw else 0
         ids.append({
-            "name": clean(full) or clean(name),
+            # name = col A only (e.g. "LCB Sinner"); the "[name] sinner" combined
+            # form (col I) is just a formula, kept out of the editable data.
+            "name": clean(name),
             "sinner": clean(idl.cell(r, 2).value),
             "tier": "★" * stars if stars else "",
             "tierStars": stars,
@@ -242,7 +244,8 @@ def main():
         if not full and not short:
             continue
         egos.append({
-            "name": clean(full) or clean(short),
+            # name = col A only (e.g. "Crow's Eye View"); col J is the "[name] sinner" formula.
+            "name": clean(short),
             "sinner": clean(egl.cell(r, 2).value),
             "sin": clean(egl.cell(r, 3).value),
             "tier": clean(egl.cell(r, 4).value),

@@ -158,6 +158,20 @@ export const STATUS_FILL = {
   Sinking: "#3E6FA8", Poise: "#C9A227", Charge: "#3DA8B8",
 };
 
+// Uptie/Threadspin value 5 = "maxed" (ID Level col L cellIs "= 5" rule, theme accent4).
+export const SCALE_MAX5 = "#34A853";
+
+// Season tag colours (not in the xlsx — defined scheme). Priority for the whole
+// cell colour: Walpurgisnaught > season number > Standard Fare.
+export const SEASON_FILL = {
+  Walpurgisnaught: "#7E57C2", // purple
+  number: "#C9A227",          // gold (a season number tag, e.g. "7")
+  "Standard Fare": "#6E7B8B", // slate
+};
+
+// ID Tier (★ count) colours.
+export const TIER_FILL = { 1: "#B87333", 2: "#9FB0BE", 3: "#D4AF37" }; // copper / silver / gold
+
 // IF SS7 faction/source colours for the ID/EGO cells (G2:J13 conditional formatting).
 // {match, fill, font}; match is the substring searched (order matters).
 export const FACTION_COLORS = [

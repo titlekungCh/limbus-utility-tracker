@@ -4,7 +4,7 @@ import {
   SINNER_ORDER, SINNER_COLORS, LEVEL_FILL, LEVEL_FILL_DEFAULT, SCALE_STOPS,
   SHARD_TYPE_FILL, GACHA_TIER_FILL, DAY_FILL,
   EVENT_ITEM_FILL, EVENT_REWARD_FILL, SIN_ORDER, SIN_FILL,
-  STATUS_ORDER, STATUS_FILL, FACTION_COLORS,
+  STATUS_ORDER, STATUS_FILL, FACTION_COLORS, SCALE_MAX5, SEASON_FILL, TIER_FILL,
 } from "./constants.js";
 import {
   managerForecast, resourceForecast, shardPlanRows, idLeveling, SHARD_TYPES,
@@ -498,6 +498,7 @@ function levelColor(v) {
 }
 function scaleColor(v) {
   if (v == null || v === "") return null;
+  if (Number(v) >= 5) return fillColor(SCALE_MAX5); // uptie/threadspin "maxed" (ID Level col L "=5")
   let n = Math.max(0, Math.min(4, Number(v)));
   let lo = SCALE_STOPS[0], hi = SCALE_STOPS[2];
   if (n <= 2) { lo = SCALE_STOPS[0]; hi = SCALE_STOPS[1]; } else { lo = SCALE_STOPS[1]; hi = SCALE_STOPS[2]; }
@@ -516,6 +517,20 @@ const shardTypeColor = (t) => fillColor(SHARD_TYPE_FILL[t]);
 const gachaTierColor = (t) => fillColor(GACHA_TIER_FILL[t]);
 const dayColor = (d) => fillColor(DAY_FILL[d]);
 const sinColor = (s) => fillColor(SIN_FILL[s]);
+const tierColor = (v) => { const n = (String(v || "").match(/★/g) || []).length; return n ? fillColor(TIER_FILL[n]) : null; };
+const keywordTagColor = (tag) => fillColor(STATUS_FILL[tag]); // keyword tag coloured by status text
+function seasonTagColor(tag) { // per-tag season colour
+  if (tag === "Walpurgisnaught") return fillColor(SEASON_FILL.Walpurgisnaught);
+  if (/^\d+$/.test(tag)) return fillColor(SEASON_FILL.number);
+  if (tag === "Standard Fare") return fillColor(SEASON_FILL["Standard Fare"]);
+  return null;
+}
+function seasonCellColor(tags) { // whole-cell priority: Walp > number > Standard Fare
+  if (tags.some((t) => t === "Walpurgisnaught")) return fillColor(SEASON_FILL.Walpurgisnaught);
+  if (tags.some((t) => /^\d+$/.test(t))) return fillColor(SEASON_FILL.number);
+  if (tags.some((t) => t === "Standard Fare")) return fillColor(SEASON_FILL["Standard Fare"]);
+  return null;
+}
 // colour a cell by the first status keyword it contains (IF SS7 keyword cells / legend)
 function statusColor(text) {
   if (!text) return null;
@@ -564,6 +579,13 @@ function renderEditableList(viewId, arrayName, columns, searchKeys, makeBlank) {
     return [...set].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
   };
 
+  const chipHtml = (tc, t) => { const c = tc && tc(t); return c ? `<span class="chip" style="background:${c.fill};color:${c.font}">${esc(t)}</span>` : `<span class="chip plain">${esc(t)}</span>`; };
+  const tagSummary = (col, tags) => {
+    if (col.cellColor) return `<span class="tag" style="${styleAttr(col.cellColor(tags))}">${tags.length ? esc(tags.join(", ")) : "—"}</span>`;
+    if (col.tagColor) return tags.length ? tags.map((t) => chipHtml(col.tagColor, t)).join(" ") : "—";
+    return tags.length ? esc(tags.join(", ")) : "—";
+  };
+
   const cellHtml = (col, item, idx, tagOpts) => {
     const v = item[col.key];
     const st = col.color ? styleAttr(col.color(v, item)) : "";
@@ -576,11 +598,12 @@ function renderEditableList(viewId, arrayName, columns, searchKeys, makeBlank) {
       return `<td class="num"><input type="number" data-idx="${idx}" data-key="${col.key}" value="${v ?? ""}" style="${st}"/></td>`;
     if (col.type === "tags") {
       const tags = splitTags(v);
-      const label = tags.length ? tags.join(", ") : "—";
       const opts = tagOpts[col.key] || [];
-      return `<td class="season-cell"><details class="ms"><summary title="${esc(label)}">${esc(label)}</summary>
+      const optColor = col.optColor || col.tagColor;
+      const optLabel = (t) => (optColor && optColor(t) ? chipHtml(optColor, t) : esc(t));
+      return `<td class="season-cell"><details class="ms"><summary>${tagSummary(col, tags)}</summary>
         <div class="ms-panel" data-idx="${idx}" data-key="${col.key}">
-          ${opts.map((t) => `<label class="ms-opt"><input type="checkbox" data-tag="${esc(t)}" ${tags.includes(t) ? "checked" : ""}/> ${esc(t)}</label>`).join("")}
+          ${opts.map((t) => `<label class="ms-opt"><input type="checkbox" data-tag="${esc(t)}" ${tags.includes(t) ? "checked" : ""}/> ${optLabel(t)}</label>`).join("")}
           <div class="ms-add"><input type="text" class="ms-newtag" placeholder="+ add…"/></div>
         </div></details></td>`;
     }
@@ -641,9 +664,7 @@ function renderEditableList(viewId, arrayName, columns, searchKeys, makeBlank) {
       const added = [...checked].filter((t) => !prev.includes(t));
       const tags = [...kept, ...added];
       item[key] = tags.join(", ");
-      const sum = panel.parentElement.querySelector("summary");
-      sum.textContent = tags.length ? tags.join(", ") : "—";
-      sum.title = sum.textContent;
+      panel.parentElement.querySelector("summary").innerHTML = tagSummary(colByKey[key], tags);
       autosave();
       return;
     }
@@ -682,9 +703,9 @@ function renderIDs() {
   renderEditableList("ids", "ids", [
     { label: "ID Name", key: "name", type: "text", color: (v, it) => sinnerColor(it.sinner) },
     { label: "Sinner", key: "sinner", type: "select", options: SINNER_ORDER, color: (v) => sinnerColor(v) },
-    { label: "Tier", key: "tier", type: "select", options: ["★", "★★", "★★★"] },
-    { label: "Season", key: "season", type: "tags" },
-    { label: "Keyword", key: "keyword", type: "tags" },
+    { label: "Tier", key: "tier", type: "select", options: ["★", "★★", "★★★"], color: (v) => tierColor(v) },
+    { label: "Season", key: "season", type: "tags", cellColor: seasonCellColor, optColor: seasonTagColor },
+    { label: "Keyword", key: "keyword", type: "tags", tagColor: keywordTagColor },
     { label: "Extra Keyword", key: "extraKeyword", type: "tags" },
     { label: "Owned", key: "acquired", type: "check" },
     { label: "Level", key: "level", type: "num", color: (v) => levelColor(v) },
@@ -699,8 +720,8 @@ function renderEGOs() {
     { label: "Sinner", key: "sinner", type: "select", options: SINNER_ORDER, color: (v) => sinnerColor(v) },
     { label: "Sin", key: "sin", type: "select", options: SIN_ORDER, color: (v) => sinColor(v) },
     { label: "Grade", key: "tier", type: "select", options: ["ZAYIN", "TETH", "HE", "WAW"], color: (v) => shardTypeColor(v) },
-    { label: "Season", key: "season", type: "tags" },
-    { label: "Keyword", key: "keyword", type: "tags" },
+    { label: "Season", key: "season", type: "tags", cellColor: seasonCellColor, optColor: seasonTagColor },
+    { label: "Keyword", key: "keyword", type: "tags", tagColor: keywordTagColor },
     { label: "Extra Keyword", key: "extraKeyword", type: "tags" },
     { label: "Owned", key: "acquired", type: "check" },
     { label: "Threadspin", key: "threadspin", type: "num", color: (v) => scaleColor(v) },
