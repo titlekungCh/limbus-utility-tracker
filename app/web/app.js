@@ -5,7 +5,7 @@ import {
   SHARD_TYPE_FILL, GACHA_TIER_FILL, DAY_FILL,
   EVENT_ITEM_FILL, EVENT_REWARD_FILL, SIN_ORDER, SIN_FILL,
   STATUS_ORDER, STATUS_FILL, FACTION_COLORS, SCALE_MAX5, SEASON_FILL, TIER_FILL,
-  SEASON_NUMBER_FILL, KEYWORD_FILL, DAYS,
+  SEASON_NUMBER_FILL, KEYWORD_FILL, DAYS, INVENTORY_FILL,
 } from "./constants.js";
 
 // Most recent Thursday (the current patch), incl. today; local date as YYYY-MM-DD.
@@ -106,8 +106,12 @@ function renderDashboard() {
   const t = s.inventory.tickets;
 
   const kv = (rows) => rows.map(([k, v, big]) => `<div class="k">${esc(k)}</div><div class="v${big ? " big" : ""}">${esc(fmt(v))}</div>`).join("");
-  // editable number row (writes to a dotted state path on change)
-  const erow = (label, path, val, big) => `<div class="k">${esc(label)}</div><div class="v${big ? " big" : ""}"><input type="number" class="kv-num" data-path="${path}" value="${val ?? ""}"/></div>`;
+  // editable number row (writes to a dotted state path on change); optional colour
+  const erow = (label, path, val, big, color) => {
+    const st = color ? `background:${color.fill};color:${color.font};` : "";
+    return `<div class="k" style="${st}">${esc(label)}</div><div class="v${big ? " big" : ""}"><input type="number" class="kv-num" data-path="${path}" value="${val ?? ""}" style="${st}"/></div>`;
+  };
+  const invColor = (path) => fillColor(INVENTORY_FILL[path.replace("inventory.", "")]);
   const checks = (arr, labels) => arr.map((on, i) => `<span class="pill ${on ? "on" : "off"}">${esc(labels[i])}</span>`).join("");
 
   $("#dashboard").innerHTML = `
@@ -128,13 +132,13 @@ function renderDashboard() {
       <div class="card">
         <h2>Inventory</h2>
         <div class="body"><div class="kv">
-          ${erow("Crates", "inventory.crate", s.inventory.crate, true)}
-          ${erow("Limbus Pass Lv", "inventory.pass", s.inventory.pass)}
-          ${erow("Threads", "inventory.threads", s.inventory.threads)}
-          ${erow("IV Ticket", "inventory.tickets.IV", t.IV)}
-          ${erow("III Ticket", "inventory.tickets.III", t.III)}
-          ${erow("II Ticket", "inventory.tickets.II", t.II)}
-          ${erow("I Ticket", "inventory.tickets.I", t.I)}
+          ${erow("Crates", "inventory.crate", s.inventory.crate, true, invColor("inventory.crate"))}
+          ${erow("Limbus Pass Lv", "inventory.pass", s.inventory.pass, false, invColor("inventory.pass"))}
+          ${erow("Threads", "inventory.threads", s.inventory.threads, false, invColor("inventory.threads"))}
+          ${erow("IV Ticket", "inventory.tickets.IV", t.IV, false, invColor("inventory.tickets.IV"))}
+          ${erow("III Ticket", "inventory.tickets.III", t.III, false, invColor("inventory.tickets.III"))}
+          ${erow("II Ticket", "inventory.tickets.II", t.II, false, invColor("inventory.tickets.II"))}
+          ${erow("I Ticket", "inventory.tickets.I", t.I, false, invColor("inventory.tickets.I"))}
         </div></div>
       </div>
 

@@ -127,6 +127,12 @@ export const SHARD_TYPE_FILL = {
 // Gacha-tier fills (Inventory B36:M36/H5/L16).
 export const GACHA_TIER_FILL = { "1Star": "#FFC8AA", "2Star": "#FFCFC9", "3Star": "#FFE5A0" };
 
+// Inventory item fills (DataSheet I13:J15 crate/pass/threads, I30:K33 tickets).
+export const INVENTORY_FILL = {
+  crate: "#FFE599", pass: "#EA9999", threads: "#EFEFEF",
+  "tickets.I": "#C87329", "tickets.II": "#BDBDBD", "tickets.III": "#FFC000", "tickets.IV": "#02CFCB",
+};
+
 // Day-of-week fills (Inventory H18/J6/K14).
 export const DAY_FILL = {
   Mon: "#FFE5A0", Tue: "#FFC9EF", Wed: "#D4EDBC", Thurs: "#FFC8AA",
