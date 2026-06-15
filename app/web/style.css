@@ -156,6 +156,12 @@ table.sheet td select option { background: var(--panel); color: var(--text); }
 /* colored status tag (e.g. current day) */
 .tag { display: inline-block; padding: 2px 9px; border-radius: 10px; font-family: var(--mono); font-size: 12px; }
 
+/* per-word status chips (IF SS7 keyword cells + legend) */
+.chip { display: inline-block; padding: 1px 7px; margin: 1px; border-radius: 9px; font-size: 11px; white-space: nowrap; }
+.chip.plain { color: var(--muted); border: 1px solid var(--line); }
+td.kw { cursor: text; min-width: 90px; }
+td.kw input.kw-edit { width: 100%; box-sizing: border-box; }
+
 /* season multi-select (details/summary popover) */
 .season-cell details.ms { position: relative; }
 .season-cell summary {

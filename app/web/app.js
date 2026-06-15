@@ -529,6 +529,15 @@ function factionColor(text) {
   for (const f of FACTION_COLORS) if (s.includes(f.match)) return { fill: f.fill, font: f.font };
   return null;
 }
+// IF SS7 keyword cells hold space-separated statuses; colour EACH word (by text)
+function statusChips(text) {
+  if (text == null || text === "") return "";
+  return String(text).split(/\s+/).filter(Boolean).map((w) => {
+    const c = fillColor(STATUS_FILL[w]);
+    return c ? `<span class="chip" style="background:${c.fill};color:${c.font}">${esc(w)}</span>`
+      : `<span class="chip plain">${esc(w)}</span>`;
+  }).join(" ");
+}
 
 // ---------- ID / EGO editable, colour-coded tables ----------
 function renderEditableList(viewId, arrayName, columns, searchKeys, makeBlank) {
@@ -787,17 +796,19 @@ function renderIFSS7() {
   const statusCounts = statuses.map((s) => [s, cSub([12, 13, 14], s), cSub([15], s)]);
 
   const ec = (r, c, fn) => `<td><input type="text" data-r="${r}" data-c="${c}" value="${esc(g[r][c] ?? "")}" style="${styleAttr(fn(g[r][c]))}"/></td>`;
+  // keyword cell: coloured per status word (click to edit)
+  const kw = (r, c) => `<td class="kw" data-r="${r}" data-c="${c}">${statusChips(g[r][c])}</td>`;
   const mainRows = [];
   for (let r = 1; r <= 12; r++) {
     mainRows.push(`<tr><td style="${styleAttr(sinnerColor(g[r][0]))}">${esc(g[r][0] ?? "")}</td>` +
       ec(r, 1, factionColor) + ec(r, 2, factionColor) + ec(r, 3, factionColor) +
       ec(r, 6, factionColor) + ec(r, 7, factionColor) + ec(r, 8, factionColor) + ec(r, 9, factionColor) +
-      ec(r, 12, statusColor) + ec(r, 13, statusColor) + ec(r, 14, statusColor) + ec(r, 15, statusColor) + `</tr>`);
+      kw(r, 12) + kw(r, 13) + kw(r, 14) + kw(r, 15) + `</tr>`);
   }
   const kv2 = (rows) => rows.map(([k, v]) => `<div class="k">${esc(k)}</div><div class="v">${esc(v)}</div>`).join("");
   const legendRows = [];
   for (let r = 14; r <= 20 && r < g.length; r++)
-    legendRows.push(`<tr>${[13, 14, 15].map((c) => `<td style="${styleAttr(statusColor(g[r][c]))}">${esc(g[r][c] ?? "")}</td>`).join("")}</tr>`);
+    legendRows.push(`<tr>${[13, 14, 15].map((c) => `<td>${statusChips(g[r][c])}</td>`).join("")}</tr>`);
 
   const teamStart = 22, width = g[0] ? g[0].length : 13;
   const teamRows = [];
@@ -830,12 +841,25 @@ function renderIFSS7() {
     <div class="table-wrap"><table class="sheet"><tbody id="ifss7-teams">${teamRows.join("")}</tbody></table></div>`;
 
   // main block edits -> re-render so computed stats update
-  $("#ifss7-main").addEventListener("change", (e) => {
+  const main = $("#ifss7-main");
+  main.addEventListener("change", (e) => {
     const t = e.target;
-    if (t.dataset.r == null) return;
+    if (t.dataset.r == null) return;   // faction inputs only (kw-edit has no data-r)
     g[+t.dataset.r][+t.dataset.c] = t.value;
     renderIFSS7();
     autosave();
+  });
+  // keyword cells: click to edit, save on blur/Enter (re-render to recolour + update counts)
+  main.addEventListener("click", (e) => {
+    const cell = e.target.closest("td.kw");
+    if (!cell || cell.querySelector("input")) return;
+    const r = +cell.dataset.r, c = +cell.dataset.c;
+    cell.innerHTML = `<input type="text" class="kw-edit" value="${esc(g[r][c] ?? "")}"/>`;
+    const inp = cell.querySelector("input");
+    inp.focus();
+    inp.select();
+    inp.addEventListener("blur", () => { g[r][c] = inp.value; renderIFSS7(); autosave(); });
+    inp.addEventListener("keydown", (ev) => { if (ev.key === "Enter") { ev.preventDefault(); inp.blur(); } });
   });
   // team edits -> inline recolour (don't affect stats)
   const teams = $("#ifss7-teams");
