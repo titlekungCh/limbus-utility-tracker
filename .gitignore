@@ -1,0 +1,11 @@
+# app state backups
+app/data.json.bak
+
+# python
+__pycache__/
+*.pyc
+
+# os / editor
+Thumbs.db
+.DS_Store
+*.tmp

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Limbus Utility Tracker</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>Limbus Utility Tracker</h1>
+    <nav class="tabs" id="tabs">
+      <button class="tab active" data-tab="dashboard">Dashboard</button>
+      <button class="tab" data-tab="actions">Quick Buttons</button>
+      <button class="tab" data-tab="eventshop">Event Shop</button>
+      <button class="tab" data-tab="ids">IDs</button>
+      <button class="tab" data-tab="egos">EGOs</button>
+      <button class="tab" data-tab="teams">Bokgak Teams</button>
+      <button class="tab" data-tab="ifss7">IF SS7</button>
+    </nav>
+    <div class="save-area">
+      <span id="saveStatus" class="save-status">loading…</span>
+      <button id="saveBtn" class="btn-save">Save</button>
+    </div>
+  </header>
+
+  <main>
+    <section id="dashboard" class="view active"></section>
+    <section id="actions" class="view"></section>
+    <section id="eventshop" class="view"></section>
+    <section id="ids" class="view"></section>
+    <section id="egos" class="view"></section>
+    <section id="teams" class="view"></section>
+    <section id="ifss7" class="view"></section>
+  </main>
+
+  <div id="log" class="log" aria-live="polite"></div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

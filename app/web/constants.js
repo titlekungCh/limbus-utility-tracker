@@ -1,0 +1,172 @@
+// Constants ported verbatim from Code.gs (the Apps Script).
+// All "cost" numbers below mirror the original functions so the app behaves
+// identically to the spreadsheet's Quick Buttons menu.
+
+export const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thurs", "Fri", "Sat"];
+
+// changeShard(shardType, sinner): delta applied to a sinner's shard count.
+export const SHARD_DELTA = {
+  "1Star": 3,
+  "2Star": 15,
+  "3Star": 50,
+  S3S: -400,
+  UT4: -50,
+  "2SUT4": -30,
+  "3SUT4": -50,
+  ZAYIN: -80,
+  TETH: -90,
+  HE: -100,
+  WAW: -150,
+};
+
+export const GACHA_TIERS = ["1Star", "2Star", "3Star"];
+
+// Uptie menu: each entry = {threads, lunacy?, shard?:shardType}. shard applies to uptie sinner.
+export const UPTIE = {
+  ut2_00:     { label: "00 UT2 (10)",                threads: -10 },
+  ut3_00:     { label: "00 UT3 (40)",                threads: -40, lunacy: 40 },
+  ut4_00:     { label: "00 UT4 (100) +30 Shard",     threads: -100, shard: "2SUT4" },
+  ut3_00Ft1:  { label: "00 UT3 from UT1 (50)",       threads: -50, lunacy: 40 },
+  ut2_000:    { label: "000 UT2 (20)",               threads: -20 },
+  ut3_000:    { label: "000 UT3 (80)",               threads: -80, lunacy: 40 },
+  ut4_000:    { label: "000 UT4 (150) +50 Shard",    threads: -150, shard: "3SUT4" },
+  ut3_000Ft1: { label: "000 UT3 from UT1 (100)",     threads: -100, lunacy: 40 },
+  ut4_module: { label: "UT4 Module",                 threads: 0, lunacy: 40 },
+};
+
+// Thread-spinning menu, grouped by EGO grade. 4th step also shards the uptie sinner.
+export const THREADSPIN = {
+  ZAYIN: { TS2: -20, TS3: -60, TS3_1: -80,  TS4: -110, shard: "ZAYIN" },
+  TETH:  { TS2: -25, TS3: -70, TS3_1: -95,  TS4: -130, shard: "TETH"  },
+  HE:    { TS2: -30, TS3: -80, TS3_1: -110, TS4: -150, shard: "HE"    },
+  WAW:   { TS2: -35, TS3: -90, TS3_1: -125, TS4: -170, shard: "WAW"   },
+};
+
+// Lunacy extractions menu. Each entry = net {paid, total} deltas applied to
+// lunacy.paid and lunacy.total (free lunacy = total - paid is derived).
+// Mirrors pLCH (changes paid AND total) and fLCH (changes total only).
+export const LUNACY_ACTIONS = {
+  mthlyFLunacy: { label: "Monthly Free Lunacy (+65)",       total: 65 },
+  freePull:     { label: "Daily Paid Pull (-13)",          paid: -13, total: -13 },
+  mf6513Lunacy: { label: "Daily Paid Pull + Monthly Free", paid: -13, total: 91 }, // pLCH(-13)+fLCH(104)
+  f300Lunacy:   { label: "300 Free Lunacy",                total: 300 },
+  f500Lunacy:   { label: "500 Free Lunacy",                total: 500 },
+  f800Lunacy:   { label: "800 Free Lunacy",                total: 800 },
+  f1300Lunacy:  { label: "1300 Free Lunacy",               total: 1300 },
+  monthlyPL:    { label: "650 Paid Lunacy",                paid: 650, total: 650 },
+};
+
+// Ticket-grant menu.
+export const TICKET_ACTIONS = {
+  free10Pulls: { label: "Free Deca Ticket (+1)",       deca: 1 },
+  free10Sep:   { label: "Free 10 Single Tickets",      ext: 10 },
+  free1Sep:    { label: "Free 1 Single Ticket",        ext: 1 },
+};
+
+// Single-pull / 10-pull cost rules (pull1Pull / pull10Pulls in Code.gs).
+export const PULL = {
+  single: { ext: 1, lunacy: 130 },
+  deca:   { deca: 1, ext: 10, lunacy: 1300 },
+};
+
+// Manager-XP runs. xp = manager XP added; effects applied in logic.js by key.
+export const XP_RUNS = {
+  addDailyXP:  { label: "Daily Luxcavation" },          // xp from constants.dailyManagerXP
+  addNMDXP:    { label: "1 Normal MD Run",  xp: 100 },
+  addWBMDXP:   { label: "1 Weekly Bonus Hard MD", xp: 120 },
+  add3HMD:     { label: "3 Hard MD at once", xp: 360 },
+  addwNormal:  { label: "1 Weekly Normal MD", xp: 100 },
+};
+
+// Sinner name -> index (0..11), matching DataSheet J1..J12 order.
+export const SINNER_ORDER = [
+  "Yi Sang", "Faust", "Don Quixote", "Ryoshu", "Meursault", "Hong Lu",
+  "Heathcliff", "Ishmael", "Rodion", "Sinclair", "Outis", "Gregor",
+];
+
+// Per-sinner colours (fill + font) from the ID Level / EGO Tier conditional
+// formatting — applied to the ID/EGO name cell.
+export const SINNER_COLORS = {
+  "Yi Sang":     { fill: "#E8EAED", font: "#202124" },
+  "Faust":       { fill: "#FFCFC9", font: "#D92A2A" },
+  "Don Quixote": { fill: "#FFE5A0", font: "#202124" },
+  "Ryoshu":      { fill: "#D82E2E", font: "#F4CCCC" },
+  "Meursault":   { fill: "#BFE1F6", font: "#1C4587" },
+  "Hong Lu":     { fill: "#C6DBE1", font: "#073763" },
+  "Heathcliff":  { fill: "#E6CFF2", font: "#351C75" },
+  "Ishmael":     { fill: "#FFC076", font: "#20124D" },
+  "Rodion":      { fill: "#A22323", font: "#FFFFFF" },
+  "Sinclair":    { fill: "#D4EDBC", font: "#134F5C" },
+  "Outis":       { fill: "#85CAB1", font: "#EFEFEF" },
+  "Gregor":      { fill: "#DAA473", font: "#FCE5CD" },
+};
+
+// ID Level (col J) cellIs-equal fills; non-matching levels use the default.
+export const LEVEL_FILL = {
+  20: "#DAA473", 25: "#A22323", 30: "#D4EDBC", 35: "#E8EAED", 40: "#FFC076",
+  45: "#E6CFF2", 50: "#FFE5A0", 55: "#C6DBE1", 60: "#D82E2E", 65: "#BFE1F6",
+  70: "#85CAB1", 75: "#FFCFC9", 80: "#B10202", 85: "#FF0000",
+};
+export const LEVEL_FILL_DEFAULT = "#E8EAED";
+
+// Uptie / Threadspin 3-stop colour scale (0 -> red, 2 -> yellow, 4 -> green).
+export const SCALE_STOPS = [
+  { at: 0, rgb: [0xE6, 0x7C, 0x73] },
+  { at: 2, rgb: [0xFF, 0xD6, 0x66] },
+  { at: 4, rgb: [0x57, 0xBB, 0x8A] },
+];
+
+// Shard-type fills (Inventory B18/B26:M26/I4 conditional formatting).
+export const SHARD_TYPE_FILL = {
+  "EGO/3 Star": "#FF9E00", "2 3 Star + UT4": "#FFF243", "2 Star": "#B10202",
+  "000 UT4": "#FFE5A0", ZAYIN: "#D4EDBC", TETH: "#BFE1F6", HE: "#C6DBE1",
+  WAW: "#E6CFF2", None: "#E8EAED", "3 Star UT": "#FFE400", "00 UT4": "#B10202",
+  "2 3 Star": "#FFF243",
+};
+
+// Gacha-tier fills (Inventory B36:M36/H5/L16).
+export const GACHA_TIER_FILL = { "1Star": "#FFC8AA", "2Star": "#FFCFC9", "3Star": "#FFE5A0" };
+
+// Day-of-week fills (Inventory H18/J6/K14).
+export const DAY_FILL = {
+  Mon: "#FFE5A0", Tue: "#FFC9EF", Wed: "#D4EDBC", Thurs: "#FFC8AA",
+  Fri: "#BFE1F6", Sat: "#E6CFF2", Sun: "#FFCFC9",
+};
+
+// Event-shop header fills (Inventory A8:G8 items, A10:F10 rewards) — keyed by name.
+export const EVENT_ITEM_FILL = {
+  "IV Ticket": "#6D9EEB", "III Ticket": "#FFD966", Threads: "#FCE5CD", Crates: "#FFE599",
+  "Random Crates": "#EA9999", "Enkephalin Box": "#B6D7A8", "Extraction Ticket": "#FFF243",
+};
+export const EVENT_REWARD_FILL = {
+  "ID/EGO Reward": "#FF0000", Announcer: "#00FFFF", Banner: "#00FF00",
+  "Banner Effect": "#D9EAD3", Ticket: "#FFFF00", "Ticket Effect": "#FFF2CC",
+};
+
+// EGO Sin — canonical Limbus affinity colours (the sheet has no fill for these).
+export const SIN_ORDER = ["Wrath", "Lust", "Sloth", "Gluttony", "Gloom", "Pride", "Envy"];
+export const SIN_FILL = {
+  Wrath: "#C0392B", Lust: "#E67E22", Sloth: "#F1C40F", Gluttony: "#27AE60",
+  Gloom: "#2980B9", Pride: "#5B6BB5", Envy: "#8E44AD",
+};
+
+// Combat status colours (used for IF SS7 keyword cells & the status legend).
+// Search order = priority when a cell holds more than one status.
+export const STATUS_ORDER = ["Sinking", "Tremor", "Rupture", "Bleed", "Burn", "Poise", "Charge"];
+export const STATUS_FILL = {
+  Burn: "#E8623D", Bleed: "#B83232", Tremor: "#C99A3A", Rupture: "#C45A92",
+  Sinking: "#3E6FA8", Poise: "#C9A227", Charge: "#3DA8B8",
+};
+
+// IF SS7 faction/source colours for the ID/EGO cells (G2:J13 conditional formatting).
+// {match, fill, font}; match is the substring searched (order matters).
+export const FACTION_COLORS = [
+  { match: "Thumb", fill: "#F4CCCC", font: "#FF0000" },
+  { match: "Index", fill: "#134F5C", font: "#00FFFF" },
+  { match: "Middle", fill: "#EAD1DC", font: "#9900FF" },
+  { match: "Ring", fill: "#FCE5CD", font: "#FF9900" },
+  { match: "Pinky", fill: "#C9DAF8", font: "#4A86E8" },
+  { match: " Walp", fill: "#38761D", font: "#00FF00" },
+  { match: " Intv", fill: "#FFE400", font: "#202124" },
+  { match: " Bkgk", fill: "#FF9900", font: "#000000" },
+];
