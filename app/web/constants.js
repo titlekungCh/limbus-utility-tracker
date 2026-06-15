@@ -121,7 +121,7 @@ export const SHARD_TYPE_FILL = {
   "EGO/3 Star": "#FF9E00", "2 3 Star + UT4": "#FFF243", "2 Star": "#B10202",
   "000 UT4": "#FFE5A0", ZAYIN: "#D4EDBC", TETH: "#BFE1F6", HE: "#C6DBE1",
   WAW: "#E6CFF2", None: "#E8EAED", "3 Star UT": "#FFE400", "00 UT4": "#B10202",
-  "2 3 Star": "#FFF243",
+  "2 3 Star": "#FFF243", ALEPH: "#F2CFCF",
 };
 
 // Gacha-tier fills (Inventory B36:M36/H5/L16).

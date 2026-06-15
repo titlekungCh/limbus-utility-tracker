@@ -833,7 +833,7 @@ function renderEGOs() {
     { label: "EGO Name", key: "name", type: "text", color: (v, it) => sinnerColor(it.sinner) },
     { label: "Sinner", key: "sinner", type: "select", options: SINNER_ORDER, color: (v) => sinnerColor(v) },
     { label: "Sin", key: "sin", type: "select", options: SIN_ORDER, color: (v) => sinColor(v) },
-    { label: "Grade", key: "tier", type: "select", options: ["ZAYIN", "TETH", "HE", "WAW"], color: (v) => shardTypeColor(v) },
+    { label: "Grade", key: "tier", type: "select", options: ["ZAYIN", "TETH", "HE", "WAW", "ALEPH"], color: (v) => shardTypeColor(v) },
     { label: "Season", key: "season", type: "tags", tagColor: seasonTagColor },
     { label: "Keyword", key: "keyword", type: "tags", tagColor: keywordTagColor },
     { label: "Extra Keyword", key: "extraKeyword", type: "tags" },
