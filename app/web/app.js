@@ -5,7 +5,7 @@ import {
   SHARD_TYPE_FILL, GACHA_TIER_FILL, DAY_FILL,
   EVENT_ITEM_FILL, EVENT_REWARD_FILL, SIN_ORDER, SIN_FILL,
   STATUS_ORDER, STATUS_FILL, FACTION_COLORS, SCALE_MAX5, SEASON_FILL, TIER_FILL,
-  SEASON_NUMBER_FILL, KEYWORD_FILL, DAYS, INVENTORY_FILL,
+  SEASON_NUMBER_FILL, KEYWORD_FILL, DAYS, INVENTORY_FILL, LUNACY_FILL,
 } from "./constants.js";
 
 // Most recent Thursday (the current patch), incl. today; local date as YYYY-MM-DD.
@@ -112,6 +112,8 @@ function renderDashboard() {
     return `<div class="k" style="${st}">${esc(label)}</div><div class="v${big ? " big" : ""}"><input type="number" class="kv-num" data-path="${path}" value="${val ?? ""}" style="${st}"/></div>`;
   };
   const invColor = (path) => fillColor(INVENTORY_FILL[path.replace("inventory.", "")]);
+  // colored read-only row (e.g. derived Free Lunacy)
+  const srow = (label, val, big, color) => { const st = color ? `background:${color.fill};color:${color.font};` : ""; return `<div class="k" style="${st}">${esc(label)}</div><div class="v${big ? " big" : ""}" style="${st}">${esc(fmt(val))}</div>`; };
   const checks = (arr, labels) => arr.map((on, i) => `<span class="pill ${on ? "on" : "off"}">${esc(labels[i])}</span>`).join("");
 
   $("#dashboard").innerHTML = `
@@ -144,13 +146,13 @@ function renderDashboard() {
 
       <div class="card">
         <h2>Lunacy & Pulls</h2>
-        <div class="body"><div class="kv">${kv([
-          ["Total Lunacy", s.lunacy.total, true],
-          ["Paid Lunacy", s.lunacy.paid],
-          ["Free Lunacy", free],
-          ["Extraction Tickets", s.lunacy.extTickets],
-          ["Deca Tickets", s.lunacy.decaTickets],
-        ])}</div></div>
+        <div class="body"><div class="kv">
+          ${erow("Total Lunacy", "lunacy.total", s.lunacy.total, true, fillColor(LUNACY_FILL.lunacy))}
+          ${erow("Paid Lunacy", "lunacy.paid", s.lunacy.paid, false, fillColor(LUNACY_FILL.lunacy))}
+          ${srow("Free Lunacy", free, false, fillColor(LUNACY_FILL.lunacy))}
+          ${erow("Extraction Tickets", "lunacy.extTickets", s.lunacy.extTickets, false, fillColor(LUNACY_FILL.ticket))}
+          ${erow("Deca Tickets", "lunacy.decaTickets", s.lunacy.decaTickets, false, fillColor(LUNACY_FILL.ticket))}
+        </div></div>
       </div>
 
       <div class="card">
