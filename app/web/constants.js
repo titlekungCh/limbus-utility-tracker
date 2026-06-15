@@ -143,38 +143,39 @@ export const EVENT_REWARD_FILL = {
   "Banner Effect": "#D9EAD3", Ticket: "#FFFF00", "Ticket Effect": "#FFF2CC",
 };
 
-// EGO Sin — canonical Limbus affinity colours (the sheet has no fill for these).
+// EGO Sin colours (sampled from the user's reference image).
 export const SIN_ORDER = ["Wrath", "Lust", "Sloth", "Gluttony", "Gloom", "Pride", "Envy"];
 export const SIN_FILL = {
-  Wrath: "#C0392B", Lust: "#E67E22", Sloth: "#F1C40F", Gluttony: "#27AE60",
-  Gloom: "#2980B9", Pride: "#5B6BB5", Envy: "#8E44AD",
+  Wrath: "#F2CFCF", Lust: "#FFDAC6", Sloth: "#FFF6C6", Gluttony: "#D4EDBC",
+  Gloom: "#BFE1F6", Pride: "#C6C8E1", Envy: "#E6CFF2",
 };
 
-// Combat status colours (used for IF SS7 keyword cells & the status legend).
+// Combat status colours (sampled from the user's keyword reference image).
 // Search order = priority when a cell holds more than one status.
 export const STATUS_ORDER = ["Sinking", "Tremor", "Rupture", "Bleed", "Burn", "Poise", "Charge"];
 export const STATUS_FILL = {
-  Burn: "#E8623D", Bleed: "#B83232", Tremor: "#C99A3A", Rupture: "#C45A92",
-  Sinking: "#3E6FA8", Poise: "#C9A227", Charge: "#3DA8B8",
+  Burn: "#FF0000", Bleed: "#FF4F00", Tremor: "#FFED00", Rupture: "#00FF03",
+  Sinking: "#00FFFA", Poise: "#0021FF", Charge: "#AE00FF",
 };
+// Keyword tag colours = statuses plus "No Keyword".
+export const KEYWORD_FILL = { ...STATUS_FILL, "No Keyword": "#E9E8E8" };
 
 // Uptie/Threadspin value 5 = "maxed" (ID Level col L cellIs "= 5" rule, theme accent4).
 export const SCALE_MAX5 = "#34A853";
 
-// Season tag colours (defined scheme). Priority for the whole cell colour:
-// Walpurgisnaught > season number > Standard Fare. Season-number tags take the
-// matching sinner's colour (per user mapping); 11-15 (Walp-only) stay plain.
+// Season tag colours (sampled from the user's reference image). Priority for
+// the whole cell colour: Walpurgisnaught > season number > Standard Fare.
 export const SEASON_FILL = {
-  Walpurgisnaught: "#7E57C2", // purple
-  "Standard Fare": "#6E7B8B", // slate
+  Walpurgisnaught: "#38FF00",
+  "Standard Fare": "#FFD02E",
 };
-export const SEASON_NUMBER_SINNER = {
-  1: "Rodion", 2: "Yi Sang", 3: "Ishmael", 4: "Heathcliff", 5: "Don Quixote",
-  6: "Hong Lu", 7: "Ryoshu", 8: "Meursault", 9: "Outis", 10: "Faust",
+export const SEASON_NUMBER_FILL = {
+  1: "#A80000", 2: "#E2E2E2", 3: "#00CABF", 4: "#B32AFF", 5: "#FFE300",
+  6: "#00FFB5", 7: "#FF0000", 8: "#00809E", 9: "#007C60", 10: "#FFCFC9",
 };
 
-// ID Tier (★ count) colours.
-export const TIER_FILL = { 1: "#B87333", 2: "#9FB0BE", 3: "#D4AF37" }; // copper / silver / gold
+// ID Tier (★ count) colours (sampled from the user's reference image).
+export const TIER_FILL = { 1: "#966537", 2: "#FF1C00", 3: "#FFEC00" };
 
 // IF SS7 faction/source colours for the ID/EGO cells (G2:J13 conditional formatting).
 // {match, fill, font}; match is the substring searched (order matters).

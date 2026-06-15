@@ -5,7 +5,7 @@ import {
   SHARD_TYPE_FILL, GACHA_TIER_FILL, DAY_FILL,
   EVENT_ITEM_FILL, EVENT_REWARD_FILL, SIN_ORDER, SIN_FILL,
   STATUS_ORDER, STATUS_FILL, FACTION_COLORS, SCALE_MAX5, SEASON_FILL, TIER_FILL,
-  SEASON_NUMBER_SINNER,
+  SEASON_NUMBER_FILL, KEYWORD_FILL,
 } from "./constants.js";
 import {
   managerForecast, resourceForecast, shardPlanRows, idLeveling, SHARD_TYPES,
@@ -519,17 +519,17 @@ const gachaTierColor = (t) => fillColor(GACHA_TIER_FILL[t]);
 const dayColor = (d) => fillColor(DAY_FILL[d]);
 const sinColor = (s) => fillColor(SIN_FILL[s]);
 const tierColor = (v) => { const n = (String(v || "").match(/★/g) || []).length; return n ? fillColor(TIER_FILL[n]) : null; };
-const keywordTagColor = (tag) => fillColor(STATUS_FILL[tag]); // keyword tag coloured by status text
-function seasonTagColor(tag) { // per-tag season colour (number -> sinner colour)
+const keywordTagColor = (tag) => fillColor(KEYWORD_FILL[tag]); // keyword tag coloured by text
+function seasonTagColor(tag) { // per-tag season colour
   if (tag === "Walpurgisnaught") return fillColor(SEASON_FILL.Walpurgisnaught);
-  if (/^\d+$/.test(tag)) { const sn = SEASON_NUMBER_SINNER[tag]; return sn ? SINNER_COLORS[sn] : null; }
+  if (/^\d+$/.test(tag)) return fillColor(SEASON_NUMBER_FILL[tag]);
   if (tag === "Standard Fare") return fillColor(SEASON_FILL["Standard Fare"]);
   return null;
 }
-function seasonCellColor(tags) { // whole-cell priority: Walp > number(->sinner) > Standard Fare
+function seasonCellColor(tags) { // whole-cell priority: Walp > number > Standard Fare
   if (tags.some((t) => t === "Walpurgisnaught")) return fillColor(SEASON_FILL.Walpurgisnaught);
-  const num = tags.find((t) => /^\d+$/.test(t) && SEASON_NUMBER_SINNER[t]);
-  if (num) return SINNER_COLORS[SEASON_NUMBER_SINNER[num]];
+  const num = tags.find((t) => /^\d+$/.test(t) && SEASON_NUMBER_FILL[t]);
+  if (num) return fillColor(SEASON_NUMBER_FILL[num]);
   if (tags.some((t) => t === "Standard Fare")) return fillColor(SEASON_FILL["Standard Fare"]);
   return null;
 }
