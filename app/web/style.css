@@ -152,14 +152,17 @@ select, input[type=number] {
 .qty { width: 70px; }
 
 /* editable cells inside the sheet tables */
-table.sheet td input[type=text], table.sheet td input[type=number], table.sheet td select {
+table.sheet td input[type=text], table.sheet td input[type=number], table.sheet td input[type=date], table.sheet td select {
   width: 100%; box-sizing: border-box; border: 1px solid transparent; border-radius: 3px;
   padding: 3px 5px; font-size: 12px; background: transparent; color: var(--text);
   font-family: inherit;
 }
-table.sheet td input[type=text]:focus, table.sheet td input[type=number]:focus, table.sheet td select:focus {
+table.sheet td input[type=date] { color-scheme: dark; min-width: 120px; }
+table.sheet td input[type=text]:focus, table.sheet td input[type=number]:focus, table.sheet td input[type=date]:focus, table.sheet td select:focus {
   border-color: var(--gold); outline: none; background: #000a;
 }
+.ms-search { width: 100%; box-sizing: border-box; margin-bottom: 5px; padding: 3px 6px;
+  background: var(--cell); color: var(--text); border: 1px solid var(--line); border-radius: 4px; }
 table.sheet td select option { background: var(--panel); color: var(--text); }
 
 /* colored status tag (e.g. current day) */

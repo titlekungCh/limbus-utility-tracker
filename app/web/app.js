@@ -32,6 +32,8 @@ const $ = (sel, root = document) => root.querySelector(sel);
 const el = (html) => { const t = document.createElement("template"); t.innerHTML = html.trim(); return t.content.firstElementChild; };
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const fmt = (n) => { if (n == null || n === "") return ""; const r = Math.round(Number(n) * 100) / 100; return Number.isInteger(r) ? String(r) : r.toFixed(2).replace(/0$/, ""); };
+// Limbus Pass level: no decimals when whole, 1 decimal otherwise.
+const fmtPass = (v) => { const n = Number(v); return Number.isInteger(n) ? String(n) : n.toFixed(1); };
 const selectHtml = (id, options, current, color) =>
   `<select id="${id}" class="kv-select" style="${color ? `background:${color.fill};color:${color.font};` : ""}">${options.map((o) => `<option ${o === current ? "selected" : ""}>${esc(o)}</option>`).join("")}</select>`;
 
@@ -141,7 +143,7 @@ function renderDashboard() {
         <h2>Inventory</h2>
         <div class="body"><div class="kv">
           ${erow("Crates", "inventory.crate", s.inventory.crate, true, invColor("inventory.crate"))}
-          ${erow("Limbus Pass Lv", "inventory.pass", s.inventory.pass, false, invColor("inventory.pass"))}
+          ${erow("Limbus Pass Lv", "inventory.pass", fmtPass(s.inventory.pass), false, invColor("inventory.pass"))}
           ${erow("Threads", "inventory.threads", s.inventory.threads, false, invColor("inventory.threads"))}
           ${erow("IV Ticket", "inventory.tickets.IV", t.IV, false, invColor("inventory.tickets.IV"))}
           ${erow("III Ticket", "inventory.tickets.III", t.III, false, invColor("inventory.tickets.III"))}
@@ -375,8 +377,9 @@ function renderEgoThreadspin() {
       <div class="k">Grade</div><div class="v" style="${gradeSt}">${res ? esc(res.grade || "—") : "—"}</div>
       <div class="k">Current TS</div><div class="v" style="${curSt}">${res ? esc(res.current ?? "—") : "—"}</div>
       <div class="k">Threads Needed</div><div class="v big">${res ? fmt(res.threads) : "—"}</div>
-      <div class="k">EGO Shard Needed</div><div class="v">${res ? fmt(res.shard) : "—"}</div>
       <div class="k">Threads Left After</div><div class="v">${res ? fmt(res.threadsLeft) : "—"}</div>
+      <div class="k">EGO Shard Needed</div><div class="v">${res ? fmt(res.shard) : "—"}</div>
+      <div class="k">${res ? esc(res.sinner) : ""} Shard Left After</div><div class="v" style="${selSt}">${res ? fmt(res.shardLeft) : "—"}</div>
     </div>`;
   $("#egots-name").addEventListener("change", (e) => { egoTSel.idx = +e.target.value; renderEgoThreadspin(); });
   $("#egots-target").addEventListener("change", (e) => { egoTSel.target = Number(e.target.value) || 1; renderEgoThreadspin(); });
@@ -694,10 +697,13 @@ function renderEditableList(viewId, arrayName, columns, searchKeys, makeBlank) {
       const optLabel = (t) => (optColor && optColor(t) ? chipHtml(optColor, t) : esc(t));
       return `<td class="season-cell"><details class="ms"><summary>${tagSummary(col, tags)}</summary>
         <div class="ms-panel" data-idx="${idx}" data-key="${col.key}">
+          ${opts.length > 10 ? `<input type="text" class="ms-search" placeholder="search…"/>` : ""}
           ${opts.map((t) => `<label class="ms-opt"><input type="checkbox" data-tag="${esc(t)}" ${tags.includes(t) ? "checked" : ""}/> ${optLabel(t)}</label>`).join("")}
           <div class="ms-add"><input type="text" class="ms-newtag" placeholder="+ add…"/></div>
         </div></details></td>`;
     }
+    if (col.type === "date")
+      return `<td><input type="date" data-idx="${idx}" data-key="${col.key}" value="${esc(v ?? "")}"/></td>`;
     return `<td><input type="text" data-idx="${idx}" data-key="${col.key}" value="${esc(v ?? "")}" style="${st}"/></td>`;
   };
 
@@ -741,6 +747,7 @@ function renderEditableList(viewId, arrayName, columns, searchKeys, makeBlank) {
     // --- multi-select tags (season / keyword / extra keyword) ---
     const panel = t.closest(".ms-panel");
     if (panel) {
+      if (t.classList.contains("ms-search")) return; // filter input, not a tag edit
       const item = state[arrayName][+panel.dataset.idx];
       const key = panel.dataset.key;
       if (t.classList.contains("ms-newtag")) {
@@ -783,6 +790,14 @@ function renderEditableList(viewId, arrayName, columns, searchKeys, makeBlank) {
     draw();
     autosave();
   });
+  // live filter for searchable tag dropdowns (e.g. Extra Keyword)
+  body.addEventListener("input", (e) => {
+    if (!e.target.classList.contains("ms-search")) return;
+    const q = e.target.value.toLowerCase();
+    e.target.closest(".ms-panel").querySelectorAll(".ms-opt").forEach((opt) => {
+      opt.style.display = opt.textContent.toLowerCase().includes(q) ? "" : "none";
+    });
+  });
   $("#" + viewId + "-search").addEventListener("input", draw);
   $("#" + viewId + "-owned").addEventListener("change", draw);
   $("#" + viewId + "-add").addEventListener("click", () => {
@@ -808,8 +823,8 @@ function renderIDs() {
     { label: "Level", key: "level", type: "num", color: (v) => levelColor(v) },
     { label: "Lv Extra", key: "levelExtra", type: "num" },
     { label: "Uptie", key: "uptie", type: "num", color: (v) => scaleColor(v) },
-    { label: "Released", key: "release", type: "text" },
-    { label: "Internal ID", key: "internalId", type: "num" },
+    { label: "Released", key: "release", type: "date" },
+    { label: "Int. ID", key: "internalId", type: "num" },
   ], ["name", "sinner", "keyword", "extraKeyword", "season"],
     () => ({ name: "", sinner: "Yi Sang", tier: "★★★", tierStars: 3, season: "", keyword: "", extraKeyword: "", acquired: false, level: null, levelExtra: 0, uptie: null, release: "", internalId: null }));
 }
@@ -824,8 +839,8 @@ function renderEGOs() {
     { label: "Extra Keyword", key: "extraKeyword", type: "tags" },
     { label: "Owned", key: "acquired", type: "check" },
     { label: "Threadspin", key: "threadspin", type: "num", color: (v) => scaleColor(v) },
-    { label: "Released", key: "release", type: "text" },
-    { label: "Internal ID", key: "internalId", type: "num" },
+    { label: "Released", key: "release", type: "date" },
+    { label: "Int. ID", key: "internalId", type: "num" },
   ], ["name", "sinner", "sin", "keyword", "extraKeyword", "season"],
     () => ({ name: "", sinner: "Yi Sang", sin: "", tier: "ZAYIN", season: "", keyword: "", extraKeyword: "", acquired: false, threadspin: null, release: "", internalId: null }));
 }

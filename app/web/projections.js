@@ -135,11 +135,15 @@ export function egoThreadspin(s, idx, target) {
     threads = Math.max(0, cum[tgt] - cum[cur]);
     shard = (cur < 4 && tgt >= 4) ? Math.abs(SHARD_DELTA[grade] || 0) : 0; // TS4 shards once
   }
+  // EGO shard comes from the sinner the EGO belongs to.
+  const sinnerObj = s.sinners.find((x) => x.name === ego.sinner);
+  const shardOwned = sinnerObj ? sinnerObj.shards : 0;
   return {
     name: ego.name, sinner: ego.sinner, grade, valid: !!cum,
     current: curRaw, currentNum: cur, target: tgt,
     threads, shard,
     threadsOwned: s.inventory.threads, threadsLeft: round2(s.inventory.threads - threads),
+    shardOwned, shardLeft: round2(shardOwned - shard),
   };
 }
 
