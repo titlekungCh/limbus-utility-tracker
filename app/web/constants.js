@@ -130,6 +130,10 @@ export const GACHA_TIER_FILL = { "1Star": "#FFC8AA", "2Star": "#FFCFC9", "3Star"
 // Lunacy & ticket fills (Lunacy sheet A1:E1).
 export const LUNACY_FILL = { lunacy: "#F4CCCC", ticket: "#FFE599" };
 
+// Daily-left / weekly-left value fills (Inventory H18 / I18 conditional formatting).
+export const DAILY_LEFT_FILL = { 1: "#FFC9EF", 2: "#FFE5A0", 3: "#FFCFC9", 4: "#E6CFF2", 5: "#BFE1F6", 6: "#FFC8AA", 7: "#D4EDBC" };
+export const WEEKLY_LEFT_FILL = { 0: "#FFE5A0", 1: "#BFE1F6", 2: "#FFC8AA", 5: "#D4EDBC" };
+
 // Inventory item fills (DataSheet I13:J15 crate/pass/threads, I30:K33 tickets).
 export const INVENTORY_FILL = {
   crate: "#FFE599", pass: "#EA9999", threads: "#EFEFEF",

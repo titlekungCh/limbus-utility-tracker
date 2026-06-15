@@ -6,6 +6,7 @@ import {
   EVENT_ITEM_FILL, EVENT_REWARD_FILL, SIN_ORDER, SIN_FILL,
   STATUS_ORDER, STATUS_FILL, FACTION_COLORS, SCALE_MAX5, SEASON_FILL, TIER_FILL,
   SEASON_NUMBER_FILL, KEYWORD_FILL, DAYS, INVENTORY_FILL, LUNACY_FILL,
+  DAILY_LEFT_FILL, WEEKLY_LEFT_FILL,
 } from "./constants.js";
 
 // Most recent Thursday (the current patch), incl. today; local date as YYYY-MM-DD.
@@ -158,12 +159,14 @@ function renderDashboard() {
       <div class="card">
         <h2>Mirror Dungeon</h2>
         <div class="body">
-          <div class="kv">${kv([
-            ["Daily left", s.md.dailyLeft],
-            ["Weekly left", s.md.weeklyLeft],
-            ["Normal left total", s.md.normalLeftTotal],
-            ["Week til Season end", s.weekTilSeasonEnd],
-          ])}</div>
+          <div class="kv">
+            ${srow("Daily left", s.md.dailyLeft, false, fillColor(DAILY_LEFT_FILL[s.md.dailyLeft]))}
+            ${srow("Weekly left", s.md.weeklyLeft, false, fillColor(WEEKLY_LEFT_FILL[s.md.weeklyLeft]))}
+            ${kv([
+              ["Normal left total", s.md.normalLeftTotal],
+              ["Week til Season end", s.weekTilSeasonEnd],
+            ])}
+          </div>
           <div class="subhead">Hard MD</div>
           <div class="checks">${s.md.hard.map((on, i) => mdPill(on, (s.md.hardStatus || [])[i] || `${i + 1} Hard`)).join("")}</div>
           <div class="subhead">Normal MD</div>
