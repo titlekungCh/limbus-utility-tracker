@@ -17,11 +17,12 @@ function currentPatchISO() {
 }
 import {
   managerForecast, resourceForecast, shardPlanRows, idLeveling, SHARD_TYPES,
-  eventShop, REWARD_TYPES,
+  eventShop, REWARD_TYPES, egoThreadspin,
 } from "./projections.js";
 
-// persists across dashboard re-renders (idx into state.ids)
+// persists across dashboard re-renders (idx into state.ids / state.egos)
 let idLevelSel = { idx: null, target: 60 };
+let egoTSel = { idx: null, target: 5 };
 
 let state = null;
 let dirty = false;
@@ -279,6 +280,11 @@ function renderForecast() {
         <div class="body" id="idlevel-body"></div>
       </div>
 
+      <div class="card" id="egots-card">
+        <h2>EGO Threadspinning Calculator</h2>
+        <div class="body" id="egots-body"></div>
+      </div>
+
       <div class="card" style="grid-column: 1 / -1;">
         <h2>Shard Planning <span class="count">(set Type &amp; Enabled — Needed/Owned/Crate/Thread are derived, and roll up into the Crate Forecast)</span></h2>
         <div class="body" style="padding:0;">
@@ -312,6 +318,7 @@ function renderForecast() {
   });
 
   renderIdLeveling();
+  renderEgoThreadspin();
 }
 
 function renderIdLeveling() {
@@ -345,6 +352,34 @@ function renderIdLeveling() {
     <div class="kv">${ticketRows}</div>`;
   $("#idlevel-name").addEventListener("change", (e) => { idLevelSel.idx = +e.target.value; renderIdLeveling(); });
   $("#idlevel-target").addEventListener("change", (e) => { idLevelSel.target = Number(e.target.value) || 1; renderIdLeveling(); });
+}
+
+function renderEgoThreadspin() {
+  if (egoTSel.idx == null && state.egos.length) {
+    const i = state.egos.findIndex((x) => x.acquired);
+    egoTSel.idx = i >= 0 ? i : 0;
+  }
+  const res = egoThreadspin(state, egoTSel.idx, egoTSel.target);
+  const body = $("#egots-body");
+  if (!body) return;
+  const selEgo = state.egos[egoTSel.idx];
+  const selSt = styleAttr(selEgo ? sinnerColor(selEgo.sinner) : null);  // EGO dropdown -> sinner colour
+  const gradeSt = res ? styleAttr(shardTypeColor(res.grade)) : "";       // grade -> ZAYIN/TETH/HE/WAW colour
+  const curSt = res ? styleAttr(scaleColor(res.currentNum)) : "";
+  body.innerHTML = `
+    <div class="field"><label>EGO</label>
+      <select id="egots-name" style="${selSt}">${state.egos.map((x, i) => `<option value="${i}" ${i === egoTSel.idx ? "selected" : ""}>[${esc(x.name)}] ${esc(x.sinner)}</option>`).join("")}</select></div>
+    <div class="field"><label>Target TS</label>
+      <input type="number" id="egots-target" class="qty" min="1" max="5" value="${egoTSel.target}"/></div>
+    <div class="kv" style="margin-top:6px;">
+      <div class="k">Grade</div><div class="v" style="${gradeSt}">${res ? esc(res.grade || "—") : "—"}</div>
+      <div class="k">Current TS</div><div class="v" style="${curSt}">${res ? esc(res.current ?? "—") : "—"}</div>
+      <div class="k">Threads Needed</div><div class="v big">${res ? fmt(res.threads) : "—"}</div>
+      <div class="k">EGO Shard Needed</div><div class="v">${res ? fmt(res.shard) : "—"}</div>
+      <div class="k">Threads Left After</div><div class="v">${res ? fmt(res.threadsLeft) : "—"}</div>
+    </div>`;
+  $("#egots-name").addEventListener("change", (e) => { egoTSel.idx = +e.target.value; renderEgoThreadspin(); });
+  $("#egots-target").addEventListener("change", (e) => { egoTSel.target = Number(e.target.value) || 1; renderEgoThreadspin(); });
 }
 
 // ---------- Intervallo event shop (editable planner) ----------

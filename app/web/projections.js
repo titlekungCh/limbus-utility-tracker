@@ -1,5 +1,6 @@
 // Projection/forecast calculations ported from the Inventory sheet formulas.
 // Each was verified against the spreadsheet's cached values.
+import { THREADSPIN, SHARD_DELTA } from "./constants.js";
 const round2 = (n) => Math.round(n * 100) / 100;
 
 // Manager XP: "After 1..7 Daily" and "+1 MD" (Inventory I10:I16 / J10:J16),
@@ -110,6 +111,37 @@ export function idLeveling(s, idx, target) {
 }
 
 export const SHARD_TYPES = (s) => s.constants.shardTable.map((t) => t.type);
+
+// EGO threadspinning: threads + EGO shard to spin from current TS to target TS,
+// using the Thread Spinning quick-button costs per grade (TS4 also shards).
+// Cumulative threads to reach TS level (1..5); TS5 == TS4 (no further spin step).
+export const TS_MAX = 5;
+function tsCumulative(grade) {
+  const c = THREADSPIN[grade];
+  if (!c) return null;
+  const a = Math.abs(c.TS2), b = Math.abs(c.TS3), d = Math.abs(c.TS4);
+  return [null, 0, a, a + b, a + b + d, a + b + d]; // index 1..5
+}
+export function egoThreadspin(s, idx, target) {
+  const ego = s.egos[idx];
+  if (!ego) return null;
+  const grade = ego.tier;
+  const cum = tsCumulative(grade);
+  const curRaw = ego.threadspin;
+  const clamp = (v) => Math.max(1, Math.min(TS_MAX, Math.round(Number(v) || 1)));
+  const cur = clamp(curRaw), tgt = clamp(target);
+  let threads = 0, shard = 0;
+  if (cum) {
+    threads = Math.max(0, cum[tgt] - cum[cur]);
+    shard = (cur < 4 && tgt >= 4) ? Math.abs(SHARD_DELTA[grade] || 0) : 0; // TS4 shards once
+  }
+  return {
+    name: ego.name, sinner: ego.sinner, grade, valid: !!cum,
+    current: curRaw, currentNum: cur, target: tgt,
+    threads, shard,
+    threadsOwned: s.inventory.threads, threadsLeft: round2(s.inventory.threads - threads),
+  };
+}
 
 // ---- Intervallo event-shop planner (Inventory A1:G13) ----
 export const REWARD_TYPES = ["EGO", "000 ID", "00 ID"];
