@@ -22,7 +22,7 @@ import {
 
 // persists across dashboard re-renders (idx into state.ids / state.egos)
 let idLevelSel = { idx: null, target: 60 };
-let egoTSel = { idx: null, target: 5 };
+let egoTSel = { idx: null, target: 4 };
 
 let state = null;
 let dirty = false;
