@@ -63,6 +63,23 @@ function act(fn) {
   autosave();
 }
 
+// Set a dotted state path (supports array indices, e.g. "sinners.3.shards").
+function setByPath(obj, path, val) {
+  const p = path.split(".");
+  let o = obj;
+  for (let i = 0; i < p.length - 1; i++) o = o[p[i]];
+  o[p[p.length - 1]] = val;
+}
+// Delegated handler for editable number inputs on the Dashboard (data-path).
+function dashboardEdit(e) {
+  const t = e.target;
+  if (!t.dataset || !t.dataset.path) return;
+  setByPath(state, t.dataset.path, t.value === "" ? 0 : Number(t.value));
+  recompute(state);
+  renderDashboard();
+  autosave();
+}
+
 // Update a dotted state path (e.g. "uptie.sinner") and keep the Dashboard
 // Status card and the Quick Buttons selectors in sync, then save.
 function setSelection(path, value) {
@@ -82,6 +99,8 @@ function renderDashboard() {
   const t = s.inventory.tickets;
 
   const kv = (rows) => rows.map(([k, v, big]) => `<div class="k">${esc(k)}</div><div class="v${big ? " big" : ""}">${esc(fmt(v))}</div>`).join("");
+  // editable number row (writes to a dotted state path on change)
+  const erow = (label, path, val, big) => `<div class="k">${esc(label)}</div><div class="v${big ? " big" : ""}"><input type="number" class="kv-num" data-path="${path}" value="${val ?? ""}"/></div>`;
   const checks = (arr, labels) => arr.map((on, i) => `<span class="pill ${on ? "on" : "off"}">${esc(labels[i])}</span>`).join("");
 
   $("#dashboard").innerHTML = `
@@ -89,11 +108,11 @@ function renderDashboard() {
       <div class="card">
         <h2>Manager</h2>
         <div class="body">
-          <div class="kv">${kv([
-            ["Level", s.manager.level, true],
-            ["Current XP", s.manager.currentXP],
-            ["Next Level XP", s.manager.nextLevelXP],
-          ])}</div>
+          <div class="kv">
+            ${erow("Level", "manager.level", s.manager.level, true)}
+            ${erow("Current XP", "manager.currentXP", s.manager.currentXP)}
+            ${kv([["Next Level XP", s.manager.nextLevelXP]])}
+          </div>
           <div class="bar"><span style="width:${pct}%"></span></div>
           <div class="bar-label">${fmt(s.manager.currentXP)} / ${fmt(s.manager.nextLevelXP)} (${pct.toFixed(1)}%)</div>
         </div>
@@ -101,12 +120,15 @@ function renderDashboard() {
 
       <div class="card">
         <h2>Inventory</h2>
-        <div class="body"><div class="kv">${kv([
-          ["Crates", s.inventory.crate, true],
-          ["Limbus Pass Lv", s.inventory.pass],
-          ["Threads", s.inventory.threads],
-          ["IV Ticket", t.IV], ["III Ticket", t.III], ["II Ticket", t.II], ["I Ticket", t.I],
-        ])}</div></div>
+        <div class="body"><div class="kv">
+          ${erow("Crates", "inventory.crate", s.inventory.crate, true)}
+          ${erow("Limbus Pass Lv", "inventory.pass", s.inventory.pass)}
+          ${erow("Threads", "inventory.threads", s.inventory.threads)}
+          ${erow("IV Ticket", "inventory.tickets.IV", t.IV)}
+          ${erow("III Ticket", "inventory.tickets.III", t.III)}
+          ${erow("II Ticket", "inventory.tickets.II", t.II)}
+          ${erow("I Ticket", "inventory.tickets.I", t.I)}
+        </div></div>
       </div>
 
       <div class="card">
@@ -162,8 +184,9 @@ function renderDashboard() {
           <table class="sheet">
             <thead><tr><th>Sinner</th>${SINNER_ORDER.map((n) => `<th style="${styleAttr(sinnerColor(n))}">${esc(state.sinners.find((x) => x.name === n)?.acronym || n)}</th>`).join("")}</tr></thead>
             <tbody><tr><td>Shards</td>${SINNER_ORDER.map((n) => {
-              const sh = state.sinners.find((x) => x.name === n)?.shards ?? 0;
-              return `<td class="num ${sh < 50 ? "shard-low" : "shard-ok"}">${fmt(sh)}</td>`;
+              const i = state.sinners.findIndex((x) => x.name === n);
+              const sh = state.sinners[i]?.shards ?? 0;
+              return `<td class="num"><input type="number" class="kv-num ${sh < 50 ? "shard-low" : "shard-ok"}" data-path="sinners.${i}.shards" value="${sh}"/></td>`;
             }).join("")}</tr></tbody>
           </table>
         </div>
@@ -706,7 +729,7 @@ function renderIDs() {
     { label: "ID Name", key: "name", type: "text", color: (v, it) => sinnerColor(it.sinner) },
     { label: "Sinner", key: "sinner", type: "select", options: SINNER_ORDER, color: (v) => sinnerColor(v) },
     { label: "Tier", key: "tier", type: "select", options: ["★", "★★", "★★★"], color: (v) => tierColor(v) },
-    { label: "Season", key: "season", type: "tags", cellColor: seasonCellColor, optColor: seasonTagColor },
+    { label: "Season", key: "season", type: "tags", tagColor: seasonTagColor },
     { label: "Keyword", key: "keyword", type: "tags", tagColor: keywordTagColor },
     { label: "Extra Keyword", key: "extraKeyword", type: "tags" },
     { label: "Owned", key: "acquired", type: "check" },
@@ -722,7 +745,7 @@ function renderEGOs() {
     { label: "Sinner", key: "sinner", type: "select", options: SINNER_ORDER, color: (v) => sinnerColor(v) },
     { label: "Sin", key: "sin", type: "select", options: SIN_ORDER, color: (v) => sinColor(v) },
     { label: "Grade", key: "tier", type: "select", options: ["ZAYIN", "TETH", "HE", "WAW"], color: (v) => shardTypeColor(v) },
-    { label: "Season", key: "season", type: "tags", cellColor: seasonCellColor, optColor: seasonTagColor },
+    { label: "Season", key: "season", type: "tags", tagColor: seasonTagColor },
     { label: "Keyword", key: "keyword", type: "tags", tagColor: keywordTagColor },
     { label: "Extra Keyword", key: "extraKeyword", type: "tags" },
     { label: "Owned", key: "acquired", type: "check" },
@@ -927,6 +950,7 @@ window.addEventListener("beforeunload", (e) => { if (dirty) { e.preventDefault()
     return;
   }
   recompute(state);
+  $("#dashboard").addEventListener("change", dashboardEdit); // once; #dashboard persists across re-renders
   renderDashboard();
   renderActions();
   renderEventShop();
