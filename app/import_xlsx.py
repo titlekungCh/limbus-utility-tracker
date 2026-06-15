@@ -123,6 +123,9 @@ def main():
             "normalLeftTotal": num(I("J18")),
             "hard": [bool(I("H20")), bool(I("I20")), bool(I("J20"))],
             "normal": [bool(I("H22")), bool(I("I22")), bool(I("J22"))],
+            # status theme per MD slot (H21:J21 hard, H23:J23 normal)
+            "hardStatus": [clean(I("H21")), clean(I("I21")), clean(I("J21"))],
+            "normalStatus": [clean(I("H23")), clean(I("I23")), clean(I("J23"))],
             "rental": bool(I("K20")),
             "rentalWeek": int(num(I("K22"))),
             # N17:N22 schedule checkboxes

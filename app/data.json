@@ -40,6 +40,16 @@
       false,
       true
     ],
+    "hardStatus": [
+      "Poise Rupture",
+      "Sinking",
+      "Bleed"
+    ],
+    "normalStatus": [
+      "Tremor",
+      "Burn",
+      "Charge"
+    ],
     "rental": true,
     "rentalWeek": 1,
     "schedule": [

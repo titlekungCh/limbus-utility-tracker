@@ -5,8 +5,15 @@ import {
   SHARD_TYPE_FILL, GACHA_TIER_FILL, DAY_FILL,
   EVENT_ITEM_FILL, EVENT_REWARD_FILL, SIN_ORDER, SIN_FILL,
   STATUS_ORDER, STATUS_FILL, FACTION_COLORS, SCALE_MAX5, SEASON_FILL, TIER_FILL,
-  SEASON_NUMBER_FILL, KEYWORD_FILL,
+  SEASON_NUMBER_FILL, KEYWORD_FILL, DAYS,
 } from "./constants.js";
+
+// Most recent Thursday (the current patch), incl. today; local date as YYYY-MM-DD.
+function currentPatchISO() {
+  const d = new Date();
+  d.setDate(d.getDate() - ((d.getDay() - 4 + 7) % 7));
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
 import {
   managerForecast, resourceForecast, shardPlanRows, idLeveling, SHARD_TYPES,
   eventShop, REWARD_TYPES,
@@ -152,10 +159,10 @@ function renderDashboard() {
             ["Week til Season end", s.weekTilSeasonEnd],
           ])}</div>
           <div class="subhead">Hard MD</div>
-          <div class="checks">${checks(s.md.hard, ["1 Hard", "2 Hard", "3 Hard"])}</div>
+          <div class="checks">${s.md.hard.map((on, i) => mdPill(on, (s.md.hardStatus || [])[i] || `${i + 1} Hard`)).join("")}</div>
           <div class="subhead">Normal MD</div>
-          <div class="checks">${checks(s.md.normal, ["1 Norm", "2 Norm", "3 Norm"])}
-            <span class="pill ${s.md.rental ? "on" : "off"}">Rental</span></div>
+          <div class="checks">${s.md.normal.map((on, i) => mdPill(on, (s.md.normalStatus || [])[i] || `${i + 1} Norm`)).join("")}
+            <span class="mdpill ${s.md.rental ? "" : "done"}">Rental</span></div>
         </div>
       </div>
 
@@ -164,7 +171,7 @@ function renderDashboard() {
         <div class="body">
           <div class="kv">
             <div class="k">Current Day</div><div class="v"><span class="tag" style="${styleAttr(dayColor(s.currentDay))}">${esc(s.currentDay)}</span></div>
-            <div class="k">Current Date</div><div class="v">${esc(s.lunacy.currentDate)}</div>
+            <div class="k">Current Patch</div><div class="v">${esc(s.lunacy.currentDate)}</div>
             <div class="k">Uptying Sinner</div><div class="v">${selectHtml("st-uptie", SINNER_ORDER, s.uptie.sinner, sinnerColor(s.uptie.sinner))}</div>
             <div class="k">Gacha Sinner</div><div class="v">${selectHtml("st-gsinner", SINNER_ORDER, s.gacha.sinner, sinnerColor(s.gacha.sinner))}</div>
             <div class="k">Gacha Tier</div><div class="v">${selectHtml("st-gtier", GACHA_TIERS, s.gacha.tier, gachaTierColor(s.gacha.tier))}</div>
@@ -569,6 +576,10 @@ function factionColor(text) {
   for (const f of FACTION_COLORS) if (s.includes(f.match)) return { fill: f.fill, font: f.font };
   return null;
 }
+// MD slot pill: status theme coloured per word; dimmed when already done (unchecked).
+function mdPill(on, status) {
+  return `<span class="mdpill ${on ? "" : "done"}">${statusChips(status)}</span>`;
+}
 // IF SS7 keyword cells hold space-separated statuses; colour EACH word (by text)
 function statusChips(text) {
   if (text == null || text === "") return "";
@@ -655,6 +666,12 @@ function renderEditableList(viewId, arrayName, columns, searchKeys, makeBlank) {
       if (!q) return true;
       return searchKeys.some((k) => String(it[k] ?? "").toLowerCase().includes(q));
     });
+    // sort by release date, then internal id (blanks last)
+    rows.sort((a, b) => {
+      const ra = a.it.release || "9999-99-99", rb = b.it.release || "9999-99-99";
+      if (ra !== rb) return ra < rb ? -1 : 1;
+      return (a.it.internalId ?? 1e9) - (b.it.internalId ?? 1e9);
+    });
     const tagOpts = {};
     columns.forEach((c) => { if (c.type === "tags") tagOpts[c.key] = distinctTags(c.key); });
     $("#" + viewId + "-body").innerHTML = rows.map(({ it, idx }) =>
@@ -736,8 +753,10 @@ function renderIDs() {
     { label: "Level", key: "level", type: "num", color: (v) => levelColor(v) },
     { label: "Lv Extra", key: "levelExtra", type: "num" },
     { label: "Uptie", key: "uptie", type: "num", color: (v) => scaleColor(v) },
+    { label: "Released", key: "release", type: "text" },
+    { label: "Internal ID", key: "internalId", type: "num" },
   ], ["name", "sinner", "keyword", "extraKeyword", "season"],
-    () => ({ name: "", sinner: "Yi Sang", tier: "★★★", tierStars: 3, season: "", keyword: "", extraKeyword: "", acquired: false, level: null, levelExtra: 0, uptie: null }));
+    () => ({ name: "", sinner: "Yi Sang", tier: "★★★", tierStars: 3, season: "", keyword: "", extraKeyword: "", acquired: false, level: null, levelExtra: 0, uptie: null, release: "", internalId: null }));
 }
 function renderEGOs() {
   renderEditableList("egos", "egos", [
@@ -750,8 +769,10 @@ function renderEGOs() {
     { label: "Extra Keyword", key: "extraKeyword", type: "tags" },
     { label: "Owned", key: "acquired", type: "check" },
     { label: "Threadspin", key: "threadspin", type: "num", color: (v) => scaleColor(v) },
+    { label: "Released", key: "release", type: "text" },
+    { label: "Internal ID", key: "internalId", type: "num" },
   ], ["name", "sinner", "sin", "keyword", "extraKeyword", "season"],
-    () => ({ name: "", sinner: "Yi Sang", sin: "", tier: "ZAYIN", season: "", keyword: "", extraKeyword: "", acquired: false, threadspin: null }));
+    () => ({ name: "", sinner: "Yi Sang", sin: "", tier: "ZAYIN", season: "", keyword: "", extraKeyword: "", acquired: false, threadspin: null, release: "", internalId: null }));
 }
 
 // ---------- editable free-form grids (Teams / IF SS7) ----------
@@ -949,6 +970,9 @@ window.addEventListener("beforeunload", (e) => { if (dirty) { e.preventDefault()
     document.body.innerHTML = `<p style="padding:20px;color:#e0524b">Could not load data.json. Run <code>python app/import_xlsx.py</code> then restart the server.</p>`;
     return;
   }
+  // on launch: refresh current day, and set current patch = latest Thursday
+  state.currentDay = DAYS[new Date().getDay()];
+  state.lunacy.currentDate = currentPatchISO();
   recompute(state);
   $("#dashboard").addEventListener("change", dashboardEdit); // once; #dashboard persists across re-renders
   renderDashboard();

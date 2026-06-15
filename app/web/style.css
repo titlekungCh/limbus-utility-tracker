@@ -110,6 +110,10 @@ table.sheet td input.kv-num { width: 100%; box-sizing: border-box; text-align: r
 }
 .pill.on { background: #2c3a26; color: #bfe0a8; border-color: var(--green); }
 .pill.off { opacity: .7; }
+/* MD slot pill: holds status chips, dim when done */
+.mdpill { display: inline-flex; align-items: center; gap: 3px; padding: 3px 7px; border-radius: 12px;
+  border: 1px solid var(--line); background: var(--cell); font-size: 11px; }
+.mdpill.done { opacity: .4; text-decoration: line-through; }
 
 /* sinner shard table */
 table.sheet { border-collapse: collapse; width: 100%; font-size: 13px; }
