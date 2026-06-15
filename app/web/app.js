@@ -5,6 +5,7 @@ import {
   SHARD_TYPE_FILL, GACHA_TIER_FILL, DAY_FILL,
   EVENT_ITEM_FILL, EVENT_REWARD_FILL, SIN_ORDER, SIN_FILL,
   STATUS_ORDER, STATUS_FILL, FACTION_COLORS, SCALE_MAX5, SEASON_FILL, TIER_FILL,
+  SEASON_NUMBER_SINNER,
 } from "./constants.js";
 import {
   managerForecast, resourceForecast, shardPlanRows, idLeveling, SHARD_TYPES,
@@ -519,15 +520,16 @@ const dayColor = (d) => fillColor(DAY_FILL[d]);
 const sinColor = (s) => fillColor(SIN_FILL[s]);
 const tierColor = (v) => { const n = (String(v || "").match(/★/g) || []).length; return n ? fillColor(TIER_FILL[n]) : null; };
 const keywordTagColor = (tag) => fillColor(STATUS_FILL[tag]); // keyword tag coloured by status text
-function seasonTagColor(tag) { // per-tag season colour
+function seasonTagColor(tag) { // per-tag season colour (number -> sinner colour)
   if (tag === "Walpurgisnaught") return fillColor(SEASON_FILL.Walpurgisnaught);
-  if (/^\d+$/.test(tag)) return fillColor(SEASON_FILL.number);
+  if (/^\d+$/.test(tag)) { const sn = SEASON_NUMBER_SINNER[tag]; return sn ? SINNER_COLORS[sn] : null; }
   if (tag === "Standard Fare") return fillColor(SEASON_FILL["Standard Fare"]);
   return null;
 }
-function seasonCellColor(tags) { // whole-cell priority: Walp > number > Standard Fare
+function seasonCellColor(tags) { // whole-cell priority: Walp > number(->sinner) > Standard Fare
   if (tags.some((t) => t === "Walpurgisnaught")) return fillColor(SEASON_FILL.Walpurgisnaught);
-  if (tags.some((t) => /^\d+$/.test(t))) return fillColor(SEASON_FILL.number);
+  const num = tags.find((t) => /^\d+$/.test(t) && SEASON_NUMBER_SINNER[t]);
+  if (num) return SINNER_COLORS[SEASON_NUMBER_SINNER[num]];
   if (tags.some((t) => t === "Standard Fare")) return fillColor(SEASON_FILL["Standard Fare"]);
   return null;
 }

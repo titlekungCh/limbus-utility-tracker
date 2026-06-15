@@ -161,12 +161,16 @@ export const STATUS_FILL = {
 // Uptie/Threadspin value 5 = "maxed" (ID Level col L cellIs "= 5" rule, theme accent4).
 export const SCALE_MAX5 = "#34A853";
 
-// Season tag colours (not in the xlsx — defined scheme). Priority for the whole
-// cell colour: Walpurgisnaught > season number > Standard Fare.
+// Season tag colours (defined scheme). Priority for the whole cell colour:
+// Walpurgisnaught > season number > Standard Fare. Season-number tags take the
+// matching sinner's colour (per user mapping); 11-15 (Walp-only) stay plain.
 export const SEASON_FILL = {
   Walpurgisnaught: "#7E57C2", // purple
-  number: "#C9A227",          // gold (a season number tag, e.g. "7")
   "Standard Fare": "#6E7B8B", // slate
+};
+export const SEASON_NUMBER_SINNER = {
+  1: "Rodion", 2: "Yi Sang", 3: "Ishmael", 4: "Heathcliff", 5: "Don Quixote",
+  6: "Hong Lu", 7: "Ryoshu", 8: "Meursault", 9: "Outis", 10: "Faust",
 };
 
 // ID Tier (★ count) colours.
