@@ -105,6 +105,9 @@ function renderDashboard() {
   const free = s.lunacy.total - s.lunacy.paid;
   const pct = Math.max(0, Math.min(100, (s.manager.currentXP / s.manager.nextLevelXP) * 100));
   const t = s.inventory.tickets;
+  // does the next manager level grant +1 max enkephalin? (sheet K9)
+  const nextEnkRow = s.constants.managerCurve.find((r) => r.level === s.manager.level + 1);
+  const nextEnk = nextEnkRow && nextEnkRow.maxIncrease !== 0 ? "+1" : "0";
 
   const kv = (rows) => rows.map(([k, v, big]) => `<div class="k">${esc(k)}</div><div class="v${big ? " big" : ""}">${esc(fmt(v))}</div>`).join("");
   // editable number row (writes to a dotted state path on change); optional colour
@@ -129,6 +132,7 @@ function renderDashboard() {
           </div>
           <div class="bar"><span style="width:${pct}%"></span></div>
           <div class="bar-label">${fmt(s.manager.currentXP)} / ${fmt(s.manager.nextLevelXP)} (${pct.toFixed(1)}%)</div>
+          <div class="kv" style="margin-top:8px;"><div class="k">Next Level Enkephalin</div><div class="v">${esc(nextEnk)}</div></div>
         </div>
       </div>
 
@@ -319,15 +323,21 @@ function renderIdLeveling() {
   const res = idLeveling(state, idLevelSel.idx, idLevelSel.target);
   const body = $("#idlevel-body");
   if (!body) return;
-  const ticketRows = res ? ["IV", "III", "II", "I"].map((tier) =>
-    `<div class="k">Ticket ${tier}</div><div class="v">${fmt(res.need[tier])} <span class="count">(${fmt(res.left[tier])} left)</span></div>`).join("") : "";
+  const selId = state.ids[idLevelSel.idx];
+  const selSt = styleAttr(selId ? sinnerColor(selId.sinner) : null);   // ID dropdown -> sinner colour
+  const lvlSt = res ? styleAttr(levelColor(res.current)) : "";          // current level -> bracket
+  const tgtSt = styleAttr(levelColor(idLevelSel.target));
+  const ticketRows = res ? ["IV", "III", "II", "I"].map((tier) => {
+    const st = styleAttr(fillColor(INVENTORY_FILL["tickets." + tier]));
+    return `<div class="k" style="${st}">Ticket ${tier}</div><div class="v" style="${st}">${fmt(res.need[tier])} <span class="count">(${fmt(res.left[tier])} left)</span></div>`;
+  }).join("") : "";
   body.innerHTML = `
     <div class="field"><label>ID</label>
-      <select id="idlevel-name">${state.ids.map((x, i) => `<option value="${i}" ${i === idLevelSel.idx ? "selected" : ""}>[${esc(x.name)}] ${esc(x.sinner)}</option>`).join("")}</select></div>
+      <select id="idlevel-name" style="${selSt}">${state.ids.map((x, i) => `<option value="${i}" ${i === idLevelSel.idx ? "selected" : ""}>[${esc(x.name)}] ${esc(x.sinner)}</option>`).join("")}</select></div>
     <div class="field"><label>Target Lv</label>
-      <input type="number" id="idlevel-target" class="qty" min="1" max="100" value="${idLevelSel.target}"/></div>
+      <input type="number" id="idlevel-target" class="qty" min="1" max="100" value="${idLevelSel.target}" style="${tgtSt}"/></div>
     <div class="kv" style="margin-top:6px;">
-      <div class="k">Current Level</div><div class="v">${res ? fmt(res.current) : "—"}</div>
+      <div class="k" style="${lvlSt}">Current Level</div><div class="v" style="${lvlSt}">${res ? fmt(res.current) : "—"}</div>
       <div class="k">Level Extra XP</div><div class="v">${res ? fmt(res.levelExtra) : "—"}</div>
       <div class="k">XP Needed</div><div class="v big">${res ? fmt(res.xpNeeded) : "—"}</div>
     </div>
