@@ -86,8 +86,8 @@ export function totalXPAt(s, level) {
   const c = s.constants.idLevelCurve.find((r) => r.level === Math.round(level));
   return c ? c.totalXP : null;
 }
-export function idLeveling(s, idName, target) {
-  const id = s.ids.find((x) => x.name === idName);
+export function idLeveling(s, idx, target) {
+  const id = s.ids[idx];
   if (!id) return null;
   const current = id.level || 1;
   const atCur = totalXPAt(s, current) ?? 0;
@@ -106,7 +106,7 @@ export function idLeveling(s, idName, target) {
   const owned = s.inventory.tickets;
   const left = { IV: owned.IV - need.IV, III: owned.III - need.III, II: owned.II - need.II, I: owned.I - need.I };
 
-  return { name: idName, current, target, atCur, atTarget, levelExtra: id.levelExtra || 0, xpNeeded, need, left, leftover: rem };
+  return { name: id.name, sinner: id.sinner, current, target, atCur, atTarget, levelExtra: id.levelExtra || 0, xpNeeded, need, left, leftover: rem };
 }
 
 export const SHARD_TYPES = (s) => s.constants.shardTable.map((t) => t.type);

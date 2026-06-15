@@ -19,8 +19,8 @@ import {
   eventShop, REWARD_TYPES,
 } from "./projections.js";
 
-// persists across dashboard re-renders
-let idLevelSel = { name: null, target: 60 };
+// persists across dashboard re-renders (idx into state.ids)
+let idLevelSel = { idx: null, target: 60 };
 
 let state = null;
 let dirty = false;
@@ -285,7 +285,7 @@ function renderForecast() {
                 <td class="num ${p.shardShort > 0 ? "shard-low" : "shard-ok"}">${fmt(p.shardShort)}</td>
                 <td class="num">${fmt(p.crateNeeded)}</td>
                 <td class="num">${fmt(p.threadNeeded)}</td>
-                <td>${esc(p.target)}</td>
+                <td><input type="text" data-i="${p.index}" data-f="target" value="${esc(p.target)}"/></td>
               </tr>`).join("")}</tbody>
           </table>
         </div>
@@ -306,18 +306,19 @@ function renderForecast() {
 }
 
 function renderIdLeveling() {
-  if (!idLevelSel.name && state.ids.length) {
+  if (idLevelSel.idx == null && state.ids.length) {
     // default to a leveled, owned ID if available
-    idLevelSel.name = (state.ids.find((x) => x.acquired && x.level) || state.ids[0]).name;
+    const i = state.ids.findIndex((x) => x.acquired && x.level);
+    idLevelSel.idx = i >= 0 ? i : 0;
   }
-  const res = idLeveling(state, idLevelSel.name, idLevelSel.target);
+  const res = idLeveling(state, idLevelSel.idx, idLevelSel.target);
   const body = $("#idlevel-body");
   if (!body) return;
   const ticketRows = res ? ["IV", "III", "II", "I"].map((tier) =>
     `<div class="k">Ticket ${tier}</div><div class="v">${fmt(res.need[tier])} <span class="count">(${fmt(res.left[tier])} left)</span></div>`).join("") : "";
   body.innerHTML = `
     <div class="field"><label>ID</label>
-      <select id="idlevel-name">${state.ids.map((x) => `<option ${x.name === idLevelSel.name ? "selected" : ""}>${esc(x.name)}</option>`).join("")}</select></div>
+      <select id="idlevel-name">${state.ids.map((x, i) => `<option value="${i}" ${i === idLevelSel.idx ? "selected" : ""}>[${esc(x.name)}] ${esc(x.sinner)}</option>`).join("")}</select></div>
     <div class="field"><label>Target Lv</label>
       <input type="number" id="idlevel-target" class="qty" min="1" max="100" value="${idLevelSel.target}"/></div>
     <div class="kv" style="margin-top:6px;">
@@ -327,7 +328,7 @@ function renderIdLeveling() {
     </div>
     <div class="subhead">EXP Tickets needed</div>
     <div class="kv">${ticketRows}</div>`;
-  $("#idlevel-name").addEventListener("change", (e) => { idLevelSel.name = e.target.value; renderIdLeveling(); });
+  $("#idlevel-name").addEventListener("change", (e) => { idLevelSel.idx = +e.target.value; renderIdLeveling(); });
   $("#idlevel-target").addEventListener("change", (e) => { idLevelSel.target = Number(e.target.value) || 1; renderIdLeveling(); });
 }
 
