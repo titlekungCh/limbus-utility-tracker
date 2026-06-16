@@ -34,6 +34,32 @@ const el = (html) => { const t = document.createElement("template"); t.innerHTML
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 // <img> tag for an icon path (or "" when falsy)
 const icoTag = (p) => (p ? `<img class="opt-ico" src="${esc(p)}" alt="" loading="lazy">` : "");
+// sinner acronym -> icon (e.g. "HL" -> Hong Lu); built from state.sinners
+let _acroIcon = null;
+const acroIconMap = () => {
+  if (!_acroIcon) { _acroIcon = {}; for (const sn of state.sinners) if (sn.acronym) _acroIcon[sn.acronym] = OPTION_ICONS.sinner[sn.name]; }
+  return _acroIcon;
+};
+// render a Bokgak/IF SS7 cell value, swapping any sinner-acronym token for its icon
+const acellView = (value) => {
+  const v = String(value ?? "");
+  if (!v) return "";
+  const map = acroIconMap();
+  return v.split(" ").map((tok) => (map[tok] ? icoTag(map[tok]) : esc(tok))).join(" ");
+};
+// wrap a grid <input> so the acronym icon shows when the cell isn't focused
+const wrapAcell = (inputHtml, value, colorObj) => {
+  const st = colorObj ? `background:${colorObj.fill};color:${colorObj.font};` : "";
+  return `<div class="acell" style="${st}">${inputHtml}<div class="acell-view">${acellView(value)}</div></div>`;
+};
+// after an acronym cell edits, recolour its container + refresh the icon view
+const refreshAcell = (input) => {
+  const cell = input.closest(".acell"); if (!cell) return;
+  const c = acronymColor(input.value);
+  cell.setAttribute("style", c ? `background:${c.fill};color:${c.font};` : "");
+  const view = cell.querySelector(".acell-view");
+  if (view) view.innerHTML = acellView(input.value);
+};
 // icon shown before a dropdown option (not part of its text); "" when none maps
 const optIcon = (cat, val) => icoTag(cat && OPTION_ICONS[cat] && OPTION_ICONS[cat][val]);
 // decoration before an option: image icon, or (for grade) the Hebrew glyph
@@ -974,7 +1000,7 @@ function renderEditableGrid(viewId, arrayName) {
     gbody.innerHTML = rows.map((r, ri) =>
       `<tr>${Array.from({ length: cols }, (_, ci) => {
         const v = r[ci] ?? "";
-        return `<td><input type="text" data-r="${ri}" data-c="${ci}" value="${esc(v)}" style="${styleAttr(acronymColor(v))}"/></td>`;
+        return `<td>${wrapAcell(`<input type="text" data-r="${ri}" data-c="${ci}" value="${esc(v)}"/>`, v, acronymColor(v))}</td>`;
       }).join("")}<td style="text-align:center"><button class="reset" data-delrow="${ri}" title="delete row">✕</button></td></tr>`).join("");
     $("#" + viewId + "-count").textContent = `${rows.length} rows × ${cols} cols`;
   };
@@ -985,7 +1011,7 @@ function renderEditableGrid(viewId, arrayName) {
     const row = state[arrayName][+t.dataset.r], c = +t.dataset.c;
     while (row.length <= c) row.push("");
     row[c] = t.value;
-    t.style.cssText = styleAttr(acronymColor(t.value));
+    refreshAcell(t);
     autosave();
   });
   gbody.addEventListener("click", (e) => {
@@ -1051,7 +1077,7 @@ function renderIFSS7() {
   const teamStart = 22, width = g[0] ? g[0].length : 13;
   const teamRows = [];
   for (let r = teamStart; r < g.length; r++)
-    teamRows.push(`<tr>${g[r].map((v, c) => `<td><input type="text" data-tr="${r}" data-tc="${c}" value="${esc(v ?? "")}" style="${styleAttr(acronymColor(v))}"/></td>`).join("")}<td style="text-align:center"><button class="reset" data-delrow="${r}">✕</button></td></tr>`);
+    teamRows.push(`<tr>${g[r].map((v, c) => `<td>${wrapAcell(`<input type="text" data-tr="${r}" data-tc="${c}" value="${esc(v ?? "")}"/>`, v ?? "", acronymColor(v))}</td>`).join("")}<td style="text-align:center"><button class="reset" data-delrow="${r}">✕</button></td></tr>`);
 
   root.innerHTML = `
     <div class="table-wrap" style="margin-bottom:14px;">
@@ -1105,7 +1131,7 @@ function renderIFSS7() {
     const t = e.target;
     if (t.dataset.tr == null) return;
     g[+t.dataset.tr][+t.dataset.tc] = t.value;
-    t.style.cssText = styleAttr(acronymColor(t.value));
+    refreshAcell(t);
     autosave();
   });
   teams.addEventListener("click", (e) => {
