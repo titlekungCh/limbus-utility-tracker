@@ -91,7 +91,12 @@ table.sheet tr.disabled td select { color: var(--muted); }
 .kv .v { font-family: var(--mono); text-align: right; color: var(--text); }
 .kv .v.big { color: var(--gold); font-weight: 700; }
 .kv .v { display: flex; justify-content: flex-end; align-items: center; }
-.kv .v select.kv-select { width: 100%; min-width: 120px; padding: 4px 6px; font-size: 12px; text-align: left; }
+/* single-select dropdowns fill their value cell flat, like the label cell beside them */
+.kv .v:has(select.kv-select) { padding: 0; }
+.kv .v select.kv-select {
+  width: 100%; box-sizing: border-box; min-width: 120px; align-self: stretch;
+  border: none; border-radius: 0; padding: 6px 9px; font-size: 13px; text-align: left;
+}
 .kv .v input.kv-num { width: 96px; text-align: right; font-family: var(--mono); padding: 3px 6px;
   background: var(--cell); color: var(--text); border: 1px solid var(--line); border-radius: 5px; }
 .kv .v input.kv-num:focus { border-color: var(--gold); outline: none; }
