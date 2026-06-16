@@ -687,7 +687,24 @@ function renderEditableList(viewId, arrayName, columns, searchKeys, makeBlank) {
     return tags.length ? esc(tags.join(", ")) : "—";
   };
 
-  const cellHtml = (col, item, idx, tagOpts) => {
+  // fill a multi-select popover's options the first time it's opened
+  const fillPanel = (panel) => {
+    if (!panel || panel.dataset.filled) return;
+    const col = colByKey[panel.dataset.key];
+    const item = state[arrayName][+panel.dataset.idx];
+    if (!col || !item) return;
+    const tags = splitTags(item[col.key]);
+    const opts = distinctTags(col.key, col.optOrder);
+    const optColor = col.optColor || col.tagColor;
+    const optLabel = (t) => (optColor && optColor(t) ? chipHtml(optColor, t) : esc(t));
+    panel.innerHTML =
+      (opts.length > 10 ? `<input type="text" class="ms-search" placeholder="search…"/>` : "") +
+      opts.map((t) => `<label class="ms-opt"><input type="checkbox" data-tag="${esc(t)}" ${tags.includes(t) ? "checked" : ""}/> ${optLabel(t)}</label>`).join("") +
+      `<div class="ms-add"><input type="text" class="ms-newtag" placeholder="+ add…"/></div>`;
+    panel.dataset.filled = "1";
+  };
+
+  const cellHtml = (col, item, idx) => {
     const v = item[col.key];
     const st = col.color ? styleAttr(col.color(v, item)) : "";
     if (col.type === "check")
@@ -699,15 +716,10 @@ function renderEditableList(viewId, arrayName, columns, searchKeys, makeBlank) {
       return `<td class="num"><input type="number" data-idx="${idx}" data-key="${col.key}" value="${v ?? ""}" style="${st}"/></td>`;
     if (col.type === "tags") {
       const tags = splitTags(v);
-      const opts = tagOpts[col.key] || [];
-      const optColor = col.optColor || col.tagColor;
-      const optLabel = (t) => (optColor && optColor(t) ? chipHtml(optColor, t) : esc(t));
+      // panel options are filled lazily on first open (see fillPanel) so we
+      // don't bake every row's full option list into the DOM up-front.
       return `<td class="season-cell"><details class="ms"><summary>${tagSummary(col, tags)}</summary>
-        <div class="ms-panel" data-idx="${idx}" data-key="${col.key}">
-          ${opts.length > 10 ? `<input type="text" class="ms-search" placeholder="search…"/>` : ""}
-          ${opts.map((t) => `<label class="ms-opt"><input type="checkbox" data-tag="${esc(t)}" ${tags.includes(t) ? "checked" : ""}/> ${optLabel(t)}</label>`).join("")}
-          <div class="ms-add"><input type="text" class="ms-newtag" placeholder="+ add…"/></div>
-        </div></details></td>`;
+        <div class="ms-panel" data-idx="${idx}" data-key="${col.key}"></div></details></td>`;
     }
     if (col.type === "date")
       return `<td><input type="date" data-idx="${idx}" data-key="${col.key}" value="${esc(v ?? "")}"/></td>`;
@@ -740,15 +752,17 @@ function renderEditableList(viewId, arrayName, columns, searchKeys, makeBlank) {
       if (ra !== rb) return ra < rb ? -1 : 1;
       return (a.it.internalId ?? 1e9) - (b.it.internalId ?? 1e9);
     });
-    const tagOpts = {};
-    columns.forEach((c) => { if (c.type === "tags") tagOpts[c.key] = distinctTags(c.key, c.optOrder); });
     $("#" + viewId + "-body").innerHTML = rows.map(({ it, idx }) =>
-      `<tr data-row="${idx}">${columns.map((c) => cellHtml(c, it, idx, tagOpts)).join("")}` +
+      `<tr data-row="${idx}">${columns.map((c) => cellHtml(c, it, idx)).join("")}` +
       `<td style="text-align:center"><button class="reset" data-del="${idx}" title="delete">✕</button></td></tr>`).join("");
     $("#" + viewId + "-count").textContent = `${rows.length} / ${arr.length}`;
   };
 
   const body = $("#" + viewId + "-body");
+  // toggle doesn't bubble — capture it to lazily fill a popover when it opens
+  body.addEventListener("toggle", (e) => {
+    if (e.target.tagName === "DETAILS" && e.target.open) fillPanel(e.target.querySelector(".ms-panel"));
+  }, true);
   body.addEventListener("change", (e) => {
     const t = e.target;
     // --- multi-select tags (season / keyword / extra keyword) ---
