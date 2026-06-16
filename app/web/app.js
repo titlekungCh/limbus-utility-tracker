@@ -5,7 +5,7 @@ import {
   SHARD_TYPE_FILL, GACHA_TIER_FILL, DAY_FILL,
   EVENT_ITEM_FILL, EVENT_REWARD_FILL, SIN_ORDER, SIN_FILL,
   STATUS_ORDER, STATUS_FILL, FACTION_COLORS, SCALE_MAX5, SEASON_FILL, TIER_FILL,
-  SEASON_NUMBER_FILL, KEYWORD_FILL, DAYS, INVENTORY_FILL, LUNACY_FILL,
+  SEASON_NUMBER_FILL, KEYWORD_FILL, KEYWORD_ORDER, DAYS, INVENTORY_FILL, LUNACY_FILL,
   DAILY_LEFT_FILL, WEEKLY_LEFT_FILL,
 } from "./constants.js";
 
@@ -34,8 +34,11 @@ const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<
 const fmt = (n) => { if (n == null || n === "") return ""; const r = Math.round(Number(n) * 100) / 100; return Number.isInteger(r) ? String(r) : r.toFixed(2).replace(/0$/, ""); };
 // Limbus Pass level: no decimals when whole, 1 decimal otherwise.
 const fmtPass = (v) => { const n = Number(v); return Number.isInteger(n) ? String(n) : n.toFixed(1); };
-const selectHtml = (id, options, current, color) =>
-  `<select id="${id}" class="kv-select" style="${color ? `background:${color.fill};color:${color.font};` : ""}">${options.map((o) => `<option ${o === current ? "selected" : ""}>${esc(o)}</option>`).join("")}</select>`;
+// per-<option> inline style for a colour-coded dropdown ({fill, font} | null)
+const optStyle = (c) => (c ? ` style="background:${c.fill};color:${c.font}"` : "");
+// optColor: optional (o) => {fill,font} to colour-code each option in the list
+const selectHtml = (id, options, current, color, optColor) =>
+  `<select id="${id}" class="kv-select" style="${color ? `background:${color.fill};color:${color.font};` : ""}">${options.map((o) => `<option${o === current ? " selected" : ""}${optColor ? optStyle(optColor(o)) : ""}>${esc(o)}</option>`).join("")}</select>`;
 
 function toast(lines) {
   if (!lines || !lines.length) return;
@@ -188,9 +191,9 @@ function renderDashboard() {
           <div class="kv">
             <div class="k">Current Day</div><div class="v"><span class="tag" style="${styleAttr(dayColor(s.currentDay))}">${esc(s.currentDay)}</span></div>
             <div class="k">Current Patch</div><div class="v">${esc(s.lunacy.currentDate)}</div>
-            <div class="k">Uptying Sinner</div><div class="v">${selectHtml("st-uptie", SINNER_ORDER, s.uptie.sinner, sinnerColor(s.uptie.sinner))}</div>
-            <div class="k">Gacha Sinner</div><div class="v">${selectHtml("st-gsinner", SINNER_ORDER, s.gacha.sinner, sinnerColor(s.gacha.sinner))}</div>
-            <div class="k">Gacha Tier</div><div class="v">${selectHtml("st-gtier", GACHA_TIERS, s.gacha.tier, gachaTierColor(s.gacha.tier))}</div>
+            <div class="k">Uptying Sinner</div><div class="v">${selectHtml("st-uptie", SINNER_ORDER, s.uptie.sinner, sinnerColor(s.uptie.sinner), sinnerColor)}</div>
+            <div class="k">Gacha Sinner</div><div class="v">${selectHtml("st-gsinner", SINNER_ORDER, s.gacha.sinner, sinnerColor(s.gacha.sinner), sinnerColor)}</div>
+            <div class="k">Gacha Tier</div><div class="v">${selectHtml("st-gtier", GACHA_TIERS, s.gacha.tier, gachaTierColor(s.gacha.tier), gachaTierColor)}</div>
             <div class="k">Rental Week</div><div class="v">${fmt(s.md.rentalWeek)}</div>
             <div class="k">Event Currency</div><div class="v"><input type="number" class="qty" id="st-currency" value="${fmt(s.event.currency)}"/></div>
           </div>
@@ -295,7 +298,7 @@ function renderForecast() {
             <tbody>${plan.map((p) => `
               <tr class="${p.enabled ? "" : "disabled"}">
                 <td style="${styleAttr(sinnerColor(p.sinner))}">${esc(p.sinner)}</td>
-                <td><select data-i="${p.index}" data-f="type" style="${styleAttr(shardTypeColor(p.type))}">${SHARD_TYPES(s).map((t) => `<option ${t === p.type ? "selected" : ""}>${esc(t)}</option>`).join("")}</select></td>
+                <td><select data-i="${p.index}" data-f="type" style="${styleAttr(shardTypeColor(p.type))}">${SHARD_TYPES(s).map((t) => `<option${t === p.type ? " selected" : ""}${optStyle(shardTypeColor(t))}>${esc(t)}</option>`).join("")}</select></td>
                 <td style="text-align:center"><input type="checkbox" data-i="${p.index}" data-f="enabled" ${p.enabled ? "checked" : ""}/></td>
                 <td class="num">${fmt(p.shardNeeded)}</td>
                 <td class="num">${fmt(p.shardsOwned)}</td>
@@ -342,7 +345,7 @@ function renderIdLeveling() {
   }).join("") : "";
   body.innerHTML = `
     <div class="field"><label>ID</label>
-      <select id="idlevel-name" style="${selSt}">${state.ids.map((x, i) => `<option value="${i}" ${i === idLevelSel.idx ? "selected" : ""}>[${esc(x.name)}] ${esc(x.sinner)}</option>`).join("")}</select></div>
+      <select id="idlevel-name" style="${selSt}">${state.ids.map((x, i) => `<option value="${i}"${i === idLevelSel.idx ? " selected" : ""}${optStyle(sinnerColor(x.sinner))}>[${esc(x.name)}] ${esc(x.sinner)}</option>`).join("")}</select></div>
     <div class="field"><label>Target Lv</label>
       <input type="number" id="idlevel-target" class="qty" min="1" max="100" value="${idLevelSel.target}" style="${tgtSt}"/></div>
     <div class="kv" style="margin-top:6px;">
@@ -370,7 +373,7 @@ function renderEgoThreadspin() {
   const curSt = res ? styleAttr(scaleColor(res.currentNum)) : "";
   body.innerHTML = `
     <div class="field"><label>EGO</label>
-      <select id="egots-name" style="${selSt}">${state.egos.map((x, i) => `<option value="${i}" ${i === egoTSel.idx ? "selected" : ""}>[${esc(x.name)}] ${esc(x.sinner)}</option>`).join("")}</select></div>
+      <select id="egots-name" style="${selSt}">${state.egos.map((x, i) => `<option value="${i}"${i === egoTSel.idx ? " selected" : ""}${optStyle(sinnerColor(x.sinner))}>[${esc(x.name)}] ${esc(x.sinner)}</option>`).join("")}</select></div>
     <div class="field"><label>Target TS</label>
       <input type="number" id="egots-target" class="qty" min="1" max="5" value="${egoTSel.target}"/></div>
     <div class="kv" style="margin-top:6px;">
@@ -667,10 +670,14 @@ function renderEditableList(viewId, arrayName, columns, searchKeys, makeBlank) {
   // multi-value "tags" columns (season, keyword, extra keyword) are stored
   // comma-separated, e.g. "Season, 7, Event" or "Reload, Retreat".
   const splitTags = (s) => (s ? String(s).split(",").map((x) => x.trim()).filter(Boolean) : []);
-  const distinctTags = (key) => {
+  // `order` (optional) pins those tags first in that exact order (and always
+  // offers them, even if no row uses one yet); any extras follow alphabetically.
+  const distinctTags = (key, order) => {
     const set = new Set();
     state[arrayName].forEach((it) => splitTags(it[key]).forEach((t) => set.add(t)));
-    return [...set].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+    const extras = [...set].filter((t) => !order || !order.includes(t))
+      .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+    return order ? [...order, ...extras] : extras;
   };
 
   const chipHtml = (tc, t) => { const c = tc && tc(t); return c ? `<span class="chip" style="background:${c.fill};color:${c.font}">${esc(t)}</span>` : `<span class="chip plain">${esc(t)}</span>`; };
@@ -687,7 +694,7 @@ function renderEditableList(viewId, arrayName, columns, searchKeys, makeBlank) {
       return `<td style="text-align:center"><input type="checkbox" data-idx="${idx}" data-key="${col.key}" ${v ? "checked" : ""}/></td>`;
     if (col.type === "select")
       return `<td><select data-idx="${idx}" data-key="${col.key}" style="${st}">${
-        ["", ...col.options].map((o) => `<option ${o === (v ?? "") ? "selected" : ""}>${esc(o)}</option>`).join("")}</select></td>`;
+        ["", ...col.options].map((o) => `<option${o === (v ?? "") ? " selected" : ""}${col.color ? optStyle(col.color(o, item)) : ""}>${esc(o)}</option>`).join("")}</select></td>`;
     if (col.type === "num")
       return `<td class="num"><input type="number" data-idx="${idx}" data-key="${col.key}" value="${v ?? ""}" style="${st}"/></td>`;
     if (col.type === "tags") {
@@ -734,7 +741,7 @@ function renderEditableList(viewId, arrayName, columns, searchKeys, makeBlank) {
       return (a.it.internalId ?? 1e9) - (b.it.internalId ?? 1e9);
     });
     const tagOpts = {};
-    columns.forEach((c) => { if (c.type === "tags") tagOpts[c.key] = distinctTags(c.key); });
+    columns.forEach((c) => { if (c.type === "tags") tagOpts[c.key] = distinctTags(c.key, c.optOrder); });
     $("#" + viewId + "-body").innerHTML = rows.map(({ it, idx }) =>
       `<tr data-row="${idx}">${columns.map((c) => cellHtml(c, it, idx, tagOpts)).join("")}` +
       `<td style="text-align:center"><button class="reset" data-del="${idx}" title="delete">✕</button></td></tr>`).join("");
@@ -817,7 +824,7 @@ function renderIDs() {
     { label: "Sinner", key: "sinner", type: "select", options: SINNER_ORDER, color: (v) => sinnerColor(v) },
     { label: "Tier", key: "tier", type: "select", options: ["★", "★★", "★★★"], color: (v) => tierColor(v) },
     { label: "Season", key: "season", type: "tags", tagColor: seasonTagColor },
-    { label: "Keyword", key: "keyword", type: "tags", tagColor: keywordTagColor },
+    { label: "Keyword", key: "keyword", type: "tags", tagColor: keywordTagColor, optOrder: KEYWORD_ORDER },
     { label: "Extra Keyword", key: "extraKeyword", type: "tags" },
     { label: "Owned", key: "acquired", type: "check" },
     { label: "Level", key: "level", type: "num", color: (v) => levelColor(v) },
@@ -835,7 +842,7 @@ function renderEGOs() {
     { label: "Sin", key: "sin", type: "select", options: SIN_ORDER, color: (v) => sinColor(v) },
     { label: "Grade", key: "tier", type: "select", options: ["ZAYIN", "TETH", "HE", "WAW", "ALEPH"], color: (v) => shardTypeColor(v) },
     { label: "Season", key: "season", type: "tags", tagColor: seasonTagColor },
-    { label: "Keyword", key: "keyword", type: "tags", tagColor: keywordTagColor },
+    { label: "Keyword", key: "keyword", type: "tags", tagColor: keywordTagColor, optOrder: KEYWORD_ORDER },
     { label: "Extra Keyword", key: "extraKeyword", type: "tags" },
     { label: "Owned", key: "acquired", type: "check" },
     { label: "Threadspin", key: "threadspin", type: "num", color: (v) => scaleColor(v) },

@@ -172,6 +172,8 @@ export const STATUS_FILL = {
 };
 // Keyword tag colours = statuses plus "No Keyword".
 export const KEYWORD_FILL = { ...STATUS_FILL, "No Keyword": "#E9E8E8" };
+// Fixed display order for the Keyword dropdown (matches the in-game status list).
+export const KEYWORD_ORDER = ["Burn", "Bleed", "Tremor", "Rupture", "Sinking", "Poise", "Charge", "No Keyword"];
 
 // Uptie/Threadspin value 5 = "maxed" (ID Level col L cellIs "= 5" rule, theme accent4).
 export const SCALE_MAX5 = "#34A853";
