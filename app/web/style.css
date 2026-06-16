@@ -200,7 +200,16 @@ button.act.qa-sinner .opt-ico { width: 26px; height: 26px; margin: 0; }
 /* per-word status chips (IF SS7 keyword cells + legend) */
 .chip { display: inline-block; padding: 1px 7px; margin: 1px; border-radius: 9px; font-size: 11px; white-space: nowrap; }
 .chip.plain { color: var(--muted); border: 1px solid var(--line); }
-td.kw { cursor: text; min-width: 90px; }
+td.kw { cursor: text; min-width: 90px; white-space: nowrap; }
+/* IF SS7 tables: scroll sideways; columns size to content (keywords stay 1 line) */
+.ifss7-scroll table.sheet { width: max-content; min-width: 100%; }
+.ifss7-scroll td, .ifss7-scroll th { white-space: nowrap; }
+/* registered teams: divider between the left (cols 0-5) and right (6-11) team */
+.ifss7-scroll td.team-div { border-left: 3px solid var(--gold); }
+/* band header row (team faction + keywords) */
+tr.team-head > td { border-top: 3px solid var(--panel-2); }
+tr.team-head > td.team-kw { background: #221b13; }
+td.team-del { text-align: center; }
 td.kw input.kw-edit { width: 100%; box-sizing: border-box; }
 
 /* season multi-select (details/summary popover) */

@@ -40,25 +40,36 @@ const acroIconMap = () => {
   if (!_acroIcon) { _acroIcon = {}; for (const sn of state.sinners) if (sn.acronym) _acroIcon[sn.acronym] = OPTION_ICONS.sinner[sn.name]; }
   return _acroIcon;
 };
-// render a Bokgak/IF SS7 cell value, swapping any sinner-acronym token for its icon
-const acellView = (value) => {
+// keyword chips: status-coloured, with the tag icon before the word when available
+const kwChips = (text) => {
+  if (!text) return "";
+  return String(text).split(/\s+/).filter(Boolean).map((w) => {
+    const c = fillColor(STATUS_FILL[w]), ico = optIcon("keyword", w);
+    return c ? `<span class="chip" style="background:${c.fill};color:${c.font}">${ico}${esc(w)}</span>`
+      : `<span class="chip plain">${ico}${esc(w)}</span>`;
+  }).join(" ");
+};
+// render a grid cell value: mode "keyword" -> status chips; else sinner-acronym icons
+const acellView = (value, mode) => {
   const v = String(value ?? "");
   if (!v) return "";
+  if (mode === "keyword") return kwChips(v);
   const map = acroIconMap();
   return v.split(" ").map((tok) => (map[tok] ? icoTag(map[tok]) : esc(tok))).join(" ");
 };
-// wrap a grid <input> so the acronym icon shows when the cell isn't focused
-const wrapAcell = (inputHtml, value, colorObj) => {
+// wrap a grid <input> so the icon/chips view shows when the cell isn't focused
+const wrapAcell = (inputHtml, value, colorObj, mode) => {
   const st = colorObj ? `background:${colorObj.fill};color:${colorObj.font};` : "";
-  return `<div class="acell" style="${st}">${inputHtml}<div class="acell-view">${acellView(value)}</div></div>`;
+  return `<div class="acell"${mode ? ` data-mode="${mode}"` : ""} style="${st}">${inputHtml}<div class="acell-view">${acellView(value, mode)}</div></div>`;
 };
-// after an acronym cell edits, recolour its container + refresh the icon view
+// after a cell edits, recolour its container + refresh the icon/chips view
 const refreshAcell = (input) => {
   const cell = input.closest(".acell"); if (!cell) return;
-  const c = acronymColor(input.value);
+  const mode = cell.dataset.mode;
+  const c = mode === "keyword" ? null : acronymColor(input.value);
   cell.setAttribute("style", c ? `background:${c.fill};color:${c.font};` : "");
   const view = cell.querySelector(".acell-view");
-  if (view) view.innerHTML = acellView(input.value);
+  if (view) view.innerHTML = acellView(input.value, mode);
 };
 // icon shown before a dropdown option (not part of its text); "" when none maps
 const optIcon = (cat, val) => icoTag(cat && OPTION_ICONS[cat] && OPTION_ICONS[cat][val]);
@@ -1078,13 +1089,32 @@ function renderIFSS7() {
   for (let r = 14; r <= 20 && r < g.length; r++)
     legendRows.push(`<tr>${[13, 14, 15].map((c) => `<td>${statusChips(g[r][c])}</td>`).join("")}</tr>`);
 
-  const teamStart = 22, width = g[0] ? g[0].length : 13;
+  // Registered teams: 12 columns = a left team (cols 0-5) and a right team
+  // (cols 6-11), grouped into bands of 3 rows (header keyword/faction row + two
+  // member rows). Trailing blank columns are dropped.
+  const teamStart = 22, TEAM_W = 12;
+  for (let r = teamStart; r < g.length; r++) if (g[r].length > TEAM_W) g[r] = g[r].slice(0, TEAM_W); // drop trailing blank cols
+  while ((g.length - teamStart) % 3 !== 0) g.push(Array(TEAM_W).fill("")); // keep bands of 3
   const teamRows = [];
-  for (let r = teamStart; r < g.length; r++)
-    teamRows.push(`<tr>${g[r].map((v, c) => `<td>${wrapAcell(`<input type="text" data-tr="${r}" data-tc="${c}" value="${esc(v ?? "")}"/>`, v ?? "", acronymColor(v))}</td>`).join("")}<td style="text-align:center"><button class="reset" data-delrow="${r}">✕</button></td></tr>`);
+  for (let r = teamStart; r < g.length; r++) {
+    const head = (r - teamStart) % 3 === 0;
+    const cells = [];
+    for (let c = 0; c < TEAM_W; c++) {
+      const v = g[r][c] ?? "";
+      const div = c === 6 ? " team-div" : "";
+      const inp = `<input type="text" data-tr="${r}" data-tc="${c}" value="${esc(v)}"/>`;
+      cells.push(head
+        ? `<td class="team-kw${div}">${wrapAcell(inp, v, null, "keyword")}</td>`
+        : `<td class="${div.trim()}">${wrapAcell(inp, v, acronymColor(v))}</td>`);
+    }
+    cells.push(head
+      ? `<td class="team-del"><button class="reset" data-delband="${r}" title="delete team">✕</button></td>`
+      : `<td></td>`);
+    teamRows.push(`<tr class="${head ? "team-head" : ""}">${cells.join("")}</tr>`);
+  }
 
   root.innerHTML = `
-    <div class="table-wrap" style="margin-bottom:14px;">
+    <div class="table-wrap ifss7-scroll" style="margin-bottom:14px;">
       <table class="sheet"><thead><tr>
         <th>Sinner</th><th>Pred ID#1</th><th>Pred ID#2</th><th>Pred EGO</th>
         <th>Actual ID#1</th><th>Actual ID#2</th><th>Actual ID#3</th><th>Actual EGO</th>
@@ -1106,7 +1136,7 @@ function renderIFSS7() {
     </div>
     <h2 class="section-title">Registered Teams</h2>
     <div class="list-controls"><button class="act primary" id="ifss7-addteam">+ Team Row</button></div>
-    <div class="table-wrap"><table class="sheet"><tbody id="ifss7-teams">${teamRows.join("")}</tbody></table></div>`;
+    <div class="table-wrap ifss7-scroll"><table class="sheet"><tbody id="ifss7-teams">${teamRows.join("")}</tbody></table></div>`;
 
   // main block edits -> re-render so computed stats update
   const main = $("#ifss7-main");
@@ -1139,13 +1169,14 @@ function renderIFSS7() {
     autosave();
   });
   teams.addEventListener("click", (e) => {
-    const d = e.target.closest("[data-delrow]");
+    const d = e.target.closest("[data-delband]");
     if (!d) return;
-    g.splice(+d.dataset.delrow, 1);
+    g.splice(+d.dataset.delband, 3);   // remove the whole 3-row team band
     renderIFSS7();
     autosave();
   });
-  $("#ifss7-addteam").addEventListener("click", () => { g.push(Array(width).fill("")); renderIFSS7(); autosave(); });
+  // a "team row" is a 3-row band (header + 2 member rows) holding a left & right team
+  $("#ifss7-addteam").addEventListener("click", () => { for (let i = 0; i < 3; i++) g.push(Array(12).fill("")); renderIFSS7(); autosave(); });
 }
 
 // ---------- tabs ----------
