@@ -177,6 +177,10 @@ table.sheet td input[type=text], table.sheet td input[type=number], table.sheet 
   font-family: inherit;
 }
 table.sheet td input[type=date] { color-scheme: dark; min-width: 120px; }
+/* Internal ID: no number spinner arrows (saves space), still numeric */
+input[data-key="internalId"] { -moz-appearance: textfield; appearance: textfield; }
+input[data-key="internalId"]::-webkit-outer-spin-button,
+input[data-key="internalId"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 table.sheet td input[type=text]:focus, table.sheet td input[type=number]:focus, table.sheet td input[type=date]:focus, table.sheet td select:focus {
   border-color: var(--gold); outline: none; background: #000a;
 }
