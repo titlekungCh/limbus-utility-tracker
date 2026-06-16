@@ -615,7 +615,11 @@ function renderActions() {
   b.appendChild(el(`<div class="subhead">Quick add (uses tier above)</div>`));
   // one colour-coded button per sinner, in DataSheet order, split YS..HL / HC..GG
   const qaBtn = (n) => {
-    const bn = btn(state.sinners.find((x) => x.name === n)?.acronym || n, () => act((s) => ACTIONS.gachaFor(s, n)));
+    const ac = state.sinners.find((x) => x.name === n)?.acronym || n;
+    const bn = btn(ac, () => act((s) => ACTIONS.gachaFor(s, n)), "qa-sinner");
+    const ico = OPTION_ICONS.sinner[n];
+    if (ico) bn.innerHTML = icoTag(ico);   // sinner icon instead of the acronym text
+    bn.title = n;
     const c = sinnerColor(n);
     if (c) bn.style.cssText = `background:${c.fill};color:${c.font};border-color:${c.fill};`;
     return bn;

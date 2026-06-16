@@ -189,6 +189,9 @@ table.sheet td select option { background: var(--panel); color: var(--text); }
 
 /* icon shown before a dropdown option / tag chip (not part of the text) */
 .opt-ico { width: 16px; height: 16px; object-fit: contain; vertical-align: middle; margin-right: 4px; }
+/* gacha quick-add: compact icon-only sinner buttons */
+button.act.qa-sinner { padding: 4px 6px; line-height: 0; }
+button.act.qa-sinner .opt-ico { width: 26px; height: 26px; margin: 0; }
 
 /* per-word status chips (IF SS7 keyword cells + legend) */
 .chip { display: inline-block; padding: 1px 7px; margin: 1px; border-radius: 9px; font-size: 11px; white-space: nowrap; }
