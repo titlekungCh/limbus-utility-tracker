@@ -32,13 +32,21 @@ let dirty = false;
 const $ = (sel, root = document) => root.querySelector(sel);
 const el = (html) => { const t = document.createElement("template"); t.innerHTML = html.trim(); return t.content.firstElementChild; };
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-// <img> tag for an icon path (or "" when falsy)
-const icoTag = (p) => (p ? `<img class="opt-ico" src="${esc(p)}" alt="" loading="lazy">` : "");
-// sinner acronym -> icon (e.g. "HL" -> Hong Lu); built from state.sinners
-let _acroIcon = null;
-const acroIconMap = () => {
-  if (!_acroIcon) { _acroIcon = {}; for (const sn of state.sinners) if (sn.acronym) _acroIcon[sn.acronym] = OPTION_ICONS.sinner[sn.name]; }
-  return _acroIcon;
+// inverted (complementary) hex colour, used for a contrasting icon glow
+const invertHex = (hex) => {
+  const h = String(hex || "").replace("#", "");
+  if (h.length < 6) return "#000000";
+  return "#" + [0, 2, 4].map((i) => (255 - parseInt(h.slice(i, i + 2), 16)).toString(16).padStart(2, "0")).join("");
+};
+// <img> tag for an icon path (or "" when falsy); optional drop-shadow colour
+const icoTag = (p, shadow) => (p ? `<img class="opt-ico" src="${esc(p)}" alt="" loading="lazy"${shadow ? ` style="filter:drop-shadow(0 0 2px ${shadow})"` : ""}>` : "");
+// sinner icon with a drop shadow in the inverse of the sinner's colour
+const sinnerIco = (name) => icoTag(OPTION_ICONS.sinner[name], SINNER_COLORS[name] ? invertHex(SINNER_COLORS[name].fill) : null);
+// sinner acronym -> sinner name (e.g. "HL" -> "Hong Lu"); built from state.sinners
+let _acroName = null;
+const acroNameMap = () => {
+  if (!_acroName) { _acroName = {}; for (const sn of state.sinners) if (sn.acronym) _acroName[sn.acronym] = sn.name; }
+  return _acroName;
 };
 // keyword chips: colour each word as a combat status or a sin, with its icon
 const kwChips = (text) => {
@@ -55,8 +63,8 @@ const acellView = (value, mode) => {
   const v = String(value ?? "");
   if (!v) return "";
   if (mode === "keyword") return kwChips(v);
-  const map = acroIconMap();
-  return v.split(" ").map((tok) => (map[tok] ? icoTag(map[tok]) : esc(tok))).join(" ");
+  const map = acroNameMap();
+  return v.split(" ").map((tok) => (map[tok] ? optIcon("sinner", map[tok]) : esc(tok))).join(" ");
 };
 // wrap a grid <input> so the icon/chips view shows when the cell isn't focused
 const wrapAcell = (inputHtml, value, colorObj, mode) => {
@@ -73,7 +81,7 @@ const refreshAcell = (input) => {
   if (view) view.innerHTML = acellView(input.value, mode);
 };
 // icon shown before a dropdown option (not part of its text); "" when none maps
-const optIcon = (cat, val) => icoTag(cat && OPTION_ICONS[cat] && OPTION_ICONS[cat][val]);
+const optIcon = (cat, val) => (cat === "sinner" ? sinnerIco(val) : icoTag(cat && OPTION_ICONS[cat] && OPTION_ICONS[cat][val]));
 // decoration before an option: image icon, or (for grade) the Hebrew glyph
 const optDeco = (cat, val) => (cat === "grade"
   ? (GRADE_GLYPH[val] ? `<span class="grade-glyph">${esc(GRADE_GLYPH[val])}</span>` : "")
@@ -106,7 +114,7 @@ function initCustomSelects() {
     const cat = d.dataset.iconcat;
     panel.innerHTML = [...sel.options].map((o) =>
       `<div class="csel-opt${o.value === sel.value ? " on" : ""}" data-val="${esc(o.value)}" style="${o.style.cssText}">`
-      + `${o.dataset.icon ? icoTag(o.dataset.icon) : optDeco(cat, o.value)}<span>${esc(o.textContent)}</span></div>`).join("");
+      + `${o.dataset.sinner ? optIcon("sinner", o.dataset.sinner) : (o.dataset.icon ? icoTag(o.dataset.icon) : optDeco(cat, o.value))}<span>${esc(o.textContent)}</span></div>`).join("");
     panel.dataset.filled = "1";
   }, true);
   document.addEventListener("click", (e) => {
@@ -117,7 +125,7 @@ function initCustomSelects() {
         sel.value = opt.dataset.val;
         const o = sel.options[sel.selectedIndex], sum = d.querySelector(".csel-sum");
         sum.style.cssText = o.style.cssText + (o.style.backgroundColor ? `;border-color:${o.style.backgroundColor}` : "");
-        const deco = o.dataset.icon ? icoTag(o.dataset.icon) : optDeco(d.dataset.iconcat, o.value);
+        const deco = o.dataset.sinner ? optIcon("sinner", o.dataset.sinner) : (o.dataset.icon ? icoTag(o.dataset.icon) : optDeco(d.dataset.iconcat, o.value));
         sum.innerHTML = `${deco}<span class="csel-val">${esc(o.textContent)}</span><span class="csel-caret">▾</span>`;
         const p = d.querySelector(".csel-panel"); if (p) p.dataset.filled = ""; // refill (marker/colors) on next open
         sel.dispatchEvent(new Event("change", { bubbles: true }));
@@ -448,7 +456,7 @@ function renderIdLeveling() {
   body.innerHTML = `
     <div class="field"><label>ID</label>
       ${cselHtml(
-        `<select id="idlevel-name" style="${selSt}">${state.ids.map((x, i) => `<option value="${i}"${i === idLevelSel.idx ? " selected" : ""}${optStyle(sinnerColor(x.sinner))} data-icon="${esc(OPTION_ICONS.sinner[x.sinner] || "")}">[${esc(x.name)}] ${esc(x.sinner)}</option>`).join("")}</select>`,
+        `<select id="idlevel-name" style="${selSt}">${state.ids.map((x, i) => `<option value="${i}"${i === idLevelSel.idx ? " selected" : ""}${optStyle(sinnerColor(x.sinner))} data-sinner="${esc(x.sinner)}">[${esc(x.name)}] ${esc(x.sinner)}</option>`).join("")}</select>`,
         "sinner", selId ? `[${selId.name}] ${selId.sinner}` : "", selId ? sinnerColor(selId.sinner) : null, selId ? optIcon("sinner", selId.sinner) : "")}</div>
     <div class="field"><label>Target Lv</label>
       <input type="number" id="idlevel-target" class="qty" min="1" max="100" value="${idLevelSel.target}" style="${tgtSt}"/></div>
@@ -478,7 +486,7 @@ function renderEgoThreadspin() {
   body.innerHTML = `
     <div class="field"><label>EGO</label>
       ${cselHtml(
-        `<select id="egots-name" style="${selSt}">${state.egos.map((x, i) => `<option value="${i}"${i === egoTSel.idx ? " selected" : ""}${optStyle(sinnerColor(x.sinner))} data-icon="${esc(OPTION_ICONS.sinner[x.sinner] || "")}">[${esc(x.name)}] ${esc(x.sinner)}</option>`).join("")}</select>`,
+        `<select id="egots-name" style="${selSt}">${state.egos.map((x, i) => `<option value="${i}"${i === egoTSel.idx ? " selected" : ""}${optStyle(sinnerColor(x.sinner))} data-sinner="${esc(x.sinner)}">[${esc(x.name)}] ${esc(x.sinner)}</option>`).join("")}</select>`,
         "sinner", selEgo ? `[${selEgo.name}] ${selEgo.sinner}` : "", selEgo ? sinnerColor(selEgo.sinner) : null, selEgo ? optIcon("sinner", selEgo.sinner) : "")}</div>
     <div class="field"><label>Target TS</label>
       <input type="number" id="egots-target" class="qty" min="1" max="5" value="${egoTSel.target}"/></div>
@@ -629,8 +637,8 @@ function renderActions() {
   const qaBtn = (n) => {
     const ac = state.sinners.find((x) => x.name === n)?.acronym || n;
     const bn = btn(ac, () => act((s) => ACTIONS.gachaFor(s, n)), "qa-sinner");
-    const ico = OPTION_ICONS.sinner[n];
-    if (ico) bn.innerHTML = icoTag(ico);   // sinner icon instead of the acronym text
+    const ico = optIcon("sinner", n);
+    if (ico) bn.innerHTML = ico;   // sinner icon (w/ inverted-colour shadow) instead of text
     bn.title = n;
     const c = sinnerColor(n);
     if (c) bn.style.cssText = `background:${c.fill};color:${c.font};border-color:${c.fill};`;
