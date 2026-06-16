@@ -149,6 +149,7 @@ select, input[type=number] {
 }
 .field { display: flex; align-items: center; gap: 8px; }
 .field label { color: var(--muted); font-size: 12px; min-width: 56px; }
+.field select { flex: 1; min-width: 0; }
 .qty { width: 70px; }
 
 /* editable cells inside the sheet tables */
