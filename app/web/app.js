@@ -241,6 +241,8 @@ function renderForecast() {
   const rf = resourceForecast(s);
   const plan = shardPlanRows(s);
   const kv = (rows) => rows.map(([k, v, big]) => `<div class="k">${esc(k)}</div><div class="v${big ? " big" : ""}">${esc(fmt(v))}</div>`).join("");
+  // level-up marker: shown next to any forecast value that reaches next-level XP
+  const lvlGlyph = (on) => (on ? ` <span class="lvlup" title="reaches next level">▲</span>` : "");
 
   $("#forecast").innerHTML = `
     <div class="grid">
@@ -248,8 +250,8 @@ function renderForecast() {
         <h2>Manager XP Forecast</h2>
         <div class="body" style="padding:0;">
           <table class="sheet">
-            <thead><tr><th>Run</th><th>After N Daily</th><th>+ 1 MD</th></tr></thead>
-            <tbody>${mf.rows.map((r) => `<tr><td>${r.n} Daily</td><td class="num">${fmt(r.afterDaily)}</td><td class="num">${fmt(r.afterMD)}</td></tr>`).join("")}</tbody>
+            <thead><tr><th>Run</th><th>After N Daily</th><th>after MD <span class="count">(${mf.mdHard ? "Hard +120" : "Easy +100"})</span></th></tr></thead>
+            <tbody>${mf.rows.map((r) => `<tr><td>${r.n} Daily</td><td class="num">${fmt(r.afterDaily)}${lvlGlyph(r.dailyLevels)}</td><td class="num">${fmt(r.afterMD)}${lvlGlyph(r.mdLevels)}</td></tr>`).join("")}</tbody>
           </table>
         </div>
         <div class="body"><div class="kv">${kv([["Next Level XP", mf.nextLevelXP], ["Next Lvl Enkephalin", mf.enk]])}</div></div>

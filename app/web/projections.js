@@ -3,19 +3,45 @@
 import { THREADSPIN, SHARD_DELTA } from "./constants.js";
 const round2 = (n) => Math.round(n * 100) / 100;
 
-// Manager XP: "After 1..7 Daily" and "+1 MD" (Inventory I10:I16 / J10:J16),
-// plus the next-level enkephalin flag (K9).
+// Is the next Mirror Dungeon run to be done a Hard one? The weekly cycle is
+// (Hard > Easy) x3, then a Rental on rental weeks (rental counts as Easy), then
+// it repeats. A run is still pending when its flag is `true` (its pill on the
+// Mirror Dungeon card isn't struck through); the next run is the first pending
+// one in that order. If everything is done the cycle restarts on a Hard.
+export function nextMDIsHard(s) {
+  const md = s.md;
+  const seq = [];
+  for (let i = 0; i < 3; i++) {
+    seq.push(["hard", !!(md.hard && md.hard[i])]);
+    seq.push(["easy", !!(md.normal && md.normal[i])]);
+  }
+  if (md.rentalWeek === 0) seq.push(["easy", !!md.rental]); // rental = Easy, rental weeks only
+  const next = seq.find(([, pending]) => pending);
+  return next ? next[0] === "hard" : true;
+}
+
+// Manager XP: "After 1..7 Daily" and "after MD" (Inventory I10:I16 / J10:J16),
+// plus the next-level enkephalin flag (K9). The MD column adds the next run's
+// reward: +120 if the next MD is Hard, +100 if Easy/Rental. A `levels` flag is
+// set on any value that reaches the next level XP.
 export function managerForecast(s) {
   const daily = s.constants.dailyManagerXP;
   const cur = s.manager.currentXP;
+  const nextXP = s.manager.nextLevelXP;
+  const mdHard = nextMDIsHard(s);
+  const mdBonus = mdHard ? 120 : 100;
   const rows = [];
   for (let i = 1; i <= 7; i++) {
     const afterDaily = round2(cur + daily * i);
-    rows.push({ n: i, afterDaily, afterMD: round2(afterDaily + 100) });
+    const afterMD = round2(afterDaily + mdBonus);
+    rows.push({
+      n: i, afterDaily, afterMD,
+      dailyLevels: afterDaily >= nextXP, mdLevels: afterMD >= nextXP,
+    });
   }
   const nextRow = s.constants.managerCurve.find((r) => r.level === s.manager.level + 1);
   const enk = nextRow && nextRow.maxIncrease !== 0 ? "+1" : "0";
-  return { rows, nextLevelXP: s.manager.nextLevelXP, enk };
+  return { rows, nextLevelXP: nextXP, enk, mdHard, mdBonus };
 }
 
 // Crate + Pass forecasts (Inventory C/D 17-23 and E/F 17-23).

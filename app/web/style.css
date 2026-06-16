@@ -135,6 +135,8 @@ table.sheet tr:nth-child(even) td { background: #1f1a15; }
 table.sheet tr:hover td { background: #2a221b; }
 .shard-low { color: var(--crimson-bright); }
 .shard-ok { color: #bfe0a8; }
+/* level-up marker next to a forecast value that reaches next-level XP */
+.lvlup { color: var(--gold); font-weight: 700; font-size: 11px; }
 
 /* ---------- actions ---------- */
 .panels { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; align-items: start; }
