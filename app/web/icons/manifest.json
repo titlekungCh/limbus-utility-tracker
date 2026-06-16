@@ -11,6 +11,10 @@
     "Assist Defense": "icons/keyword/assistDefense.webp",
     "Attack Power Down": "icons/keyword/attackPowerDown.webp",
     "Attack Power Up": "icons/keyword/attackPowerUp.webp",
+    "Attack Type DMG/Power Up": "icons/keyword/slashDamageUp.webp",
+    "Attack Type Fragility": "icons/keyword/slashFragility.webp",
+    "Attack Type Protection": "icons/keyword/slashProtection.webp",
+    "Attack Type Resist Down": "icons/keyword/slashResistDown.webp",
     "Bind": "icons/keyword/bind.webp",
     "Bleed": "icons/keyword/bleed.webp",
     "Bloodfeast": "icons/keyword/bloodfeast.webp",
@@ -31,6 +35,7 @@
     "Defense Power Up": "icons/keyword/defensePowerUp.webp",
     "Dimensional Rift": "icons/keyword/dimensionalRift.webp",
     "Discard": "icons/keyword/discard.webp",
+    "E.G.O Resource Amp": "icons/keyword/egoResourseAmp.webp",
     "Fragile": "icons/keyword/fragile.webp",
     "HP Healing Down": "icons/keyword/hpHealingDown.webp",
     "Haste": "icons/keyword/haste.webp",
@@ -53,6 +58,10 @@
     "SP Healing Efficiency": "icons/keyword/spHealEfficiency.webp",
     "SP Loss Efficiency": "icons/keyword/spLossEfficiency.webp",
     "Shin": "icons/keyword/shinDihuiStar.webp",
+    "Sin DMG/Power Up": "icons/keyword/wrathDamageUp.webp",
+    "Sin Fragility": "icons/keyword/wrathFragility.webp",
+    "Sin Protection": "icons/keyword/wrathProtection.webp",
+    "Sin Resist Down": "icons/keyword/wrathResistDown.webp",
     "Sinking": "icons/keyword/sinking.webp",
     "Tremor": "icons/keyword/tremor.webp",
     "Tremor - Chain": "icons/keyword/tremorChain.webp",
@@ -133,6 +142,9 @@
   "tier": {
     "★": "icons/tier/O.webp",
     "★★": "icons/tier/OO.webp",
-    "★★★": "icons/tier/OOO.webp"
+    "★★★": "icons/tier/OOO.webp",
+    "1Star": "icons/tier/O.webp",
+    "2Star": "icons/tier/OO.webp",
+    "3Star": "icons/tier/OOO.webp"
   }
 }
