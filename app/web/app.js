@@ -904,7 +904,7 @@ function renderIDs() {
   renderEditableList("ids", "ids", [
     { label: "ID Name", key: "name", type: "text", color: (v, it) => sinnerColor(it.sinner) },
     { label: "Sinner", key: "sinner", type: "select", options: SINNER_ORDER, color: (v) => sinnerColor(v), iconCat: "sinner" },
-    { label: "Tier", key: "tier", type: "select", options: ["★", "★★", "★★★"], color: (v) => tierColor(v) },
+    { label: "Tier", key: "tier", type: "select", options: ["★", "★★", "★★★"], color: (v) => tierColor(v), iconCat: "tier" },
     { label: "Season", key: "season", type: "tags", tagColor: seasonTagColor, iconCat: "season" },
     { label: "Keyword", key: "keyword", type: "tags", tagColor: keywordTagColor, optOrder: KEYWORD_ORDER, iconCat: "keyword" },
     { label: "Extra Keyword", key: "extraKeyword", type: "tags", iconCat: "keyword" },
