@@ -84,6 +84,9 @@ table.sheet tr.disabled td select { color: var(--muted); }
 .kv { display: grid; grid-template-columns: 1fr auto; gap: 1px; }
 /* blocks with a dropdown: let the value column fill so the select spans full width */
 .kv:has(select.kv-select) { grid-template-columns: auto 1fr; }
+/* number blocks: fix the value column so the full-width input doesn't claim its
+   default (~20ch) intrinsic width and squeeze the label into two lines */
+.kv:has(input.kv-num) { grid-template-columns: 1fr 120px; }
 .kv > div {
   background: var(--cell); padding: 6px 9px; border: 1px solid var(--line);
 }
