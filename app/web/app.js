@@ -511,9 +511,9 @@ function renderActions() {
 
   // Gacha
   b = panel("Sinner Gacha Result");
-  const gTier = el(`<div class="field"><label>Tier</label><select>${GACHA_TIERS.map((t) => `<option ${t === state.gacha.tier ? "selected" : ""}>${t}</option>`).join("")}</select></div>`);
+  const gTier = el(`<div class="field"><label>Tier</label><select style="${styleAttr(gachaTierColor(state.gacha.tier))}">${GACHA_TIERS.map((t) => `<option ${t === state.gacha.tier ? "selected" : ""}${optStyle(gachaTierColor(t))}>${t}</option>`).join("")}</select></div>`);
   gTier.querySelector("select").addEventListener("change", (e) => setSelection("gacha.tier", e.target.value));
-  const gSinner = el(`<div class="field"><label>Sinner</label><select>${SINNER_ORDER.map((n) => `<option ${n === state.gacha.sinner ? "selected" : ""}>${n}</option>`).join("")}</select></div>`);
+  const gSinner = el(`<div class="field"><label>Sinner</label><select style="${styleAttr(sinnerColor(state.gacha.sinner))}">${SINNER_ORDER.map((n) => `<option ${n === state.gacha.sinner ? "selected" : ""}${optStyle(sinnerColor(n))}>${n}</option>`).join("")}</select></div>`);
   gSinner.querySelector("select").addEventListener("change", (e) => setSelection("gacha.sinner", e.target.value));
   b.append(gTier, gSinner);
   r = row(b);
@@ -561,7 +561,7 @@ function renderActions() {
 
   // Uptie
   b = panel("Uptying (uses Uptying Sinner)");
-  const uSinner = el(`<div class="field"><label>Sinner</label><select>${SINNER_ORDER.map((n) => `<option ${n === state.uptie.sinner ? "selected" : ""}>${n}</option>`).join("")}</select></div>`);
+  const uSinner = el(`<div class="field"><label>Sinner</label><select style="${styleAttr(sinnerColor(state.uptie.sinner))}">${SINNER_ORDER.map((n) => `<option ${n === state.uptie.sinner ? "selected" : ""}${optStyle(sinnerColor(n))}>${n}</option>`).join("")}</select></div>`);
   uSinner.querySelector("select").addEventListener("change", (e) => setSelection("uptie.sinner", e.target.value));
   b.appendChild(uSinner);
   r = row(b);
