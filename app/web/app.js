@@ -5,7 +5,7 @@ import {
   SHARD_TYPE_FILL, GACHA_TIER_FILL, DAY_FILL,
   EVENT_ITEM_FILL, EVENT_REWARD_FILL, SIN_ORDER, SIN_FILL,
   STATUS_ORDER, STATUS_FILL, FACTION_COLORS, SCALE_MAX5, SEASON_FILL, TIER_FILL,
-  SEASON_NUMBER_FILL, KEYWORD_FILL, KEYWORD_ORDER, DAYS, INVENTORY_FILL, LUNACY_FILL,
+  SEASON_NUMBER_FILL, KEYWORD_FILL, KEYWORD_ORDER, OPTION_ICONS, DAYS, INVENTORY_FILL, LUNACY_FILL,
   DAILY_LEFT_FILL, WEEKLY_LEFT_FILL,
 } from "./constants.js";
 
@@ -31,6 +31,8 @@ let dirty = false;
 const $ = (sel, root = document) => root.querySelector(sel);
 const el = (html) => { const t = document.createElement("template"); t.innerHTML = html.trim(); return t.content.firstElementChild; };
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+// icon shown before a dropdown option (not part of its text); "" when none maps
+const optIcon = (cat, val) => { const p = cat && OPTION_ICONS[cat] && OPTION_ICONS[cat][val]; return p ? `<img class="opt-ico" src="${esc(p)}" alt="" loading="lazy">` : ""; };
 const fmt = (n) => { if (n == null || n === "") return ""; const r = Math.round(Number(n) * 100) / 100; return Number.isInteger(r) ? String(r) : r.toFixed(2).replace(/0$/, ""); };
 // Limbus Pass level: no decimals when whole, 1 decimal otherwise.
 const fmtPass = (v) => { const n = Number(v); return Number.isInteger(n) ? String(n) : n.toFixed(1); };
@@ -692,7 +694,7 @@ function renderEditableList(viewId, arrayName, columns, searchKeys, makeBlank) {
   const chipHtml = (tc, t) => { const c = tc && tc(t); return c ? `<span class="chip" style="background:${c.fill};color:${c.font}">${esc(t)}</span>` : `<span class="chip plain">${esc(t)}</span>`; };
   const tagSummary = (col, tags) => {
     if (col.cellColor) return `<span class="tag" style="${styleAttr(col.cellColor(tags))}">${tags.length ? esc(tags.join(", ")) : "—"}</span>`;
-    if (col.tagColor) return tags.length ? tags.map((t) => chipHtml(col.tagColor, t)).join(" ") : "—";
+    if (col.tagColor) return tags.length ? tags.map((t) => optIcon(col.iconCat, t) + chipHtml(col.tagColor, t)).join(" ") : "—";
     return tags.length ? esc(tags.join(", ")) : "—";
   };
 
@@ -705,7 +707,7 @@ function renderEditableList(viewId, arrayName, columns, searchKeys, makeBlank) {
     const tags = splitTags(item[col.key]);
     const opts = distinctTags(col.key, col.optOrder);
     const optColor = col.optColor || col.tagColor;
-    const optLabel = (t) => (optColor && optColor(t) ? chipHtml(optColor, t) : esc(t));
+    const optLabel = (t) => optIcon(col.iconCat, t) + (optColor && optColor(t) ? chipHtml(optColor, t) : esc(t));
     panel.innerHTML =
       (opts.length > 10 ? `<input type="text" class="ms-search" placeholder="search…"/>` : "") +
       opts.map((t) => `<label class="ms-opt"><input type="checkbox" data-tag="${esc(t)}" ${tags.includes(t) ? "checked" : ""}/> ${optLabel(t)}</label>`).join("") +
@@ -846,9 +848,9 @@ function renderIDs() {
     { label: "ID Name", key: "name", type: "text", color: (v, it) => sinnerColor(it.sinner) },
     { label: "Sinner", key: "sinner", type: "select", options: SINNER_ORDER, color: (v) => sinnerColor(v) },
     { label: "Tier", key: "tier", type: "select", options: ["★", "★★", "★★★"], color: (v) => tierColor(v) },
-    { label: "Season", key: "season", type: "tags", tagColor: seasonTagColor },
-    { label: "Keyword", key: "keyword", type: "tags", tagColor: keywordTagColor, optOrder: KEYWORD_ORDER },
-    { label: "Extra Keyword", key: "extraKeyword", type: "tags" },
+    { label: "Season", key: "season", type: "tags", tagColor: seasonTagColor, iconCat: "season" },
+    { label: "Keyword", key: "keyword", type: "tags", tagColor: keywordTagColor, optOrder: KEYWORD_ORDER, iconCat: "keyword" },
+    { label: "Extra Keyword", key: "extraKeyword", type: "tags", iconCat: "keyword" },
     { label: "Owned", key: "acquired", type: "check" },
     { label: "Level", key: "level", type: "num", color: (v) => levelColor(v) },
     { label: "Lv Extra", key: "levelExtra", type: "num" },
@@ -864,9 +866,9 @@ function renderEGOs() {
     { label: "Sinner", key: "sinner", type: "select", options: SINNER_ORDER, color: (v) => sinnerColor(v) },
     { label: "Sin", key: "sin", type: "select", options: SIN_ORDER, color: (v) => sinColor(v) },
     { label: "Grade", key: "tier", type: "select", options: ["ZAYIN", "TETH", "HE", "WAW", "ALEPH"], color: (v) => shardTypeColor(v) },
-    { label: "Season", key: "season", type: "tags", tagColor: seasonTagColor },
-    { label: "Keyword", key: "keyword", type: "tags", tagColor: keywordTagColor, optOrder: KEYWORD_ORDER },
-    { label: "Extra Keyword", key: "extraKeyword", type: "tags" },
+    { label: "Season", key: "season", type: "tags", tagColor: seasonTagColor, iconCat: "season" },
+    { label: "Keyword", key: "keyword", type: "tags", tagColor: keywordTagColor, optOrder: KEYWORD_ORDER, iconCat: "keyword" },
+    { label: "Extra Keyword", key: "extraKeyword", type: "tags", iconCat: "keyword" },
     { label: "Owned", key: "acquired", type: "check" },
     { label: "Threadspin", key: "threadspin", type: "num", color: (v) => scaleColor(v) },
     { label: "Released", key: "release", type: "date" },
