@@ -191,38 +191,7 @@ export const SEASON_NUMBER_FILL = {
 
 // ID Tier (★ count) colours (sampled from the user's reference image).
 export const TIER_FILL = { 1: "#966537", 2: "#FF1C00", 3: "#FFEC00" };
-
-// Dropdown option icons (scraped to app/web/icons; see icons/manifest.json).
-// Keyed by the value as stored in state; paths are relative to the web root.
-export const OPTION_ICONS = {
-  keyword: {
-    Burn: "icons/keyword/burn.webp", Bleed: "icons/keyword/bleed.webp",
-    Tremor: "icons/keyword/tremor.webp", Rupture: "icons/keyword/rupture.webp",
-    Sinking: "icons/keyword/sinking.webp", Poise: "icons/keyword/poise.webp",
-    Charge: "icons/keyword/charge.webp",
-  },
-  sin: {
-    Wrath: "icons/sin/wrath.webp", Lust: "icons/sin/lust.webp", Sloth: "icons/sin/sloth.webp",
-    Gluttony: "icons/sin/glut.webp", Gloom: "icons/sin/gloom.webp", Pride: "icons/sin/pride.webp",
-    Envy: "icons/sin/envy.webp",
-  },
-  sinner: {
-    "Yi Sang": "icons/sinner/yi-sang.webp", Faust: "icons/sinner/faust.webp",
-    "Don Quixote": "icons/sinner/don-quixote.webp", Ryoshu: "icons/sinner/ryoshu.webp",
-    Meursault: "icons/sinner/meursault.webp", "Hong Lu": "icons/sinner/hong-lu.webp",
-    Heathcliff: "icons/sinner/heathcliff.webp", Ishmael: "icons/sinner/ishmael.webp",
-    Rodion: "icons/sinner/rodion.webp", Sinclair: "icons/sinner/sinclair.webp",
-    Outis: "icons/sinner/outis.webp", Gregor: "icons/sinner/gregor.webp",
-  },
-  season: {
-    "Standard Fare": "icons/season/s-0.webp", Walpurgisnaught: "icons/walpurgis/w-8.webp",
-    1: "icons/season/s-1.webp", 2: "icons/season/s-2.webp", 3: "icons/season/s-3.webp",
-    4: "icons/season/s-4.webp", 5: "icons/season/s-5.webp", 6: "icons/season/s-6.webp",
-    7: "icons/season/s-7.webp",
-  },
-};
-// EGO grade has no icon on the source site — it's a Hebrew glyph.
-export const GRADE_GLYPH = { ZAYIN: "ז", TETH: "ט", HE: "ה", WAW: "ו", ALEPH: "ℵ" };
+// Dropdown option icons + grade glyphs live in the generated ./icons-map.js.
 
 // IF SS7 faction/source colours for the ID/EGO cells (G2:J13 conditional formatting).
 // {match, fill, font}; match is the substring searched (order matters).

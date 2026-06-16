@@ -5,9 +5,10 @@ import {
   SHARD_TYPE_FILL, GACHA_TIER_FILL, DAY_FILL,
   EVENT_ITEM_FILL, EVENT_REWARD_FILL, SIN_ORDER, SIN_FILL,
   STATUS_ORDER, STATUS_FILL, FACTION_COLORS, SCALE_MAX5, SEASON_FILL, TIER_FILL,
-  SEASON_NUMBER_FILL, KEYWORD_FILL, KEYWORD_ORDER, OPTION_ICONS, GRADE_GLYPH, DAYS, INVENTORY_FILL, LUNACY_FILL,
+  SEASON_NUMBER_FILL, KEYWORD_FILL, KEYWORD_ORDER, DAYS, INVENTORY_FILL, LUNACY_FILL,
   DAILY_LEFT_FILL, WEEKLY_LEFT_FILL,
 } from "./constants.js";
+import { OPTION_ICONS, GRADE_GLYPH } from "./icons-map.js";
 
 // Most recent Thursday (the current patch), incl. today; local date as YYYY-MM-DD.
 function currentPatchISO() {
@@ -88,8 +89,11 @@ const fmtPass = (v) => { const n = Number(v); return Number.isInteger(n) ? Strin
 // per-<option> inline style for a colour-coded dropdown ({fill, font} | null)
 const optStyle = (c) => (c ? ` style="background:${c.fill};color:${c.font}"` : "");
 // optColor: optional (o) => {fill,font} to colour-code each option in the list
-const selectHtml = (id, options, current, color, optColor) =>
-  `<select id="${id}" class="kv-select" style="${color ? `background:${color.fill};color:${color.font};` : ""}">${options.map((o) => `<option${o === current ? " selected" : ""}${optColor ? optStyle(optColor(o)) : ""}>${esc(o)}</option>`).join("")}</select>`;
+// iconCat: optional category -> render as a custom icon dropdown (cselHtml)
+const selectHtml = (id, options, current, color, optColor, iconCat) => {
+  const sel = `<select id="${id}" class="kv-select" style="${color ? `background:${color.fill};color:${color.font};` : ""}">${options.map((o) => `<option${o === current ? " selected" : ""}${optColor ? optStyle(optColor(o)) : ""}>${esc(o)}</option>`).join("")}</select>`;
+  return iconCat ? cselHtml(sel, iconCat, current, color) : sel;
+};
 
 function toast(lines) {
   if (!lines || !lines.length) return;
@@ -242,8 +246,8 @@ function renderDashboard() {
           <div class="kv">
             <div class="k">Current Day</div><div class="v"><span class="tag" style="${styleAttr(dayColor(s.currentDay))}">${esc(s.currentDay)}</span></div>
             <div class="k">Current Patch</div><div class="v">${esc(s.lunacy.currentDate)}</div>
-            <div class="k">Uptying Sinner</div><div class="v">${selectHtml("st-uptie", SINNER_ORDER, s.uptie.sinner, sinnerColor(s.uptie.sinner), sinnerColor)}</div>
-            <div class="k">Gacha Sinner</div><div class="v">${selectHtml("st-gsinner", SINNER_ORDER, s.gacha.sinner, sinnerColor(s.gacha.sinner), sinnerColor)}</div>
+            <div class="k">Uptying Sinner</div><div class="v">${selectHtml("st-uptie", SINNER_ORDER, s.uptie.sinner, sinnerColor(s.uptie.sinner), sinnerColor, "sinner")}</div>
+            <div class="k">Gacha Sinner</div><div class="v">${selectHtml("st-gsinner", SINNER_ORDER, s.gacha.sinner, sinnerColor(s.gacha.sinner), sinnerColor, "sinner")}</div>
             <div class="k">Gacha Tier</div><div class="v">${selectHtml("st-gtier", GACHA_TIERS, s.gacha.tier, gachaTierColor(s.gacha.tier), gachaTierColor)}</div>
             <div class="k">Rental Week</div><div class="v">${fmt(s.md.rentalWeek)}</div>
             <div class="k">Event Currency</div><div class="v"><input type="number" class="qty" id="st-currency" value="${fmt(s.event.currency)}"/></div>
@@ -564,7 +568,8 @@ function renderActions() {
   b = panel("Sinner Gacha Result");
   const gTier = el(`<div class="field"><label>Tier</label><select style="${styleAttr(gachaTierColor(state.gacha.tier))}">${GACHA_TIERS.map((t) => `<option ${t === state.gacha.tier ? "selected" : ""}${optStyle(gachaTierColor(t))}>${t}</option>`).join("")}</select></div>`);
   gTier.querySelector("select").addEventListener("change", (e) => setSelection("gacha.tier", e.target.value));
-  const gSinner = el(`<div class="field"><label>Sinner</label><select style="${styleAttr(sinnerColor(state.gacha.sinner))}">${SINNER_ORDER.map((n) => `<option ${n === state.gacha.sinner ? "selected" : ""}${optStyle(sinnerColor(n))}>${n}</option>`).join("")}</select></div>`);
+  const gSinnerSel = `<select style="${styleAttr(sinnerColor(state.gacha.sinner))}">${SINNER_ORDER.map((n) => `<option ${n === state.gacha.sinner ? "selected" : ""}${optStyle(sinnerColor(n))}>${esc(n)}</option>`).join("")}</select>`;
+  const gSinner = el(`<div class="field"><label>Sinner</label>${cselHtml(gSinnerSel, "sinner", state.gacha.sinner, sinnerColor(state.gacha.sinner))}</div>`);
   gSinner.querySelector("select").addEventListener("change", (e) => setSelection("gacha.sinner", e.target.value));
   b.append(gTier, gSinner);
   r = row(b);
@@ -612,7 +617,8 @@ function renderActions() {
 
   // Uptie
   b = panel("Uptying (uses Uptying Sinner)");
-  const uSinner = el(`<div class="field"><label>Sinner</label><select style="${styleAttr(sinnerColor(state.uptie.sinner))}">${SINNER_ORDER.map((n) => `<option ${n === state.uptie.sinner ? "selected" : ""}${optStyle(sinnerColor(n))}>${n}</option>`).join("")}</select></div>`);
+  const uSinnerSel = `<select style="${styleAttr(sinnerColor(state.uptie.sinner))}">${SINNER_ORDER.map((n) => `<option ${n === state.uptie.sinner ? "selected" : ""}${optStyle(sinnerColor(n))}>${esc(n)}</option>`).join("")}</select>`;
+  const uSinner = el(`<div class="field"><label>Sinner</label>${cselHtml(uSinnerSel, "sinner", state.uptie.sinner, sinnerColor(state.uptie.sinner))}</div>`);
   uSinner.querySelector("select").addEventListener("change", (e) => setSelection("uptie.sinner", e.target.value));
   b.appendChild(uSinner);
   r = row(b);

@@ -234,6 +234,13 @@ table.sheet td:has(> details.csel) { padding: 0; }
 .csel-opt:hover { background: #ffffff12; }
 .csel-opt.on { box-shadow: inset 2px 0 0 var(--gold); }
 .grade-glyph { display: inline-block; min-width: 14px; text-align: center; font-weight: 700; }
+/* custom dropdown inside a dashboard kv value cell (flat, fills like kv-select) */
+.kv .v details.csel { width: 100%; align-self: stretch; }
+.kv .v:has(details.csel) { padding: 0; }
+.kv .v .csel > summary.csel-sum { height: 100%; box-sizing: border-box; }
+/* custom dropdown inside a calculator/panel field row (looks like a control) */
+.field .csel { flex: 1; min-width: 0; }
+.field .csel > summary.csel-sum { border: 1px solid var(--line); background: var(--cell); border-radius: 0; }
 
 /* ---------- list tables (IDs / EGOs) ---------- */
 .list-controls { display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; align-items: center; }
