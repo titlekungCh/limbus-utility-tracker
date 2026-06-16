@@ -296,7 +296,7 @@ function renderDashboard() {
         <h2>Sinner Shards</h2>
         <div class="body" style="padding:0;">
           <table class="sheet">
-            <thead><tr><th>Sinner</th>${SINNER_ORDER.map((n) => { const ac = state.sinners.find((x) => x.name === n)?.acronym || n; return `<th style="${styleAttr(sinnerColor(n))}" title="${esc(n)}">${optIcon("sinner", n) || esc(ac)}</th>`; }).join("")}</tr></thead>
+            <thead><tr><th>Sinner</th>${SINNER_ORDER.map((n) => { const ac = state.sinners.find((x) => x.name === n)?.acronym || n; return `<th style="${styleAttr(sinnerColor(n))}" title="${esc(n)}"><div class="shard-hdr">${optIcon("sinner", n) || esc(ac)}<span>${esc(n)}</span></div></th>`; }).join("")}</tr></thead>
             <tbody><tr><td>Shards</td>${SINNER_ORDER.map((n) => {
               const i = state.sinners.findIndex((x) => x.name === n);
               const sh = state.sinners[i]?.shards ?? 0;

@@ -189,6 +189,10 @@ table.sheet td select option { background: var(--panel); color: var(--text); }
 
 /* icon shown before a dropdown option / tag chip (not part of the text) */
 .opt-ico { width: 16px; height: 16px; object-fit: contain; vertical-align: middle; margin-right: 4px; }
+/* Sinner Shards header: sinner icon above the full name */
+.shard-hdr { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.shard-hdr .opt-ico { margin: 0; width: 22px; height: 22px; }
+.shard-hdr span { font-size: 10px; font-weight: 600; white-space: nowrap; }
 /* gacha quick-add: compact icon-only sinner buttons */
 button.act.qa-sinner { padding: 4px 6px; line-height: 0; }
 button.act.qa-sinner .opt-ico { width: 26px; height: 26px; margin: 0; }
