@@ -71,7 +71,10 @@ export const OPTION_ICONS = {
   "tier": {
     "★": "icons/tier/O.webp",
     "★★": "icons/tier/OO.webp",
-    "★★★": "icons/tier/OOO.webp"
+    "★★★": "icons/tier/OOO.webp",
+    "1Star": "icons/tier/O.webp",
+    "2Star": "icons/tier/OO.webp",
+    "3Star": "icons/tier/OOO.webp"
   },
   "sin": {
     "Wrath": "icons/sin/wrath.webp",

@@ -32,8 +32,10 @@ let dirty = false;
 const $ = (sel, root = document) => root.querySelector(sel);
 const el = (html) => { const t = document.createElement("template"); t.innerHTML = html.trim(); return t.content.firstElementChild; };
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+// <img> tag for an icon path (or "" when falsy)
+const icoTag = (p) => (p ? `<img class="opt-ico" src="${esc(p)}" alt="" loading="lazy">` : "");
 // icon shown before a dropdown option (not part of its text); "" when none maps
-const optIcon = (cat, val) => { const p = cat && OPTION_ICONS[cat] && OPTION_ICONS[cat][val]; return p ? `<img class="opt-ico" src="${esc(p)}" alt="" loading="lazy">` : ""; };
+const optIcon = (cat, val) => icoTag(cat && OPTION_ICONS[cat] && OPTION_ICONS[cat][val]);
 // decoration before an option: image icon, or (for grade) the Hebrew glyph
 const optDeco = (cat, val) => (cat === "grade"
   ? (GRADE_GLYPH[val] ? `<span class="grade-glyph">${esc(GRADE_GLYPH[val])}</span>` : "")
@@ -41,10 +43,14 @@ const optDeco = (cat, val) => (cat === "grade"
 // Wrap a generated <select> string into a custom icon dropdown. The native
 // <select> stays in the DOM (hidden) as the source of truth + change target, so
 // all existing handlers keep working; we only overlay an icon-bearing list.
-const cselHtml = (selectStr, iconCat, value, colorObj) => {
+// summaryDeco: optional icon HTML for the summary (when not derivable from value,
+// e.g. ID/EGO pickers whose option value is an index). Options may also carry a
+// `data-icon` attribute that the open list/summary will use.
+const cselHtml = (selectStr, iconCat, value, colorObj, summaryDeco) => {
   const st = colorObj ? `background:${colorObj.fill};color:${colorObj.font};border-color:${colorObj.fill};` : "";
+  const deco = summaryDeco != null ? summaryDeco : optDeco(iconCat, value);
   return `<details class="csel" data-iconcat="${esc(iconCat)}">`
-    + `<summary class="csel-sum" style="${st}">${optDeco(iconCat, value)}<span class="csel-val">${esc(value)}</span><span class="csel-caret">▾</span></summary>`
+    + `<summary class="csel-sum" style="${st}">${deco}<span class="csel-val">${esc(value)}</span><span class="csel-caret">▾</span></summary>`
     + `<div class="csel-panel"></div>${selectStr}</details>`;
 };
 // One-time delegated wiring for every custom dropdown (open/fill/select/close).
@@ -62,7 +68,7 @@ function initCustomSelects() {
     const cat = d.dataset.iconcat;
     panel.innerHTML = [...sel.options].map((o) =>
       `<div class="csel-opt${o.value === sel.value ? " on" : ""}" data-val="${esc(o.value)}" style="${o.style.cssText}">`
-      + `${optDeco(cat, o.value)}<span>${esc(o.textContent)}</span></div>`).join("");
+      + `${o.dataset.icon ? icoTag(o.dataset.icon) : optDeco(cat, o.value)}<span>${esc(o.textContent)}</span></div>`).join("");
     panel.dataset.filled = "1";
   }, true);
   document.addEventListener("click", (e) => {
@@ -73,7 +79,8 @@ function initCustomSelects() {
         sel.value = opt.dataset.val;
         const o = sel.options[sel.selectedIndex], sum = d.querySelector(".csel-sum");
         sum.style.cssText = o.style.cssText + (o.style.backgroundColor ? `;border-color:${o.style.backgroundColor}` : "");
-        sum.innerHTML = `${optDeco(d.dataset.iconcat, o.value)}<span class="csel-val">${esc(o.textContent)}</span><span class="csel-caret">▾</span>`;
+        const deco = o.dataset.icon ? icoTag(o.dataset.icon) : optDeco(d.dataset.iconcat, o.value);
+        sum.innerHTML = `${deco}<span class="csel-val">${esc(o.textContent)}</span><span class="csel-caret">▾</span>`;
         const p = d.querySelector(".csel-panel"); if (p) p.dataset.filled = ""; // refill (marker/colors) on next open
         sel.dispatchEvent(new Event("change", { bubbles: true }));
       }
@@ -248,7 +255,7 @@ function renderDashboard() {
             <div class="k">Current Patch</div><div class="v">${esc(s.lunacy.currentDate)}</div>
             <div class="k">Uptying Sinner</div><div class="v">${selectHtml("st-uptie", SINNER_ORDER, s.uptie.sinner, sinnerColor(s.uptie.sinner), sinnerColor, "sinner")}</div>
             <div class="k">Gacha Sinner</div><div class="v">${selectHtml("st-gsinner", SINNER_ORDER, s.gacha.sinner, sinnerColor(s.gacha.sinner), sinnerColor, "sinner")}</div>
-            <div class="k">Gacha Tier</div><div class="v">${selectHtml("st-gtier", GACHA_TIERS, s.gacha.tier, gachaTierColor(s.gacha.tier), gachaTierColor)}</div>
+            <div class="k">Gacha Tier</div><div class="v">${selectHtml("st-gtier", GACHA_TIERS, s.gacha.tier, gachaTierColor(s.gacha.tier), gachaTierColor, "tier")}</div>
             <div class="k">Rental Week</div><div class="v">${fmt(s.md.rentalWeek)}</div>
             <div class="k">Event Currency</div><div class="v"><input type="number" class="qty" id="st-currency" value="${fmt(s.event.currency)}"/></div>
           </div>
@@ -263,7 +270,7 @@ function renderDashboard() {
         <h2>Sinner Shards</h2>
         <div class="body" style="padding:0;">
           <table class="sheet">
-            <thead><tr><th>Sinner</th>${SINNER_ORDER.map((n) => `<th style="${styleAttr(sinnerColor(n))}">${esc(state.sinners.find((x) => x.name === n)?.acronym || n)}</th>`).join("")}</tr></thead>
+            <thead><tr><th>Sinner</th>${SINNER_ORDER.map((n) => { const ac = state.sinners.find((x) => x.name === n)?.acronym || n; return `<th style="${styleAttr(sinnerColor(n))}" title="${esc(n)}">${optIcon("sinner", n) || esc(ac)}</th>`; }).join("")}</tr></thead>
             <tbody><tr><td>Shards</td>${SINNER_ORDER.map((n) => {
               const i = state.sinners.findIndex((x) => x.name === n);
               const sh = state.sinners[i]?.shards ?? 0;
@@ -354,7 +361,7 @@ function renderForecast() {
             <thead><tr><th>Sinner</th><th>Shard Type</th><th>On</th><th class="num">Needed</th><th class="num">Owned</th><th class="num">Short</th><th class="num">Crate Need</th><th class="num">Thread Need</th><th>Target</th></tr></thead>
             <tbody>${plan.map((p) => `
               <tr class="${p.enabled ? "" : "disabled"}">
-                <td style="${styleAttr(sinnerColor(p.sinner))}">${esc(p.sinner)}</td>
+                <td style="${styleAttr(sinnerColor(p.sinner))}">${optIcon("sinner", p.sinner)}${esc(p.sinner)}</td>
                 <td><select data-i="${p.index}" data-f="type" style="${styleAttr(shardTypeColor(p.type))}">${SHARD_TYPES(s).map((t) => `<option${t === p.type ? " selected" : ""}${optStyle(shardTypeColor(t))}>${esc(t)}</option>`).join("")}</select></td>
                 <td style="text-align:center"><input type="checkbox" data-i="${p.index}" data-f="enabled" ${p.enabled ? "checked" : ""}/></td>
                 <td class="num">${fmt(p.shardNeeded)}</td>
@@ -402,7 +409,9 @@ function renderIdLeveling() {
   }).join("") : "";
   body.innerHTML = `
     <div class="field"><label>ID</label>
-      <select id="idlevel-name" style="${selSt}">${state.ids.map((x, i) => `<option value="${i}"${i === idLevelSel.idx ? " selected" : ""}${optStyle(sinnerColor(x.sinner))}>[${esc(x.name)}] ${esc(x.sinner)}</option>`).join("")}</select></div>
+      ${cselHtml(
+        `<select id="idlevel-name" style="${selSt}">${state.ids.map((x, i) => `<option value="${i}"${i === idLevelSel.idx ? " selected" : ""}${optStyle(sinnerColor(x.sinner))} data-icon="${esc(OPTION_ICONS.sinner[x.sinner] || "")}">[${esc(x.name)}] ${esc(x.sinner)}</option>`).join("")}</select>`,
+        "sinner", selId ? `[${selId.name}] ${selId.sinner}` : "", selId ? sinnerColor(selId.sinner) : null, selId ? optIcon("sinner", selId.sinner) : "")}</div>
     <div class="field"><label>Target Lv</label>
       <input type="number" id="idlevel-target" class="qty" min="1" max="100" value="${idLevelSel.target}" style="${tgtSt}"/></div>
     <div class="kv" style="margin-top:6px;">
@@ -430,7 +439,9 @@ function renderEgoThreadspin() {
   const curSt = res ? styleAttr(scaleColor(res.currentNum)) : "";
   body.innerHTML = `
     <div class="field"><label>EGO</label>
-      <select id="egots-name" style="${selSt}">${state.egos.map((x, i) => `<option value="${i}"${i === egoTSel.idx ? " selected" : ""}${optStyle(sinnerColor(x.sinner))}>[${esc(x.name)}] ${esc(x.sinner)}</option>`).join("")}</select></div>
+      ${cselHtml(
+        `<select id="egots-name" style="${selSt}">${state.egos.map((x, i) => `<option value="${i}"${i === egoTSel.idx ? " selected" : ""}${optStyle(sinnerColor(x.sinner))} data-icon="${esc(OPTION_ICONS.sinner[x.sinner] || "")}">[${esc(x.name)}] ${esc(x.sinner)}</option>`).join("")}</select>`,
+        "sinner", selEgo ? `[${selEgo.name}] ${selEgo.sinner}` : "", selEgo ? sinnerColor(selEgo.sinner) : null, selEgo ? optIcon("sinner", selEgo.sinner) : "")}</div>
     <div class="field"><label>Target TS</label>
       <input type="number" id="egots-target" class="qty" min="1" max="5" value="${egoTSel.target}"/></div>
     <div class="kv" style="margin-top:6px;">
@@ -566,7 +577,8 @@ function renderActions() {
 
   // Gacha
   b = panel("Sinner Gacha Result");
-  const gTier = el(`<div class="field"><label>Tier</label><select style="${styleAttr(gachaTierColor(state.gacha.tier))}">${GACHA_TIERS.map((t) => `<option ${t === state.gacha.tier ? "selected" : ""}${optStyle(gachaTierColor(t))}>${t}</option>`).join("")}</select></div>`);
+  const gTierSel = `<select style="${styleAttr(gachaTierColor(state.gacha.tier))}">${GACHA_TIERS.map((t) => `<option ${t === state.gacha.tier ? "selected" : ""}${optStyle(gachaTierColor(t))}>${esc(t)}</option>`).join("")}</select>`;
+  const gTier = el(`<div class="field"><label>Tier</label>${cselHtml(gTierSel, "tier", state.gacha.tier, gachaTierColor(state.gacha.tier))}</div>`);
   gTier.querySelector("select").addEventListener("change", (e) => setSelection("gacha.tier", e.target.value));
   const gSinnerSel = `<select style="${styleAttr(sinnerColor(state.gacha.sinner))}">${SINNER_ORDER.map((n) => `<option ${n === state.gacha.sinner ? "selected" : ""}${optStyle(sinnerColor(n))}>${esc(n)}</option>`).join("")}</select>`;
   const gSinner = el(`<div class="field"><label>Sinner</label>${cselHtml(gSinnerSel, "sinner", state.gacha.sinner, sinnerColor(state.gacha.sinner))}</div>`);
