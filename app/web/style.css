@@ -97,8 +97,10 @@ table.sheet tr.disabled td select { color: var(--muted); }
   width: 100%; box-sizing: border-box; min-width: 120px; align-self: stretch;
   border: none; border-radius: 0; padding: 6px 9px; font-size: 13px; text-align: left;
 }
-.kv .v input.kv-num { width: 96px; text-align: right; font-family: var(--mono); padding: 3px 6px;
-  background: var(--cell); color: var(--text); border: 1px solid var(--line); border-radius: 5px; }
+/* number cells fill their value cell flat, matching the dropdown cells */
+.kv .v:has(input.kv-num) { padding: 0; }
+.kv .v input.kv-num { width: 100%; box-sizing: border-box; text-align: right; font-family: var(--mono);
+  padding: 6px 9px; background: transparent; color: var(--text); border: 1px solid transparent; border-radius: 0; }
 .kv .v input.kv-num:focus { border-color: var(--gold); outline: none; }
 .kv .v.big input.kv-num { color: var(--gold); font-weight: 700; }
 table.sheet td input.kv-num { width: 100%; box-sizing: border-box; text-align: right; }
@@ -156,13 +158,17 @@ select, input[type=number] {
 }
 .field { display: flex; align-items: center; gap: 8px; }
 .field label { color: var(--muted); font-size: 12px; min-width: 56px; }
-.field select { flex: 1; min-width: 0; }
-.qty { width: 70px; }
+.field select { flex: 1; min-width: 0; border-radius: 0; }
+.qty { width: 70px; border-radius: 0; }
 
-/* editable cells inside the sheet tables */
+/* editable cells inside the sheet tables: the control fills the whole cell
+   edge-to-edge and flat (like the Dashboard Status Tracker), so a coloured
+   value looks like a full cell rather than an inset rounded box. */
+table.sheet td:has(> input[type=text]), table.sheet td:has(> input[type=number]),
+table.sheet td:has(> input[type=date]), table.sheet td:has(> select) { padding: 0; }
 table.sheet td input[type=text], table.sheet td input[type=number], table.sheet td input[type=date], table.sheet td select {
-  width: 100%; box-sizing: border-box; border: 1px solid transparent; border-radius: 3px;
-  padding: 3px 5px; font-size: 12px; background: transparent; color: var(--text);
+  width: 100%; box-sizing: border-box; border: 1px solid transparent; border-radius: 0;
+  padding: 5px 8px; font-size: 13px; background: transparent; color: var(--text);
   font-family: inherit;
 }
 table.sheet td input[type=date] { color-scheme: dark; min-width: 120px; }
