@@ -519,8 +519,15 @@ function renderActions() {
   r = row(b);
   r.append(btn("Apply to Selected Sinner", () => act(ACTIONS.gachaSelected), "primary"));
   b.appendChild(el(`<div class="subhead">Quick add (uses tier above)</div>`));
-  r = row(b);
-  SINNER_ORDER.forEach((n) => r.append(btn(state.sinners.find((x) => x.name === n)?.acronym || n, () => act((s) => ACTIONS.gachaFor(s, n)))));
+  // one colour-coded button per sinner, in DataSheet order, split YS..HL / HC..GG
+  const qaBtn = (n) => {
+    const bn = btn(state.sinners.find((x) => x.name === n)?.acronym || n, () => act((s) => ACTIONS.gachaFor(s, n)));
+    const c = sinnerColor(n);
+    if (c) bn.style.cssText = `background:${c.fill};color:${c.font};border-color:${c.fill};`;
+    return bn;
+  };
+  const qaR1 = row(b); SINNER_ORDER.slice(0, 6).forEach((n) => qaR1.append(qaBtn(n)));
+  const qaR2 = row(b); SINNER_ORDER.slice(6).forEach((n) => qaR2.append(qaBtn(n)));
 
   // Extractions / Lunacy
   b = panel("Extractions (Lunacy)");
