@@ -99,7 +99,7 @@ table.sheet tr.disabled td select { color: var(--muted); }
 }
 /* number cells fill their value cell flat, matching the dropdown cells */
 .kv .v:has(input.kv-num) { padding: 0; }
-.kv .v input.kv-num { width: 100%; box-sizing: border-box; text-align: right; font-family: var(--mono);
+.kv .v input.kv-num { width: 100%; box-sizing: border-box; align-self: stretch; text-align: right; font-family: var(--mono);
   padding: 6px 9px; background: transparent; color: var(--text); border: 1px solid transparent; border-radius: 0; }
 .kv .v input.kv-num:focus { border-color: var(--gold); outline: none; }
 .kv .v.big input.kv-num { color: var(--gold); font-weight: 700; }
