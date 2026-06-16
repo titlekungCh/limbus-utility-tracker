@@ -82,6 +82,8 @@ table.sheet tr.disabled td select { color: var(--muted); }
 
 /* spreadsheet-style key/value rows */
 .kv { display: grid; grid-template-columns: 1fr auto; gap: 1px; }
+/* blocks with a dropdown: let the value column fill so the select spans full width */
+.kv:has(select.kv-select) { grid-template-columns: auto 1fr; }
 .kv > div {
   background: var(--cell); padding: 6px 9px; border: 1px solid var(--line);
 }
