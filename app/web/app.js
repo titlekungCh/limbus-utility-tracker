@@ -40,13 +40,14 @@ const acroIconMap = () => {
   if (!_acroIcon) { _acroIcon = {}; for (const sn of state.sinners) if (sn.acronym) _acroIcon[sn.acronym] = OPTION_ICONS.sinner[sn.name]; }
   return _acroIcon;
 };
-// keyword chips: status-coloured, with the tag icon before the word when available
+// keyword chips: colour each word as a combat status or a sin, with its icon
 const kwChips = (text) => {
   if (!text) return "";
   return String(text).split(/\s+/).filter(Boolean).map((w) => {
-    const c = fillColor(STATUS_FILL[w]), ico = optIcon("keyword", w);
-    return c ? `<span class="chip" style="background:${c.fill};color:${c.font}">${ico}${esc(w)}</span>`
-      : `<span class="chip plain">${ico}${esc(w)}</span>`;
+    let c = fillColor(STATUS_FILL[w]), cat = "keyword";
+    if (!c && SIN_FILL[w]) { c = fillColor(SIN_FILL[w]); cat = "sin"; }
+    return c ? `<span class="chip" style="background:${c.fill};color:${c.font}">${optIcon(cat, w)}${esc(w)}</span>`
+      : `<span class="chip plain">${esc(w)}</span>`;
   }).join(" ");
 };
 // render a grid cell value: mode "keyword" -> status chips; else sinner-acronym icons
