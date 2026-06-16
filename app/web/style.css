@@ -214,6 +214,27 @@ td.kw input.kw-edit { width: 100%; box-sizing: border-box; }
 .ms-add { margin-top: 5px; border-top: 1px solid var(--line); padding-top: 5px; }
 .ms-newtag { width: 100%; box-sizing: border-box; }
 
+/* custom icon dropdown (native <select> kept hidden as source of truth) */
+table.sheet td:has(> details.csel) { padding: 0; }
+.csel { position: relative; }
+.csel > select { display: none; }
+.csel > summary.csel-sum {
+  cursor: pointer; list-style: none; display: flex; align-items: center; gap: 4px;
+  white-space: nowrap; padding: 5px 8px; font-size: 13px;
+}
+.csel > summary.csel-sum::-webkit-details-marker { display: none; }
+.csel > summary.csel-sum:hover { outline: 1px solid var(--gold); outline-offset: -1px; }
+.csel-val { overflow: hidden; text-overflow: ellipsis; }
+.csel-caret { margin-left: auto; opacity: .55; font-size: 9px; padding-left: 6px; }
+.csel-panel {
+  margin-top: 3px; max-height: 240px; overflow: auto; min-width: 130px;
+  background: var(--panel-2); border: 1px solid var(--gold); border-radius: 6px; padding: 4px;
+}
+.csel-opt { display: flex; align-items: center; gap: 6px; padding: 3px 5px; font-size: 12px; white-space: nowrap; border-radius: 3px; cursor: pointer; }
+.csel-opt:hover { background: #ffffff12; }
+.csel-opt.on { box-shadow: inset 2px 0 0 var(--gold); }
+.grade-glyph { display: inline-block; min-width: 14px; text-align: center; font-weight: 700; }
+
 /* ---------- list tables (IDs / EGOs) ---------- */
 .list-controls { display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; align-items: center; }
 .list-controls input[type=text] {

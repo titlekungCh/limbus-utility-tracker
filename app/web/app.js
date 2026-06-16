@@ -5,7 +5,7 @@ import {
   SHARD_TYPE_FILL, GACHA_TIER_FILL, DAY_FILL,
   EVENT_ITEM_FILL, EVENT_REWARD_FILL, SIN_ORDER, SIN_FILL,
   STATUS_ORDER, STATUS_FILL, FACTION_COLORS, SCALE_MAX5, SEASON_FILL, TIER_FILL,
-  SEASON_NUMBER_FILL, KEYWORD_FILL, KEYWORD_ORDER, OPTION_ICONS, DAYS, INVENTORY_FILL, LUNACY_FILL,
+  SEASON_NUMBER_FILL, KEYWORD_FILL, KEYWORD_ORDER, OPTION_ICONS, GRADE_GLYPH, DAYS, INVENTORY_FILL, LUNACY_FILL,
   DAILY_LEFT_FILL, WEEKLY_LEFT_FILL,
 } from "./constants.js";
 
@@ -33,6 +33,55 @@ const el = (html) => { const t = document.createElement("template"); t.innerHTML
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 // icon shown before a dropdown option (not part of its text); "" when none maps
 const optIcon = (cat, val) => { const p = cat && OPTION_ICONS[cat] && OPTION_ICONS[cat][val]; return p ? `<img class="opt-ico" src="${esc(p)}" alt="" loading="lazy">` : ""; };
+// decoration before an option: image icon, or (for grade) the Hebrew glyph
+const optDeco = (cat, val) => (cat === "grade"
+  ? (GRADE_GLYPH[val] ? `<span class="grade-glyph">${esc(GRADE_GLYPH[val])}</span>` : "")
+  : optIcon(cat, val));
+// Wrap a generated <select> string into a custom icon dropdown. The native
+// <select> stays in the DOM (hidden) as the source of truth + change target, so
+// all existing handlers keep working; we only overlay an icon-bearing list.
+const cselHtml = (selectStr, iconCat, value, colorObj) => {
+  const st = colorObj ? `background:${colorObj.fill};color:${colorObj.font};border-color:${colorObj.fill};` : "";
+  return `<details class="csel" data-iconcat="${esc(iconCat)}">`
+    + `<summary class="csel-sum" style="${st}">${optDeco(iconCat, value)}<span class="csel-val">${esc(value)}</span><span class="csel-caret">▾</span></summary>`
+    + `<div class="csel-panel"></div>${selectStr}</details>`;
+};
+// One-time delegated wiring for every custom dropdown (open/fill/select/close).
+let cselWired = false;
+function initCustomSelects() {
+  if (cselWired) return;
+  cselWired = true;
+  // fill the option list lazily when a dropdown opens (toggle doesn't bubble)
+  document.addEventListener("toggle", (e) => {
+    const d = e.target;
+    if (!(d.tagName === "DETAILS" && d.classList.contains("csel") && d.open)) return;
+    document.querySelectorAll("details.csel[open]").forEach((o) => { if (o !== d) o.open = false; });
+    const panel = d.querySelector(".csel-panel"), sel = d.querySelector("select");
+    if (!panel || !sel || panel.dataset.filled) return;
+    const cat = d.dataset.iconcat;
+    panel.innerHTML = [...sel.options].map((o) =>
+      `<div class="csel-opt${o.value === sel.value ? " on" : ""}" data-val="${esc(o.value)}" style="${o.style.cssText}">`
+      + `${optDeco(cat, o.value)}<span>${esc(o.textContent)}</span></div>`).join("");
+    panel.dataset.filled = "1";
+  }, true);
+  document.addEventListener("click", (e) => {
+    const opt = e.target.closest(".csel-opt");
+    if (opt) {
+      const d = opt.closest("details.csel"), sel = d.querySelector("select");
+      if (sel && sel.value !== opt.dataset.val) {
+        sel.value = opt.dataset.val;
+        const o = sel.options[sel.selectedIndex], sum = d.querySelector(".csel-sum");
+        sum.style.cssText = o.style.cssText + (o.style.backgroundColor ? `;border-color:${o.style.backgroundColor}` : "");
+        sum.innerHTML = `${optDeco(d.dataset.iconcat, o.value)}<span class="csel-val">${esc(o.textContent)}</span><span class="csel-caret">▾</span>`;
+        const p = d.querySelector(".csel-panel"); if (p) p.dataset.filled = ""; // refill (marker/colors) on next open
+        sel.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+      d.open = false;
+      return;
+    }
+    document.querySelectorAll("details.csel[open]").forEach((d) => { if (!d.contains(e.target)) d.open = false; });
+  });
+}
 const fmt = (n) => { if (n == null || n === "") return ""; const r = Math.round(Number(n) * 100) / 100; return Number.isInteger(r) ? String(r) : r.toFixed(2).replace(/0$/, ""); };
 // Limbus Pass level: no decimals when whole, 1 decimal otherwise.
 const fmtPass = (v) => { const n = Number(v); return Number.isInteger(n) ? String(n) : n.toFixed(1); };
@@ -720,9 +769,11 @@ function renderEditableList(viewId, arrayName, columns, searchKeys, makeBlank) {
     const st = col.color ? styleAttr(col.color(v, item)) : "";
     if (col.type === "check")
       return `<td style="text-align:center"><input type="checkbox" data-idx="${idx}" data-key="${col.key}" ${v ? "checked" : ""}/></td>`;
-    if (col.type === "select")
-      return `<td><select data-idx="${idx}" data-key="${col.key}" style="${st}">${
-        ["", ...col.options].map((o) => `<option${o === (v ?? "") ? " selected" : ""}${col.color ? optStyle(col.color(o, item)) : ""}>${esc(o)}</option>`).join("")}</select></td>`;
+    if (col.type === "select") {
+      const sel = `<select data-idx="${idx}" data-key="${col.key}" style="${st}">${
+        ["", ...col.options].map((o) => `<option${o === (v ?? "") ? " selected" : ""}${col.color ? optStyle(col.color(o, item)) : ""}>${esc(o)}</option>`).join("")}</select>`;
+      return `<td>${col.iconCat ? cselHtml(sel, col.iconCat, v ?? "", col.color ? col.color(v, item) : null) : sel}</td>`;
+    }
     if (col.type === "num")
       return `<td class="num"><input type="number" data-idx="${idx}" data-key="${col.key}" value="${v ?? ""}" style="${st}"/></td>`;
     if (col.type === "tags") {
@@ -846,7 +897,7 @@ function renderEditableList(viewId, arrayName, columns, searchKeys, makeBlank) {
 function renderIDs() {
   renderEditableList("ids", "ids", [
     { label: "ID Name", key: "name", type: "text", color: (v, it) => sinnerColor(it.sinner) },
-    { label: "Sinner", key: "sinner", type: "select", options: SINNER_ORDER, color: (v) => sinnerColor(v) },
+    { label: "Sinner", key: "sinner", type: "select", options: SINNER_ORDER, color: (v) => sinnerColor(v), iconCat: "sinner" },
     { label: "Tier", key: "tier", type: "select", options: ["★", "★★", "★★★"], color: (v) => tierColor(v) },
     { label: "Season", key: "season", type: "tags", tagColor: seasonTagColor, iconCat: "season" },
     { label: "Keyword", key: "keyword", type: "tags", tagColor: keywordTagColor, optOrder: KEYWORD_ORDER, iconCat: "keyword" },
@@ -863,9 +914,9 @@ function renderIDs() {
 function renderEGOs() {
   renderEditableList("egos", "egos", [
     { label: "EGO Name", key: "name", type: "text", color: (v, it) => sinnerColor(it.sinner) },
-    { label: "Sinner", key: "sinner", type: "select", options: SINNER_ORDER, color: (v) => sinnerColor(v) },
-    { label: "Sin", key: "sin", type: "select", options: SIN_ORDER, color: (v) => sinColor(v) },
-    { label: "Grade", key: "tier", type: "select", options: ["ZAYIN", "TETH", "HE", "WAW", "ALEPH"], color: (v) => shardTypeColor(v) },
+    { label: "Sinner", key: "sinner", type: "select", options: SINNER_ORDER, color: (v) => sinnerColor(v), iconCat: "sinner" },
+    { label: "Sin", key: "sin", type: "select", options: SIN_ORDER, color: (v) => sinColor(v), iconCat: "sin" },
+    { label: "Grade", key: "tier", type: "select", options: ["ZAYIN", "TETH", "HE", "WAW", "ALEPH"], color: (v) => shardTypeColor(v), iconCat: "grade" },
     { label: "Season", key: "season", type: "tags", tagColor: seasonTagColor, iconCat: "season" },
     { label: "Keyword", key: "keyword", type: "tags", tagColor: keywordTagColor, optOrder: KEYWORD_ORDER, iconCat: "keyword" },
     { label: "Extra Keyword", key: "extraKeyword", type: "tags", iconCat: "keyword" },
@@ -1077,6 +1128,7 @@ window.addEventListener("beforeunload", (e) => { if (dirty) { e.preventDefault()
   state.lunacy.currentDate = currentPatchISO();
   recompute(state);
   $("#dashboard").addEventListener("change", dashboardEdit); // once; #dashboard persists across re-renders
+  initCustomSelects(); // one-time delegated wiring for the custom icon dropdowns
   renderDashboard();
   renderActions();
   renderEventShop();
