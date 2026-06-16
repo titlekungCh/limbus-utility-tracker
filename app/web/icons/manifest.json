@@ -1,0 +1,74 @@
+{
+  "_source": "Great Limbus Library (https://gll-fun.com) — /images/<folder>/<name>.webp",
+  "_scraped": "2026-06-16",
+  "_note": "Fan-site icons, scraped for local use. Grades have NO image on the source site (rendered as Hebrew glyphs); see 'grade'. Seasons exist on the source only up to s-7; w-* are the Walpurgisnaught banners. Paths are relative to the web root.",
+  "keyword": {
+    "Burn": "icons/keyword/burn.webp",
+    "Bleed": "icons/keyword/bleed.webp",
+    "Tremor": "icons/keyword/tremor.webp",
+    "Rupture": "icons/keyword/rupture.webp",
+    "Sinking": "icons/keyword/sinking.webp",
+    "Poise": "icons/keyword/poise.webp",
+    "Charge": "icons/keyword/charge.webp"
+  },
+  "sin": {
+    "Wrath": "icons/sin/wrath.webp",
+    "Lust": "icons/sin/lust.webp",
+    "Sloth": "icons/sin/sloth.webp",
+    "Gluttony": "icons/sin/glut.webp",
+    "Gloom": "icons/sin/gloom.webp",
+    "Pride": "icons/sin/pride.webp",
+    "Envy": "icons/sin/envy.webp"
+  },
+  "sinner": {
+    "Yi Sang": "icons/sinner/yi-sang.webp",
+    "Faust": "icons/sinner/faust.webp",
+    "Don Quixote": "icons/sinner/don-quixote.webp",
+    "Ryoshu": "icons/sinner/ryoshu.webp",
+    "Meursault": "icons/sinner/meursault.webp",
+    "Hong Lu": "icons/sinner/hong-lu.webp",
+    "Heathcliff": "icons/sinner/heathcliff.webp",
+    "Ishmael": "icons/sinner/ishmael.webp",
+    "Rodion": "icons/sinner/rodion.webp",
+    "Sinclair": "icons/sinner/sinclair.webp",
+    "Outis": "icons/sinner/outis.webp",
+    "Gregor": "icons/sinner/gregor.webp"
+  },
+  "season": {
+    "1": "icons/season/s-1.webp",
+    "2": "icons/season/s-2.webp",
+    "3": "icons/season/s-3.webp",
+    "4": "icons/season/s-4.webp",
+    "5": "icons/season/s-5.webp",
+    "6": "icons/season/s-6.webp",
+    "7": "icons/season/s-7.webp",
+    "_s0_raw": "icons/season/s-0.webp"
+  },
+  "walpurgis": [
+    "icons/walpurgis/w-1.webp",
+    "icons/walpurgis/w-2.webp",
+    "icons/walpurgis/w-3.webp",
+    "icons/walpurgis/w-4.webp",
+    "icons/walpurgis/w-5.webp",
+    "icons/walpurgis/w-6.webp",
+    "icons/walpurgis/w-7.webp",
+    "icons/walpurgis/w-8.webp"
+  ],
+  "grade": {
+    "ZAYIN": {
+      "glyph": "ז"
+    },
+    "TETH": {
+      "glyph": "ט"
+    },
+    "HE": {
+      "glyph": "ה"
+    },
+    "WAW": {
+      "glyph": "ו"
+    },
+    "ALEPH": {
+      "glyph": "ℵ"
+    }
+  }
+}
