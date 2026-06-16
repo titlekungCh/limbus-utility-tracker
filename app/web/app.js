@@ -250,8 +250,8 @@ function renderForecast() {
         <h2>Manager XP Forecast</h2>
         <div class="body" style="padding:0;">
           <table class="sheet">
-            <thead><tr><th>Run</th><th>After N Daily</th><th>after MD <span class="count">(${mf.mdHard ? "Hard +120" : "Easy +100"})</span></th></tr></thead>
-            <tbody>${mf.rows.map((r) => `<tr><td>${r.n} Daily</td><td class="num">${fmt(r.afterDaily)}${lvlGlyph(r.dailyLevels)}</td><td class="num">${fmt(r.afterMD)}${lvlGlyph(r.mdLevels)}</td></tr>`).join("")}</tbody>
+            <thead><tr><th>Run</th><th style="white-space:nowrap">After N Daily</th><th style="white-space:nowrap">after MD</th></tr></thead>
+            <tbody>${mf.rows.map((r) => `<tr><td style="white-space:nowrap">${r.n} Daily</td><td class="num">${fmt(r.afterDaily)}${lvlGlyph(r.dailyLevels)}</td><td class="num">${fmt(r.afterMD)} <span class="count">(+${mf.mdBonus})</span>${lvlGlyph(r.mdLevels)}</td></tr>`).join("")}</tbody>
           </table>
         </div>
         <div class="body"><div class="kv">${kv([["Next Level XP", mf.nextLevelXP], ["Next Lvl Enkephalin", mf.enk]])}</div></div>
