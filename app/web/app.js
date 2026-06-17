@@ -694,10 +694,14 @@ function renderActions() {
   // Manager XP
   b = panel("Manager XP");
   r = row(b);
+  // status keyword (glyphs) of the next pending Hard / Normal MD on the dashboard
+  const nextStatus = (doneArr, statusArr) => { let i = (doneArr || []).findIndex((v) => v); if (i < 0) i = 0; return (statusArr || [])[i] || ""; };
+  const statusGlyphs = (text) => String(text || "").split(/\s+/).filter(Boolean).map((w) => optIcon("keyword", w)).join("");
+  const mdBtn = (label, status, fn, cls) => { const bn = btn(label, () => act(fn), cls); const g = statusGlyphs(status); if (g) { bn.innerHTML = `${esc(label)} ${g}`; bn.title = `${label} — next: ${status}`; } return bn; };
   r.append(
     btn("Daily Luxcavation", () => act(ACTIONS.addDailyXP), "primary"),
-    btn("1 Normal MD", () => act(ACTIONS.addNMDXP)),
-    btn("1 Weekly Hard MD", () => act(ACTIONS.addWBMDXP)),
+    mdBtn("1 Normal MD", nextStatus(state.md.normal, state.md.normalStatus), ACTIONS.addNMDXP),
+    mdBtn("1 Weekly Hard MD", nextStatus(state.md.hard, state.md.hardStatus), ACTIONS.addWBMDXP),
     btn("3 Hard MD at once", () => act(ACTIONS.add3HMD)),
     btn("1 Weekly Normal MD", () => act(ACTIONS.addwNormal)),
   );
