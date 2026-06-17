@@ -740,10 +740,13 @@ function renderActions() {
   if (state.uptie.idIdx == null) { const i = state.ids.findIndex((x) => x.acquired); state.uptie.idIdx = i >= 0 ? i : 0; }
   b.appendChild(ownedPicker("ID", state.ids, state.uptie.idIdx, (i) => { state.uptie.idIdx = i; setSelection("uptie.sinner", state.ids[i].sinner); }));
   r = row(b);
-  Object.keys(UPTIE).forEach((k) => {
+  // only show the UT options for the selected ID's rarity (0 / 00 / 000)
+  const uStars = state.ids[state.uptie.idIdx]?.tierStars;
+  Object.keys(UPTIE).filter((k) => UPTIE[k].stars === 0 || uStars == null || UPTIE[k].stars === uStars).forEach((k) => {
     const bn = btn("", () => act((s) => ACTIONS.uptie(s, k)));
-    // the (N) in the label is the thread cost -> show the thread icon by it
-    bn.innerHTML = esc(UPTIE[k].label).replace(/\((\d+)\)/, (m, n) => `(${icoTag(RESOURCE_ICON.thread)}${n})`);
+    const starIco = UPTIE[k].stars ? icoTag(OPTION_ICONS.tier["★".repeat(UPTIE[k].stars)]) : "";
+    // rarity icon replaces the leading "0/00/000"; thread icon by the (N) cost
+    bn.innerHTML = starIco + esc(UPTIE[k].label.replace(/^0+\s*/, "")).replace(/\((\d+)\)/, (m, n) => `(${icoTag(RESOURCE_ICON.thread)}${n})`);
     r.append(bn);
   });
 
@@ -751,7 +754,11 @@ function renderActions() {
   b = panel("Thread Spinning (sets the EGO's TS level)");
   if (state.uptie.egoIdx == null) { const i = state.egos.findIndex((x) => x.acquired); state.uptie.egoIdx = i >= 0 ? i : 0; }
   b.appendChild(ownedPicker("EGO", state.egos, state.uptie.egoIdx, (i) => { state.uptie.egoIdx = i; setSelection("uptie.sinner", state.egos[i].sinner); }));
-  Object.keys(THREADSPIN).forEach((grade) => {
+  // only show the grade matching the selected EGO
+  const egoGrade = state.egos[state.uptie.egoIdx]?.tier;
+  const tsGrades = egoGrade ? (THREADSPIN[egoGrade] ? [egoGrade] : []) : Object.keys(THREADSPIN);
+  if (egoGrade && !tsGrades.length) b.appendChild(el(`<div class="hint">No thread-spin steps for grade ${esc(egoGrade)}.</div>`));
+  tsGrades.forEach((grade) => {
     b.appendChild(el(`<div class="subhead">${grade}</div>`));
     const rr = row(b);
     ["TS2", "TS3", "TS3_1", "TS4"].forEach((step) => {

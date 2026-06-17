@@ -11,6 +11,7 @@ export const SHARD_DELTA = {
   "3Star": 50,
   S3S: -400,
   UT4: -50,
+  "1SUT4": -20,
   "2SUT4": -30,
   "3SUT4": -50,
   ZAYIN: -80,
@@ -21,17 +22,20 @@ export const SHARD_DELTA = {
 
 export const GACHA_TIERS = ["1Star", "2Star", "3Star"];
 
-// Uptie menu: each entry = {threads, lunacy?, shard?:shardType}. shard applies to uptie sinner.
+// Uptie menu: each entry = {threads, lunacy?, shard?:shardType, stars}. shard
+// applies to the uptie sinner. `stars` = ID rarity the entry is for (1=0, 2=00,
+// 3=000; 0 = any). A 1★ (0) ID only has UT4 (50 threads + 20 shard).
 export const UPTIE = {
-  ut2_00:     { label: "00 UT2 (10)",                threads: -10 },
-  ut3_00:     { label: "00 UT3 (40)",                threads: -40, lunacy: 40 },
-  ut4_00:     { label: "00 UT4 (100) +30 Shard",     threads: -100, shard: "2SUT4" },
-  ut3_00Ft1:  { label: "00 UT3 from UT1 (50)",       threads: -50, lunacy: 40 },
-  ut2_000:    { label: "000 UT2 (20)",               threads: -20 },
-  ut3_000:    { label: "000 UT3 (80)",               threads: -80, lunacy: 40 },
-  ut4_000:    { label: "000 UT4 (150) +50 Shard",    threads: -150, shard: "3SUT4" },
-  ut3_000Ft1: { label: "000 UT3 from UT1 (100)",     threads: -100, lunacy: 40 },
-  ut4_module: { label: "UT4 Module",                 threads: 0, lunacy: 40 },
+  ut4_0:      { label: "0 UT4 (50) +20 Shard",       threads: -50, shard: "1SUT4", stars: 1 },
+  ut2_00:     { label: "00 UT2 (10)",                threads: -10, stars: 2 },
+  ut3_00:     { label: "00 UT3 (40)",                threads: -40, lunacy: 40, stars: 2 },
+  ut4_00:     { label: "00 UT4 (100) +30 Shard",     threads: -100, shard: "2SUT4", stars: 2 },
+  ut3_00Ft1:  { label: "00 UT3 from UT1 (50)",       threads: -50, lunacy: 40, stars: 2 },
+  ut2_000:    { label: "000 UT2 (20)",               threads: -20, stars: 3 },
+  ut3_000:    { label: "000 UT3 (80)",               threads: -80, lunacy: 40, stars: 3 },
+  ut4_000:    { label: "000 UT4 (150) +50 Shard",    threads: -150, shard: "3SUT4", stars: 3 },
+  ut3_000Ft1: { label: "000 UT3 from UT1 (100)",     threads: -100, lunacy: 40, stars: 3 },
+  ut4_module: { label: "UT4 Module",                 threads: 0, lunacy: 40, stars: 0 },
 };
 
 // Thread-spinning menu, grouped by EGO grade. 4th step also shards the uptie sinner.
@@ -49,6 +53,7 @@ export const SPINCHAIN_PER_THREAD = 2; // 2 threads -> 1 spinchain
 export const TS_STEP_LEVEL = { TS2: 2, TS3: 3, TS3_1: 3, TS4: 4, TS5: 5 };
 // Target uptie level for each Uptie menu entry (used to set the ID's UT on click).
 export const UPTIE_LEVEL = {
+  ut4_0: 4,
   ut2_00: 2, ut3_00: 3, ut4_00: 4, ut3_00Ft1: 3,
   ut2_000: 2, ut3_000: 3, ut4_000: 4, ut3_000Ft1: 3, ut4_module: 4,
 };
