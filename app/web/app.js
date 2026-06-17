@@ -316,10 +316,8 @@ function renderDashboard() {
           <div class="kv">
             ${srow("Daily left", s.md.dailyLeft, false, fillColor(DAILY_LEFT_FILL[s.md.dailyLeft]))}
             ${srow("Weekly left", s.md.weeklyLeft, false, fillColor(WEEKLY_LEFT_FILL[s.md.weeklyLeft]))}
-            ${kv([
-              ["Normal left total", s.md.normalLeftTotal],
-              ["Week til Season end", s.weekTilSeasonEnd],
-            ])}
+            ${erow("Normal left total", "md.normalLeftTotal", s.md.normalLeftTotal)}
+            ${erow("Week til Season end", "weekTilSeasonEnd", s.weekTilSeasonEnd)}
           </div>
           <div class="subhead">Hard MD</div>
           <div class="checks">${s.md.hard.map((on, i) => mdPill(on, (s.md.hardStatus || [])[i] || `${i + 1} Hard`)).join("")}</div>
@@ -1368,7 +1366,23 @@ function renderData() {
   const card = (key, inner, wide) =>
     `<div class="card"${wide ? ' style="grid-column:1/-1;"' : ""}><h2>${esc(key)}<button class="reset data-delkey" data-key="${esc(key)}" title="delete this named range" style="float:right">✕</button></h2>${inner}</div>`;
 
-  const sections = Object.keys(c).map((key) => {
+  // The daily XP/thread scalars grouped into one name|value table (computed ones
+  // are read-only). Rendered as the first card; excluded from the generic grid.
+  const DAILY_CONSTS = [
+    ["xpLux", "XP Lux"], ["dailyManagerXP", "Daily Manager XP"], ["threadLuxSkip", "Thread Lux Skip"],
+    ["skipThread", "Skip Thread"], ["dailyThreads", "Daily Threads"],
+  ];
+  const dailyKeys = new Set(DAILY_CONSTS.map(([k]) => k));
+  const dailyInput = (k) => COMPUTED_SCALARS.includes(k)
+    ? `<input class="kv-num data-computed" data-path="constants.${k}" value="${esc(c[k] ?? "")}" readonly disabled title="computed"/>`
+    : `<input class="kv-num data-edit" data-path="constants.${k}" value="${esc(c[k] ?? "")}"/>`;
+  const dailyRows = DAILY_CONSTS.filter(([k]) => k in c).map(([k, label]) =>
+    `<tr><td>${esc(label)}${COMPUTED_SCALARS.includes(k) ? ' <span class="count">(calc)</span>' : ""}</td><td class="num">${dailyInput(k)}</td></tr>`).join("");
+  const dailyCard = dailyRows
+    ? `<div class="card"><h2>Daily XP &amp; Threads</h2><div class="body" style="padding:0;"><table class="sheet"><tbody>${dailyRows}</tbody></table></div></div>`
+    : "";
+
+  const sections = Object.keys(c).filter((key) => !dailyKeys.has(key)).map((key) => {
     const v = c[key];
     if (isScalar(v)) {
       const inner = COMPUTED_SCALARS.includes(key)
@@ -1423,7 +1437,7 @@ function renderData() {
       </div>
     </div></div>
     <h2 class="section-title">Dataset <span class="count">(named ranges — edit values & rows directly; changes feed every calculation)</span></h2>
-    <div class="grid">${sections}</div>
+    <div class="grid">${dailyCard}${sections}</div>
     <h2 class="section-title">Add a named range</h2>
     <div class="card"><div class="body"><div class="field">
       <input type="text" id="data-newname" placeholder="name (e.g. myCost)" style="min-width:160px"/>
@@ -1544,9 +1558,9 @@ function recomputeDerived(s) {
   // Daily Manager XP = (Thread Lux Skip * 3) + XP Lux  (sheet DataSheet J39 = (J38*3)+J35)
   if (c.threadLuxSkip != null && c.xpLux != null)
     c.dailyManagerXP = (Number(c.threadLuxSkip) || 0) * 3 + (Number(c.xpLux) || 0);
-  // Daily Threads = Skip Thread 5 * 3  (sheet DataSheet J28 = J27*3)
-  if (c.skipThread5 != null)
-    c.dailyThreads = (Number(c.skipThread5) || 0) * 3;
+  // Daily Threads = Skip Thread * 3  (sheet DataSheet J28 = J27*3)
+  if (c.skipThread != null)
+    c.dailyThreads = (Number(c.skipThread) || 0) * 3;
 }
 
 // Bring older data.json up to date: editable shardTable colour, a single tickets
@@ -1558,10 +1572,13 @@ function migrateConstants(s) {
   // once from the built-in list so old keywords are editable/removable too.
   if (!Array.isArray(s.extraKeywords))
     s.extraKeywords = EXTRA_KEYWORD_ALL.map((name) => ({ name, icon: (OPTION_ICONS.keyword || {})[name] || "" }));
-  // Daily Threads is now computed (= skipThread5 * 3). Back-fill the input from
-  // the existing value so nothing changes for data saved before this.
-  if (c.skipThread5 == null && c.dailyThreads != null)
-    c.skipThread5 = (Number(c.dailyThreads) || 0) / 3;
+  // Daily Threads is now computed (= skipThread * 3). Back-fill/rename the input
+  // (was skipThread5) so nothing changes for data saved before this.
+  if (c.skipThread == null) {
+    if (c.skipThread5 != null) c.skipThread = c.skipThread5;
+    else if (c.dailyThreads != null) c.skipThread = (Number(c.dailyThreads) || 0) / 3;
+  }
+  delete c.skipThread5;
   if (Array.isArray(c.shardTable))
     c.shardTable.forEach((r) => { if (!r.color) r.color = SHARD_TYPE_FILL[r.type] || ""; });
   if (!Array.isArray(c.tickets)) {
