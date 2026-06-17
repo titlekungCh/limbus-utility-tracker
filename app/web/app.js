@@ -1222,8 +1222,12 @@ function renderData() {
 
   const sections = Object.keys(c).map((key) => {
     const v = c[key];
-    if (isScalar(v))
-      return card(key, `<div class="body"><div class="kv">${field("value", "constants." + key, v)}</div></div>`);
+    if (isScalar(v)) {
+      const inner = COMPUTED_SCALARS.includes(key)
+        ? `<div class="k">value <span class="count">(calc)</span></div><div class="v"><input class="data-computed" data-path="constants.${key}" value="${esc(v ?? "")}" readonly disabled title="computed"/></div>`
+        : field("value", "constants." + key, v);
+      return card(key, `<div class="body"><div class="kv">${inner}</div></div>`);
+    }
     if (Array.isArray(v)) {
       // array of objects -> editable table (scrollable for big curves)
       if (v.length && v.every((o) => o && typeof o === "object" && !Array.isArray(o))) {
@@ -1271,7 +1275,7 @@ function renderData() {
         <button class="act" id="data-applyall" style="margin-top:6px;">Apply all</button>
       </div></div></details>`;
 
-  const afterEdit = () => { recomputeCurves(state); recompute(state); renderDashboard(); autosave(); };
+  const afterEdit = () => { recomputeDerived(state); recompute(state); renderDashboard(); autosave(); };
   root.querySelectorAll(".data-edit").forEach((inp) => inp.addEventListener("change", (e) => {
     setByPath(state, e.target.dataset.path, coerce(e.target.value));
     afterEdit();
@@ -1328,11 +1332,15 @@ window.addEventListener("beforeunload", (e) => { if (dirty) { e.preventDefault()
 // mirroring the original sheet: ID Level Total XP = running sum of Exp increase;
 // Manager Max Enkephalin = base 60 + running sum of Max Increase.
 const COMPUTED_COLS = { idLevelCurve: ["totalXP"], managerCurve: ["maxEnk"] };
-function recomputeCurves(s) {
+const COMPUTED_SCALARS = ["dailyManagerXP"]; // computed, read-only in the Data page
+function recomputeDerived(s) {
   const c = s.constants || {};
   const cum = (arr, src, dst, base) => { if (!Array.isArray(arr)) return; let t = base; arr.forEach((r) => { t += Number(r[src]) || 0; r[dst] = t; }); };
   cum(c.idLevelCurve, "increase", "totalXP", 0);
   cum(c.managerCurve, "maxIncrease", "maxEnk", 60);
+  // Daily Manager XP = (Thread Lux Skip * 3) + XP Lux  (sheet DataSheet J39 = (J38*3)+J35)
+  if (c.threadLuxSkip != null && c.xpLux != null)
+    c.dailyManagerXP = (Number(c.threadLuxSkip) || 0) * 3 + (Number(c.xpLux) || 0);
 }
 
 // Bring older data.json up to date: editable shardTable colour, a single tickets
@@ -1362,7 +1370,7 @@ function migrateConstants(s) {
   }
   if (Array.isArray(c.managerCurve))         // order Max Enkephalin (computed) last
     c.managerCurve = c.managerCurve.map((r) => ({ level: r.level, nextXP: r.nextXP, maxIncrease: r.maxIncrease, maxEnk: r.maxEnk }));
-  recomputeCurves(s);
+  recomputeDerived(s);
 }
 
 (async function boot() {
