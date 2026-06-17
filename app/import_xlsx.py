@@ -168,7 +168,8 @@ def main():
             "xpLux": num(D("J35")),            # 60
             "dailyManagerXP": num(D("J39")),   # 240
             "threadLuxSkip": num(D("J38")),    # 60
-            "dailyThreads": num(D("J28")),     # 54  (threads gained per daily lux run)
+            "skipThread5": num(D("J27")),      # 18  (Skip Thread 5; daily threads = *3)
+            "dailyThreads": num(D("J28")),     # 54  (= skipThread5*3; computed, read-only)
             # tickets gained per daily luxcavation, DataSheet H30:H33 (I,II,III,IV)
             "dailyLuxTickets": {
                 "I": num(D("H30")), "II": num(D("H31")),

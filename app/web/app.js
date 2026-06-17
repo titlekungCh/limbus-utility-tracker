@@ -1534,7 +1534,7 @@ window.addEventListener("beforeunload", (e) => { if (dirty) { e.preventDefault()
 // mirroring the original sheet: ID Level Total XP = running sum of Exp increase;
 // Manager Max Enkephalin = base 60 + running sum of Max Increase.
 const COMPUTED_COLS = { idLevelCurve: ["totalXP"], managerCurve: ["nextXP", "maxEnk"] };
-const COMPUTED_SCALARS = ["dailyManagerXP"]; // computed, read-only in the Data page
+const COMPUTED_SCALARS = ["dailyManagerXP", "dailyThreads"]; // computed, read-only in the Data page
 function recomputeDerived(s) {
   const c = s.constants || {};
   const cum = (arr, src, dst, base) => { if (!Array.isArray(arr)) return; let t = base; arr.forEach((r) => { t += Number(r[src]) || 0; r[dst] = t; }); };
@@ -1544,6 +1544,9 @@ function recomputeDerived(s) {
   // Daily Manager XP = (Thread Lux Skip * 3) + XP Lux  (sheet DataSheet J39 = (J38*3)+J35)
   if (c.threadLuxSkip != null && c.xpLux != null)
     c.dailyManagerXP = (Number(c.threadLuxSkip) || 0) * 3 + (Number(c.xpLux) || 0);
+  // Daily Threads = Skip Thread 5 * 3  (sheet DataSheet J28 = J27*3)
+  if (c.skipThread5 != null)
+    c.dailyThreads = (Number(c.skipThread5) || 0) * 3;
 }
 
 // Bring older data.json up to date: editable shardTable colour, a single tickets
@@ -1555,6 +1558,10 @@ function migrateConstants(s) {
   // once from the built-in list so old keywords are editable/removable too.
   if (!Array.isArray(s.extraKeywords))
     s.extraKeywords = EXTRA_KEYWORD_ALL.map((name) => ({ name, icon: (OPTION_ICONS.keyword || {})[name] || "" }));
+  // Daily Threads is now computed (= skipThread5 * 3). Back-fill the input from
+  // the existing value so nothing changes for data saved before this.
+  if (c.skipThread5 == null && c.dailyThreads != null)
+    c.skipThread5 = (Number(c.dailyThreads) || 0) / 3;
   if (Array.isArray(c.shardTable))
     c.shardTable.forEach((r) => { if (!r.color) r.color = SHARD_TYPE_FILL[r.type] || ""; });
   if (!Array.isArray(c.tickets)) {
