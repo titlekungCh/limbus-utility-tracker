@@ -358,11 +358,20 @@ function renderForecast() {
   const plan = shardPlanRows(s);
   // Shard-plan target list: the un-owned IDs + EGOs you'd shard toward (mirrors the
   // sheet's Extraction + Need-to-Shard lists = everything not acquired).
-  const targetList = [...new Set([
-    ...s.ids.filter((x) => !x.acquired && x.name).map((x) => `[${x.name}] ${x.sinner}`),
-    ...s.egos.filter((x) => !x.acquired && x.name).map((x) => `[${x.name}] ${x.sinner}`),
-  ])];
-  const targetOpts = (sel) => ["", ...targetList].map((o) => `<option${o === (sel ?? "") ? " selected" : ""}>${esc(o)}</option>`).join("");
+  const targetSeen = new Set(), targetList = [];
+  [...s.ids, ...s.egos].forEach((x) => {
+    if (x.acquired || !x.name) return;
+    const label = `[${x.name}] ${x.sinner}`;
+    if (!targetSeen.has(label)) { targetSeen.add(label); targetList.push({ label, sinner: x.sinner }); }
+  });
+  const targetSinner = (label) => (targetList.find((o) => o.label === label) || {}).sinner;
+  // colour-coded sinner-icon dropdown (like the calculator pickers)
+  const targetSelect = (idx, df, sel) => {
+    const opts = `<option${!sel ? " selected" : ""}></option>`
+      + targetList.map((o) => `<option${o.label === sel ? " selected" : ""}${optStyle(sinnerColor(o.sinner))} data-sinner="${esc(o.sinner)}">${esc(o.label)}</option>`).join("");
+    const sn = targetSinner(sel);
+    return cselHtml(`<select data-i="${idx}" data-f="${df}">${opts}</select>`, "sinner", sel || "", sn ? sinnerColor(sn) : null, sn ? optIcon("sinner", sn) : "");
+  };
   const kv = (rows) => rows.map(([k, v, big]) => `<div class="k">${esc(k)}</div><div class="v${big ? " big" : ""}">${esc(fmt(v))}</div>`).join("");
   // level-up marker: shown next to any forecast value that reaches next-level XP
   const lvlGlyph = (on) => (on ? ` <span class="lvlup" title="reaches next level">▲</span>` : "");
@@ -433,8 +442,8 @@ function renderForecast() {
                 <td>${(() => {
                   const m = p.targetMode || "text";
                   const modeSel = `<select data-i="${p.index}" data-f="targetMode">${[["text", "Text"], ["one", "1 ID/EGO"], ["two", "2 ID/EGO"]].map(([v, l]) => `<option value="${v}"${v === m ? " selected" : ""}>${l}</option>`).join("")}</select>`;
-                  const body = m === "one" ? `<select data-i="${p.index}" data-f="targetA">${targetOpts(p.targetA)}</select>`
-                    : m === "two" ? `<select data-i="${p.index}" data-f="targetA">${targetOpts(p.targetA)}</select><select data-i="${p.index}" data-f="targetB">${targetOpts(p.targetB)}</select>`
+                  const body = m === "one" ? targetSelect(p.index, "targetA", p.targetA)
+                    : m === "two" ? targetSelect(p.index, "targetA", p.targetA) + targetSelect(p.index, "targetB", p.targetB)
                     : `<input type="text" data-i="${p.index}" data-f="target" value="${esc(p.target)}"/>`;
                   return `<div class="target-cell">${modeSel}${body}</div>`;
                 })()}</td>

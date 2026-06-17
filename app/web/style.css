@@ -162,6 +162,8 @@ table.sheet tr:hover td { background: #2a221b; }
 #planTable .target-cell { display: flex; flex-direction: row; gap: 4px; align-items: center; min-width: 240px; }
 #planTable .target-cell > * { flex: 1 1 0; min-width: 0; box-sizing: border-box; }
 #planTable .target-cell > select[data-f="targetMode"] { flex: 0 0 auto; width: auto; }
+#planTable .target-cell .csel { min-width: 0; }
+#planTable .target-cell .csel > summary.csel-sum { border: 1px solid var(--line); }
 /* low-shard cue that reads on any sinner-coloured cell: a ringed red corner dot */
 td.shard-low-cell { position: relative; }
 td.shard-low-cell::after {
