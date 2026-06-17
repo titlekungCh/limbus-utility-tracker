@@ -642,6 +642,20 @@ function renderActions() {
   };
   const row = (parent) => { const r = el(`<div class="btnrow"></div>`); parent.appendChild(r); return r; };
 
+  // colour-coded sinner-icon ID/EGO picker (same look as the calculators); `filter`
+  // picks which rows are listed; `onPick(index)` gets the chosen array index.
+  const idPicker = (label, arr, curIdx, filter, onPick) => {
+    const cur = arr[curIdx];
+    const sel = `<select>${arr.map((x, i) => [x, i]).filter(([x]) => filter(x)).map(([x, i]) => `<option value="${i}"${i === curIdx ? " selected" : ""}${optStyle(sinnerColor(x.sinner))} data-sinner="${esc(x.sinner)}">[${esc(x.name)}] ${esc(x.sinner)}</option>`).join("")}</select>`;
+    const node = el(`<div class="field"><label>${esc(label)}</label>${cselHtml(sel, "sinner", cur ? `[${cur.name}] ${cur.sinner}` : "", cur ? sinnerColor(cur.sinner) : null, cur ? optIcon("sinner", cur.sinner) : "")}</div>`);
+    node.querySelector("select").addEventListener("change", (e) => onPick(+e.target.value));
+    return node;
+  };
+  const isOwned = (x) => x.acquired;
+  // F13/F14 "Extractible" list: not-owned, named, not from a limited source.
+  const isExtractible = (x) => !x.acquired && x.name && !/Event|Reward|Bokgak|BP/i.test(x.season || "");
+  const firstIdx = (arr, f) => { const i = arr.findIndex(f); return i >= 0 ? i : 0; };
+
   // Daily
   let b = panel("Daily");
   let r = row(b);
@@ -649,6 +663,18 @@ function renderActions() {
     btn("Full Daily Schedule", () => act(ACTIONS.fullCourse), "primary"),
     btn("Day Update", () => act(ACTIONS.cmenuDayUpdate)),
   );
+
+  // Gacha Gained: mark a newly-pulled (not-owned, extractible) ID/EGO as acquired
+  b = panel("Gacha Gained");
+  const validGain = (arr, idx) => arr[idx] && isExtractible(arr[idx]);
+  if (!validGain(state.ids, state.gacha.gainIdIdx)) state.gacha.gainIdIdx = firstIdx(state.ids, isExtractible);
+  if (!validGain(state.egos, state.gacha.gainEgoIdx)) state.gacha.gainEgoIdx = firstIdx(state.egos, isExtractible);
+  b.appendChild(idPicker("ID", state.ids, state.gacha.gainIdIdx, isExtractible, (i) => { state.gacha.gainIdIdx = i; renderActions(); }));
+  r = row(b);
+  r.append(btn("Acquired", () => act((s) => ACTIONS.acquireId(s, s.gacha.gainIdIdx)), "primary"));
+  b.appendChild(idPicker("EGO", state.egos, state.gacha.gainEgoIdx, isExtractible, (i) => { state.gacha.gainEgoIdx = i; renderActions(); }));
+  r = row(b);
+  r.append(btn("Acquired", () => act((s) => ACTIONS.acquireEgo(s, s.gacha.gainEgoIdx)), "primary"));
 
   // Manager XP
   b = panel("Manager XP");
@@ -726,19 +752,10 @@ function renderActions() {
   r = row(b);
   r.append(btn("Add Ext Tickets", () => act((s) => ACTIONS.customTickets(s, $("#ct").value))));
 
-  // owned-ID/EGO picker (same listing as the calculators) -> sets state[idxPath]
-  const ownedPicker = (label, arr, curIdx, onPick) => {
-    const cur = arr[curIdx];
-    const sel = `<select>${arr.map((x, i) => [x, i]).filter(([x]) => x.acquired).map(([x, i]) => `<option value="${i}"${i === curIdx ? " selected" : ""}${optStyle(sinnerColor(x.sinner))} data-sinner="${esc(x.sinner)}">[${esc(x.name)}] ${esc(x.sinner)}</option>`).join("")}</select>`;
-    const node = el(`<div class="field"><label>${esc(label)}</label>${cselHtml(sel, "sinner", cur ? `[${cur.name}] ${cur.sinner}` : "", cur ? sinnerColor(cur.sinner) : null, cur ? optIcon("sinner", cur.sinner) : "")}</div>`);
-    node.querySelector("select").addEventListener("change", (e) => onPick(+e.target.value));
-    return node;
-  };
-
   // Uptie
   b = panel("Uptying (sets the ID's UT level)");
   if (state.uptie.idIdx == null) { const i = state.ids.findIndex((x) => x.acquired); state.uptie.idIdx = i >= 0 ? i : 0; }
-  b.appendChild(ownedPicker("ID", state.ids, state.uptie.idIdx, (i) => { state.uptie.idIdx = i; setSelection("uptie.sinner", state.ids[i].sinner); }));
+  b.appendChild(idPicker("ID", state.ids, state.uptie.idIdx, isOwned, (i) => { state.uptie.idIdx = i; setSelection("uptie.sinner", state.ids[i].sinner); }));
   r = row(b);
   // show only the UT options that match the ID's rarity AND still advance it
   const uId2 = state.ids[state.uptie.idIdx], uStars = uId2?.tierStars, uCur = Number(uId2?.uptie) || 1;
@@ -760,7 +777,7 @@ function renderActions() {
   // Thread spinning
   b = panel("Thread Spinning (sets the EGO's TS level)");
   if (state.uptie.egoIdx == null) { const i = state.egos.findIndex((x) => x.acquired); state.uptie.egoIdx = i >= 0 ? i : 0; }
-  b.appendChild(ownedPicker("EGO", state.egos, state.uptie.egoIdx, (i) => { state.uptie.egoIdx = i; setSelection("uptie.sinner", state.egos[i].sinner); }));
+  b.appendChild(idPicker("EGO", state.egos, state.uptie.egoIdx, isOwned, (i) => { state.uptie.egoIdx = i; setSelection("uptie.sinner", state.egos[i].sinner); }));
   // only show the grade matching the selected EGO
   const egoGrade = state.egos[state.uptie.egoIdx]?.tier;
   const tsGrades = egoGrade ? (THREADSPIN[egoGrade] ? [egoGrade] : []) : Object.keys(THREADSPIN);

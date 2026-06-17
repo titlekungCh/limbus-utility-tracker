@@ -228,6 +228,10 @@ export const ACTIONS = {
   gachaSelected: (s) => { changeShard(s, s.gacha.tier, s.gacha.sinner); },
   gachaFor: (s, sinnerName) => { changeShard(s, s.gacha.tier, sinnerName); },
 
+  // --- Gacha gained: mark a not-owned ID/EGO as acquired at base level ---
+  acquireId: (s, idx) => { const x = s.ids[idx]; if (x) { x.acquired = true; x.uptie = 1; x.level = 1; note(`Acquired ID: ${x.name}`); } },
+  acquireEgo: (s, idx) => { const x = s.egos[idx]; if (x) { x.acquired = true; x.threadspin = 1; note(`Acquired EGO: ${x.name}`); } },
+
   // --- Uptie ---
   uptie: (s, key) => {
     const u = UPTIE[key];
