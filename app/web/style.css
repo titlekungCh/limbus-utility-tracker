@@ -292,6 +292,11 @@ table.sheet td:has(> details.csel) { padding: 0; }
 .csel > summary.csel-sum:hover { outline: 1px solid var(--gold); outline-offset: -1px; }
 .csel-val { overflow: hidden; text-overflow: ellipsis; }
 .csel-caret { margin-left: auto; opacity: .55; font-size: 9px; padding-left: 6px; }
+/* IDs/EGOs tables: show icon only for Sinner/Tier/Sin (frees the name column);
+   the open dropdown list still shows names */
+table.sheet .csel[data-iconcat="sinner"] .csel-val,
+table.sheet .csel[data-iconcat="tier"] .csel-val,
+table.sheet .csel[data-iconcat="sin"] .csel-val { display: none; }
 .csel-panel {
   margin-top: 3px; max-height: 240px; overflow: auto; min-width: 130px;
   background: var(--panel-2); border: 1px solid var(--gold); border-radius: 6px; padding: 4px;
