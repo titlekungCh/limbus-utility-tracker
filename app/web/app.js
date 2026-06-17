@@ -320,7 +320,7 @@ function renderDashboard() {
             <tbody><tr><td>Shards</td>${SINNER_ORDER.map((n) => {
               const i = state.sinners.findIndex((x) => x.name === n);
               const sh = state.sinners[i]?.shards ?? 0;
-              return `<td class="num"><input type="number" class="kv-num ${sh < 50 ? "shard-low" : "shard-ok"}" data-path="sinners.${i}.shards" value="${sh}"/></td>`;
+              return `<td class="num"><input type="number" class="kv-num" data-path="sinners.${i}.shards" value="${sh}" style="${styleAttr(shardColor(sh))}"/></td>`;
             }).join("")}</tr></tbody>
           </table>
         </div>
@@ -725,6 +725,17 @@ function scaleColor(v) {
   const span = hi.at - lo.at, t = span ? (n - lo.at) / span : 0;
   const mix = lo.rgb.map((c, i) => Math.round(c + (hi.rgb[i] - c) * t));
   return { fill: `rgb(${mix.join(",")})`, font: "#202124" };
+}
+// Colour a sinner's shard count: red (0) -> yellow (50, the "low" threshold) -> green (100+).
+function shardColor(v) {
+  const n = Math.min(100, Math.max(0, Number(v) || 0));
+  const stops = [[0, [177, 2, 2]], [50, [255, 242, 67]], [100, [52, 168, 83]]];
+  let lo = stops[0], hi = stops[stops.length - 1];
+  for (let i = 0; i < stops.length - 1; i++) if (n >= stops[i][0] && n <= stops[i + 1][0]) { lo = stops[i]; hi = stops[i + 1]; break; }
+  const span = hi[0] - lo[0], t = span ? (n - lo[0]) / span : 0;
+  const mix = lo[1].map((c, i) => Math.round(c + (hi[1][i] - c) * t));
+  const lum = 0.299 * mix[0] + 0.587 * mix[1] + 0.114 * mix[2];
+  return { fill: `rgb(${mix.join(",")})`, font: lum > 150 ? "#202124" : "#fff" };
 }
 // Pick a readable font for an arbitrary fill (used by the non-sinner palettes).
 function contrastFont(hex) {
@@ -1188,6 +1199,76 @@ function renderIFSS7() {
   $("#ifss7-addteam").addEventListener("click", () => { for (let i = 0; i < 3; i++) g.push(Array(12).fill("")); renderIFSS7(); autosave(); });
 }
 
+// ---------- Data (named ranges / constants) editor ----------
+function renderData() {
+  const root = $("#data");
+  if (!root) return;
+  const c = state.constants || {};
+  const isScalar = (v) => v === null || ["number", "string", "boolean"].includes(typeof v);
+  const coerce = (s) => { if (s === "") return ""; const n = Number(s); return (!isNaN(n) && s.trim() !== "") ? n : s; };
+  const field = (label, path, val) =>
+    `<div class="k">${esc(label)}</div><div class="v"><input class="kv-num data-edit" data-path="${esc(path)}" value="${esc(val ?? "")}"/></div>`;
+  const jsonCard = (key, v) =>
+    `<div class="card" style="grid-column:1/-1;"><h2>${esc(key)} <span class="count">(JSON — ${Array.isArray(v) ? v.length + " rows" : "object"})</span></h2>
+      <div class="body"><textarea class="data-json" data-key="${esc(key)}" spellcheck="false">${esc(JSON.stringify(v, null, 2))}</textarea>
+      <button class="act" data-applyjson="${esc(key)}" style="margin-top:6px;">Apply ${esc(key)}</button></div></div>`;
+
+  const sections = Object.keys(c).map((key) => {
+    const v = c[key];
+    if (isScalar(v))
+      return `<div class="card"><h2>${esc(key)}</h2><div class="body"><div class="kv">${field(key, "constants." + key, v)}</div></div></div>`;
+    if (Array.isArray(v)) {
+      if (v.length && v[0] && typeof v[0] === "object" && v.length <= 30) {
+        const cols = [...new Set(v.flatMap((o) => Object.keys(o)))];
+        const body = v.map((o, i) =>
+          `<tr>${cols.map((col) => `<td><input class="data-edit" data-path="constants.${key}.${i}.${col}" value="${esc(o[col] ?? "")}"/></td>`).join("")}` +
+          `<td style="text-align:center"><button class="reset" data-delconst="${key}.${i}">✕</button></td></tr>`).join("");
+        return `<div class="card" style="grid-column:1/-1;"><h2>${esc(key)} <span class="count">(${v.length} rows)</span></h2>
+          <div class="body" style="padding:0;"><table class="sheet"><thead><tr>${cols.map((col) => `<th>${esc(col)}</th>`).join("")}<th></th></tr></thead><tbody>${body}</tbody></table></div>
+          <div class="body"><button class="act" data-addconst="${key}">+ Row</button></div></div>`;
+      }
+      return jsonCard(key, v);
+    }
+    if (typeof v === "object")
+      return `<div class="card"><h2>${esc(key)}</h2><div class="body"><div class="kv">${Object.keys(v).map((sub) => field(sub, `constants.${key}.${sub}`, v[sub])).join("")}</div></div></div>`;
+    return jsonCard(key, v);
+  }).join("");
+
+  root.innerHTML = `
+    <h2 class="section-title">Dataset <span class="count">(named ranges — edit values, add rows, or paste JSON; feeds every calculation)</span></h2>
+    <div class="grid">${sections}</div>
+    <h2 class="section-title">Add / Replace (raw JSON)</h2>
+    <div class="card" style="grid-column:1/-1;"><div class="body">
+      <div class="hint">Edit the whole constants object — add new named ranges for new calculations, or restructure existing ones. Apply validates the JSON.</div>
+      <textarea class="data-json" id="data-rawall" spellcheck="false" style="min-height:300px;">${esc(JSON.stringify(c, null, 2))}</textarea>
+      <button class="act primary" id="data-applyall" style="margin-top:6px;">Apply all</button>
+    </div></div>`;
+
+  const afterEdit = () => { recompute(state); renderDashboard(); autosave(); };
+  root.querySelectorAll(".data-edit").forEach((inp) => inp.addEventListener("change", (e) => {
+    setByPath(state, e.target.dataset.path, coerce(e.target.value));
+    afterEdit();
+  }));
+  root.querySelectorAll("[data-applyjson]").forEach((b) => b.addEventListener("click", () => {
+    const key = b.dataset.applyjson, ta = root.querySelector(`textarea[data-key="${key}"]`);
+    try { state.constants[key] = JSON.parse(ta.value); renderData(); afterEdit(); toast([`${key} updated`]); }
+    catch (err) { toast([`Invalid JSON in ${key}: ${err.message}`]); }
+  }));
+  root.querySelectorAll("[data-addconst]").forEach((b) => b.addEventListener("click", () => {
+    const key = b.dataset.addconst, arr = state.constants[key], blank = {};
+    [...new Set(arr.flatMap((o) => Object.keys(o)))].forEach((k) => (blank[k] = ""));
+    arr.push(blank); renderData(); afterEdit();
+  }));
+  root.querySelectorAll("[data-delconst]").forEach((b) => b.addEventListener("click", () => {
+    const i = b.dataset.delconst.lastIndexOf("."), key = b.dataset.delconst.slice(0, i), idx = +b.dataset.delconst.slice(i + 1);
+    state.constants[key].splice(idx, 1); renderData(); afterEdit();
+  }));
+  $("#data-applyall").addEventListener("click", () => {
+    try { state.constants = JSON.parse($("#data-rawall").value); renderData(); afterEdit(); toast(["Dataset replaced"]); }
+    catch (err) { toast([`Invalid JSON: ${err.message}`]); }
+  });
+}
+
 // ---------- tabs ----------
 function showTab(name) {
   document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("active", t.dataset.tab === name));
@@ -1224,5 +1305,6 @@ window.addEventListener("beforeunload", (e) => { if (dirty) { e.preventDefault()
   renderEGOs();
   renderEditableGrid("teams", "teams");
   renderIFSS7();
+  renderData();
   markSaved();
 })();
