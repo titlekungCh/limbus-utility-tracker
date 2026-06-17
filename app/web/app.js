@@ -635,9 +635,9 @@ function renderActions() {
   root.innerHTML = `<div class="panels" id="panels"></div>`;
   const panels = $("#panels", root);
 
-  const panel = (title) => {
+  const panel = (title, parent = panels) => {
     const p = el(`<div class="panel"><h3>${esc(title)}</h3><div class="body"></div></div>`);
-    panels.appendChild(p);
+    parent.appendChild(p);
     return $(".body", p);
   };
   const row = (parent) => { const r = el(`<div class="btnrow"></div>`); parent.appendChild(r); return r; };
@@ -656,8 +656,12 @@ function renderActions() {
   const isExtractible = (x) => !x.acquired && x.name && !/Event|Reward|Bokgak|BP/i.test(x.season || "");
   const firstIdx = (arr, f) => { const i = arr.findIndex(f); return i >= 0 ? i : 0; };
 
+  // Daily + Gacha Gained stacked in one column
+  const dailyStack = el(`<div class="panel-stack"></div>`);
+  panels.appendChild(dailyStack);
+
   // Daily
-  let b = panel("Daily");
+  let b = panel("Daily", dailyStack);
   let r = row(b);
   r.append(
     btn("Full Daily Schedule", () => act(ACTIONS.fullCourse), "primary"),
@@ -665,7 +669,7 @@ function renderActions() {
   );
 
   // Gacha Gained: mark a newly-pulled (not-owned, extractible) ID/EGO as acquired
-  b = panel("Gacha Gained");
+  b = panel("Gacha Gained", dailyStack);
   const validGain = (arr, idx) => arr[idx] && isExtractible(arr[idx]);
   if (!validGain(state.ids, state.gacha.gainIdIdx)) state.gacha.gainIdIdx = firstIdx(state.ids, isExtractible);
   if (!validGain(state.egos, state.gacha.gainEgoIdx)) state.gacha.gainEgoIdx = firstIdx(state.egos, isExtractible);
