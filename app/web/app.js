@@ -652,8 +652,10 @@ function renderActions() {
     return node;
   };
   const isOwned = (x) => x.acquired;
-  // F13/F14 "Extractible" list: not-owned, named, not from a limited source.
-  const isExtractible = (x) => !x.acquired && x.name && !/Event|Reward|Bokgak|BP/i.test(x.season || "");
+  // F13/F14 "Extractible": not-owned, named, no limited tag. F15/F16 "Need-to-Shard": the limited ones.
+  const isLimited = (x) => /Event|Reward|Bokgak|BP/i.test(x.season || "");
+  const isExtractible = (x) => !x.acquired && x.name && !isLimited(x);
+  const isShardNeeded = (x) => !x.acquired && x.name && isLimited(x);
   const firstIdx = (arr, f) => { const i = arr.findIndex(f); return i >= 0 ? i : 0; };
 
   // Daily + Gacha Gained stacked in one column
@@ -668,16 +670,25 @@ function renderActions() {
     btn("Day Update", () => act(ACTIONS.cmenuDayUpdate)),
   );
 
-  // Gacha Gained: mark a newly-pulled (not-owned, extractible) ID/EGO as acquired
-  b = panel("Gacha Gained", dailyStack);
-  const validGain = (arr, idx) => arr[idx] && isExtractible(arr[idx]);
-  if (!validGain(state.ids, state.gacha.gainIdIdx)) state.gacha.gainIdIdx = firstIdx(state.ids, isExtractible);
-  if (!validGain(state.egos, state.gacha.gainEgoIdx)) state.gacha.gainEgoIdx = firstIdx(state.egos, isExtractible);
-  const gIdField = idPicker("ID", state.ids, state.gacha.gainIdIdx, isExtractible, (i) => { state.gacha.gainIdIdx = i; renderActions(); });
-  gIdField.appendChild(btn("Acquired", () => act((s) => ACTIONS.acquireId(s, s.gacha.gainIdIdx)), "primary"));
+  // Gacha Gained / Sharded Stuff: mark a not-owned ID/EGO as acquired. The header
+  // toggle switches the source list (extractible vs need-to-shard).
+  const gMode = state.gacha.gainMode === "shard" ? "shard" : "gacha";
+  const gFilter = gMode === "shard" ? isShardNeeded : isExtractible;
+  const gIK = gMode === "shard" ? "shardIdIdx" : "gainIdIdx", gEK = gMode === "shard" ? "shardEgoIdx" : "gainEgoIdx";
+  const gPanel = el(`<div class="panel"><h3 class="seg-toggle">`
+    + `<span class="seg${gMode === "gacha" ? " on" : ""}" data-m="gacha">Gacha Gained</span>`
+    + `<span class="seg${gMode === "shard" ? " on" : ""}" data-m="shard">Sharded Stuff</span></h3><div class="body"></div></div>`);
+  dailyStack.appendChild(gPanel);
+  gPanel.querySelectorAll(".seg").forEach((sp) => sp.addEventListener("click", () => { state.gacha.gainMode = sp.dataset.m; renderActions(); }));
+  b = $(".body", gPanel);
+  const validGain = (arr, idx) => arr[idx] && gFilter(arr[idx]);
+  if (!validGain(state.ids, state.gacha[gIK])) state.gacha[gIK] = firstIdx(state.ids, gFilter);
+  if (!validGain(state.egos, state.gacha[gEK])) state.gacha[gEK] = firstIdx(state.egos, gFilter);
+  const gIdField = idPicker("ID", state.ids, state.gacha[gIK], gFilter, (i) => { state.gacha[gIK] = i; renderActions(); });
+  gIdField.appendChild(btn("Acquired", () => act((s) => ACTIONS.acquireId(s, s.gacha[gIK])), "primary"));
   b.appendChild(gIdField);
-  const gEgoField = idPicker("EGO", state.egos, state.gacha.gainEgoIdx, isExtractible, (i) => { state.gacha.gainEgoIdx = i; renderActions(); });
-  gEgoField.appendChild(btn("Acquired", () => act((s) => ACTIONS.acquireEgo(s, s.gacha.gainEgoIdx)), "primary"));
+  const gEgoField = idPicker("EGO", state.egos, state.gacha[gEK], gFilter, (i) => { state.gacha[gEK] = i; renderActions(); });
+  gEgoField.appendChild(btn("Acquired", () => act((s) => ACTIONS.acquireEgo(s, s.gacha[gEK])), "primary"));
   b.appendChild(gEgoField);
 
   // Manager XP
