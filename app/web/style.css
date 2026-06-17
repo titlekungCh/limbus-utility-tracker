@@ -164,6 +164,10 @@ table.sheet tr:hover td { background: #2a221b; }
 #planTable .target-cell > select[data-f="targetMode"] { flex: 0 0 auto; width: auto; }
 #planTable .target-cell .csel { min-width: 0; }
 #planTable .target-cell .csel > summary.csel-sum { border: 1px solid var(--line); }
+#planTable .target-cell .ut-toggle { flex: 0 0 auto; }
+.ut-toggle { padding: 3px 7px; font-size: 11px; white-space: nowrap; cursor: pointer; border-radius: 4px;
+  border: 1px solid var(--line); background: var(--cell); color: var(--muted); }
+.ut-toggle.on { background: #2c3a26; color: #bfe0a8; border-color: var(--green); }
 /* low-shard cue that reads on any sinner-coloured cell: a ringed red corner dot */
 td.shard-low-cell { position: relative; }
 td.shard-low-cell::after {

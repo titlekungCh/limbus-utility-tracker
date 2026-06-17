@@ -119,6 +119,8 @@ export function shardPlanRows(s) {
       targetMode: p.targetMode || "text",
       targetA: p.targetA || "",
       targetB: p.targetB || "",
+      targetAUT: !!p.targetAUT,
+      targetBUT: !!p.targetBUT,
     };
   });
 }

@@ -367,11 +367,13 @@ function renderForecast() {
   const targetSinner = (label) => (targetList.find((o) => o.label === label) || {}).sinner;
   // colour-coded sinner-icon dropdown (like the calculator pickers); only the
   // row's own sinner's un-owned IDs/EGOs are listed
-  const targetSelect = (idx, df, sel, sinnerName) => {
+  const targetSelect = (idx, df, sel, sinnerName, ut) => {
     const opts = `<option${!sel ? " selected" : ""}></option>`
       + targetList.filter((o) => o.sinner === sinnerName).map((o) => `<option${o.label === sel ? " selected" : ""}${optStyle(sinnerColor(o.sinner))} data-sinner="${esc(o.sinner)}">${esc(o.label)}</option>`).join("");
     const sn = targetSinner(sel);
-    return cselHtml(`<select data-i="${idx}" data-f="${df}">${opts}</select>`, "sinner", sel || "", sn ? sinnerColor(sn) : null, sn ? optIcon("sinner", sn) : "");
+    const picker = cselHtml(`<select data-i="${idx}" data-f="${df}">${opts}</select>`, "sinner", sel || "", sn ? sinnerColor(sn) : null, sn ? optIcon("sinner", sn) : "");
+    const toggle = `<button type="button" class="ut-toggle${ut ? " on" : ""}" data-i="${idx}" data-f="${df}UT" title="Uptie target / not">${ut ? "Uptie" : "No UT"}</button>`;
+    return picker + toggle;
   };
   const kv = (rows) => rows.map(([k, v, big]) => `<div class="k">${esc(k)}</div><div class="v${big ? " big" : ""}">${esc(fmt(v))}</div>`).join("");
   // level-up marker: shown next to any forecast value that reaches next-level XP
@@ -443,8 +445,8 @@ function renderForecast() {
                 <td>${(() => {
                   const m = p.targetMode || "text";
                   const modeSel = `<select data-i="${p.index}" data-f="targetMode">${[["text", "Text"], ["one", "1 ID/EGO"], ["two", "2 ID/EGO"]].map(([v, l]) => `<option value="${v}"${v === m ? " selected" : ""}>${l}</option>`).join("")}</select>`;
-                  const body = m === "one" ? targetSelect(p.index, "targetA", p.targetA, p.sinner)
-                    : m === "two" ? targetSelect(p.index, "targetA", p.targetA, p.sinner) + targetSelect(p.index, "targetB", p.targetB, p.sinner)
+                  const body = m === "one" ? targetSelect(p.index, "targetA", p.targetA, p.sinner, p.targetAUT)
+                    : m === "two" ? targetSelect(p.index, "targetA", p.targetA, p.sinner, p.targetAUT) + targetSelect(p.index, "targetB", p.targetB, p.sinner, p.targetBUT)
                     : `<input type="text" data-i="${p.index}" data-f="target" value="${esc(p.target)}"/>`;
                   return `<div class="target-cell">${modeSel}${body}</div>`;
                 })()}</td>
@@ -462,6 +464,15 @@ function renderForecast() {
       renderDashboard();     // re-runs renderForecast(): recompute derived cells + rollups
       autosave();
     });
+  });
+  // Uptie / No UT toggle next to each target picker
+  $("#planTable").addEventListener("click", (e) => {
+    const b = e.target.closest(".ut-toggle");
+    if (!b) return;
+    const i = +b.dataset.i, f = b.dataset.f;
+    state.shardPlan[i][f] = !state.shardPlan[i][f];
+    renderDashboard();
+    autosave();
   });
 
   renderIdLeveling();
