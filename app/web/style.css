@@ -158,8 +158,10 @@ table.sheet tr:hover td { background: #2a221b; }
 #planTable th, #planTable td { white-space: nowrap; }
 #planTable th:last-child, #planTable td:last-child { width: 100%; }
 #planTable td select[data-f="type"] { min-width: 0; }
-.target-cell { display: flex; flex-direction: column; gap: 3px; min-width: 150px; }
-.target-cell select, .target-cell input { width: 100%; box-sizing: border-box; }
+/* chooser on the left, picker(s) fill the rest — all on one line */
+#planTable .target-cell { display: flex; flex-direction: row; gap: 4px; align-items: center; min-width: 240px; }
+#planTable .target-cell > * { flex: 1 1 0; min-width: 0; box-sizing: border-box; }
+#planTable .target-cell > select[data-f="targetMode"] { flex: 0 0 auto; width: auto; }
 /* low-shard cue that reads on any sinner-coloured cell: a ringed red corner dot */
 td.shard-low-cell { position: relative; }
 td.shard-low-cell::after {
