@@ -320,7 +320,7 @@ function renderDashboard() {
             <tbody><tr><td>Shards</td>${SINNER_ORDER.map((n) => {
               const i = state.sinners.findIndex((x) => x.name === n);
               const sh = state.sinners[i]?.shards ?? 0;
-              return `<td class="num"><input type="number" class="kv-num" data-path="sinners.${i}.shards" value="${sh}" style="${styleAttr(sinnerColor(n))}"/></td>`;
+              return `<td class="num${sh < 50 ? " shard-low-cell" : ""}" title="${sh < 50 ? "Low shards (<50)" : ""}"><input type="number" class="kv-num" data-path="sinners.${i}.shards" value="${sh}" style="${styleAttr(sinnerColor(n))}"/></td>`;
             }).join("")}</tr></tbody>
           </table>
         </div>

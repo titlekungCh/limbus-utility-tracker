@@ -143,6 +143,13 @@ table.sheet tr:nth-child(even) td { background: #1f1a15; }
 table.sheet tr:hover td { background: #2a221b; }
 .shard-low { color: var(--crimson-bright); }
 .shard-ok { color: #bfe0a8; }
+/* low-shard cue that reads on any sinner-coloured cell: a ringed red corner dot */
+td.shard-low-cell { position: relative; }
+td.shard-low-cell::after {
+  content: ""; position: absolute; top: 2px; right: 2px; width: 7px; height: 7px;
+  border-radius: 50%; background: #ff2d2d; box-shadow: 0 0 0 1.5px #000, 0 0 3px #ff2d2d;
+  pointer-events: none;
+}
 /* level-up marker next to a forecast value that reaches next-level XP */
 .lvlup { color: var(--gold); font-weight: 700; font-size: 11px; }
 /* per-row Mirror Dungeon type badge in the Manager XP forecast */
