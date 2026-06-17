@@ -1,6 +1,6 @@
 // Projection/forecast calculations ported from the Inventory sheet formulas.
 // Each was verified against the spreadsheet's cached values.
-import { THREADSPIN, SHARD_DELTA } from "./constants.js";
+import { THREADSPIN, SHARD_DELTA, SPINCHAIN, SPINCHAIN_PER_THREAD } from "./constants.js";
 const round2 = (n) => Math.round(n * 100) / 100;
 
 // Rental runs every other week; the 2026-06-11 patch week (a Thursday) is a
@@ -176,10 +176,11 @@ export function egoThreadspin(s, idx, target) {
   const curRaw = ego.threadspin;
   const clamp = (v) => Math.max(1, Math.min(TS_MAX, Math.round(Number(v) || 1)));
   const cur = clamp(curRaw), tgt = clamp(target);
-  let threads = 0, shard = 0;
+  let threads = 0, shard = 0, spinchain = 0;
   if (cum) {
     threads = Math.max(0, cum[tgt] - cum[cur]);
     shard = (cur < 4 && tgt >= 4) ? Math.abs(SHARD_DELTA[grade] || 0) : 0; // TS4 shards once
+    spinchain = (cur < 5 && tgt >= 5) ? (SPINCHAIN[grade] || 0) : 0;       // TS5 spinchain cost
   }
   // EGO shard comes from the sinner the EGO belongs to.
   const sinnerObj = s.sinners.find((x) => x.name === ego.sinner);
@@ -187,7 +188,9 @@ export function egoThreadspin(s, idx, target) {
   return {
     name: ego.name, sinner: ego.sinner, grade, valid: !!cum,
     current: curRaw, currentNum: cur, target: tgt,
-    threads, shard,
+    threads, shard, spinchain,
+    scShard: spinchain,                          // craft 1 spinchain from 1 EGO shard
+    scThread: spinchain * SPINCHAIN_PER_THREAD,  // or from 2 threads
     threadsOwned: s.inventory.threads, threadsLeft: round2(s.inventory.threads - threads),
     shardOwned, shardLeft: round2(shardOwned - shard),
   };

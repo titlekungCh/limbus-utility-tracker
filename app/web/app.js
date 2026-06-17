@@ -1,6 +1,6 @@
 import { ACTIONS, run, recompute } from "./logic.js";
 import {
-  UPTIE, THREADSPIN, LUNACY_ACTIONS, TICKET_ACTIONS, GACHA_TIERS,
+  UPTIE, THREADSPIN, SPINCHAIN, LUNACY_ACTIONS, TICKET_ACTIONS, GACHA_TIERS,
   SINNER_ORDER, SINNER_COLORS, LEVEL_FILL, LEVEL_FILL_DEFAULT, SCALE_STOPS,
   SHARD_TYPE_FILL, GACHA_TIER_FILL, DAY_FILL,
   EVENT_ITEM_FILL, EVENT_REWARD_FILL, SIN_ORDER, SIN_FILL,
@@ -181,6 +181,8 @@ function act(fn) {
   recompute(state);
   renderDashboard();
   renderActions();   // sinner/tier selectors & values may have changed
+  renderIDs();       // uptie/threadspin actions can change an ID/EGO's UT/TS level
+  renderEGOs();
   toast(lines.length ? lines : ["Done"]);
   autosave();
 }
@@ -541,6 +543,9 @@ function renderEgoThreadspin() {
       <div class="k">Threads Left After</div><div class="v">${res ? fmt(res.threadsLeft) : "—"}</div>
       <div class="k">EGO Shard Needed</div><div class="v">${res ? fmt(res.shard) : "—"}</div>
       <div class="k">${res ? esc(res.sinner) : ""} Shard Left After</div><div class="v" style="${selSt}">${res ? fmt(res.shardLeft) : "—"}</div>
+      ${res && res.spinchain ? `<div class="k">Spinchain Needed (TS5)</div><div class="v big">${fmt(res.spinchain)}</div>
+      <div class="k">= EGO Shard (1:1)</div><div class="v">${fmt(res.scShard)}</div>
+      <div class="k">= Thread (2:1)</div><div class="v">${fmt(res.scThread)}</div>` : ""}
     </div>`;
   $("#egots-name").addEventListener("change", (e) => { egoTSel.idx = +e.target.value; renderEgoThreadspin(); });
   $("#egots-target").addEventListener("change", (e) => { egoTSel.target = Number(e.target.value) || 1; renderEgoThreadspin(); });
@@ -721,22 +726,33 @@ function renderActions() {
   r = row(b);
   r.append(btn("Add Ext Tickets", () => act((s) => ACTIONS.customTickets(s, $("#ct").value))));
 
+  // owned-ID/EGO picker (same listing as the calculators) -> sets state[idxPath]
+  const ownedPicker = (label, arr, curIdx, onPick) => {
+    const cur = arr[curIdx];
+    const sel = `<select>${arr.map((x, i) => [x, i]).filter(([x]) => x.acquired).map(([x, i]) => `<option value="${i}"${i === curIdx ? " selected" : ""}${optStyle(sinnerColor(x.sinner))} data-sinner="${esc(x.sinner)}">[${esc(x.name)}] ${esc(x.sinner)}</option>`).join("")}</select>`;
+    const node = el(`<div class="field"><label>${esc(label)}</label>${cselHtml(sel, "sinner", cur ? `[${cur.name}] ${cur.sinner}` : "", cur ? sinnerColor(cur.sinner) : null, cur ? optIcon("sinner", cur.sinner) : "")}</div>`);
+    node.querySelector("select").addEventListener("change", (e) => onPick(+e.target.value));
+    return node;
+  };
+
   // Uptie
-  b = panel("Uptying (uses Uptying Sinner)");
-  const uSinnerSel = `<select style="${styleAttr(sinnerColor(state.uptie.sinner))}">${SINNER_ORDER.map((n) => `<option ${n === state.uptie.sinner ? "selected" : ""}${optStyle(sinnerColor(n))}>${esc(n)}</option>`).join("")}</select>`;
-  const uSinner = el(`<div class="field"><label>Sinner</label>${cselHtml(uSinnerSel, "sinner", state.uptie.sinner, sinnerColor(state.uptie.sinner))}</div>`);
-  uSinner.querySelector("select").addEventListener("change", (e) => setSelection("uptie.sinner", e.target.value));
-  b.appendChild(uSinner);
+  b = panel("Uptying (sets the ID's UT level)");
+  if (state.uptie.idIdx == null) { const i = state.ids.findIndex((x) => x.acquired); state.uptie.idIdx = i >= 0 ? i : 0; }
+  b.appendChild(ownedPicker("ID", state.ids, state.uptie.idIdx, (i) => { state.uptie.idIdx = i; setSelection("uptie.sinner", state.ids[i].sinner); }));
   r = row(b);
   Object.keys(UPTIE).forEach((k) => r.append(btn(UPTIE[k].label, () => act((s) => ACTIONS.uptie(s, k)))));
 
   // Thread spinning
-  b = panel("Thread Spinning (TS4 shards Uptying Sinner)");
+  b = panel("Thread Spinning (sets the EGO's TS level)");
+  if (state.uptie.egoIdx == null) { const i = state.egos.findIndex((x) => x.acquired); state.uptie.egoIdx = i >= 0 ? i : 0; }
+  b.appendChild(ownedPicker("EGO", state.egos, state.uptie.egoIdx, (i) => { state.uptie.egoIdx = i; setSelection("uptie.sinner", state.egos[i].sinner); }));
   Object.keys(THREADSPIN).forEach((grade) => {
     b.appendChild(el(`<div class="subhead">${grade}</div>`));
     const rr = row(b);
     ["TS2", "TS3", "TS3_1", "TS4"].forEach((step) =>
       rr.append(btn(`${step.replace("_1", " (from 1)")} (${Math.abs(THREADSPIN[grade][step])})`, () => act((s) => ACTIONS.threadspin(s, grade, step)))));
+    rr.append(btn(`TS5 (${SPINCHAIN[grade]} SC ◆shard)`, () => act((s) => ACTIONS.threadspinTS5(s, grade, "shard"))));
+    rr.append(btn(`TS5 (${SPINCHAIN[grade] * 2}🧵 thread)`, () => act((s) => ACTIONS.threadspinTS5(s, grade, "thread"))));
   });
 
   // Intervallo shop lives on its own "Event Shop" tab (full editable planner).

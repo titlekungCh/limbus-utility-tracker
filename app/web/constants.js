@@ -41,6 +41,17 @@ export const THREADSPIN = {
   HE:    { TS2: -30, TS3: -80, TS3_1: -110, TS4: -150, shard: "HE"    },
   WAW:   { TS2: -35, TS3: -90, TS3_1: -125, TS4: -170, shard: "WAW"   },
 };
+// TS5 (TS4 -> TS5) costs spinchains per grade. Spinchains aren't stockpiled —
+// they're crafted at use from 1 EGO shard (1:1) or 2 threads (2:1).
+export const SPINCHAIN = { ZAYIN: 125, TETH: 150, HE: 175, WAW: 225 };
+export const SPINCHAIN_PER_THREAD = 2; // 2 threads -> 1 spinchain
+// Target TS level for each thread-spin step (used to set the EGO's TS on click).
+export const TS_STEP_LEVEL = { TS2: 2, TS3: 3, TS3_1: 3, TS4: 4, TS5: 5 };
+// Target uptie level for each Uptie menu entry (used to set the ID's UT on click).
+export const UPTIE_LEVEL = {
+  ut2_00: 2, ut3_00: 3, ut4_00: 4, ut3_00Ft1: 3,
+  ut2_000: 2, ut3_000: 3, ut4_000: 4, ut3_000Ft1: 3, ut4_module: 4,
+};
 
 // Lunacy extractions menu. Each entry = net {paid, total} deltas applied to
 // lunacy.paid and lunacy.total (free lunacy = total - paid is derived).

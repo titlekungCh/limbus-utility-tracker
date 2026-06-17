@@ -2,7 +2,7 @@
 // (the same shape as data.json) exactly as the spreadsheet's Apps Script did.
 import {
   DAYS, SHARD_DELTA, UPTIE, THREADSPIN, LUNACY_ACTIONS, TICKET_ACTIONS,
-  PULL, SINNER_ORDER,
+  PULL, SINNER_ORDER, SPINCHAIN, SPINCHAIN_PER_THREAD, TS_STEP_LEVEL, UPTIE_LEVEL,
 } from "./constants.js";
 
 // ---- transient action log (shown in the UI after each action) ----
@@ -32,6 +32,12 @@ function changeShard(s, shardType, sinnerName) {
   if (i < 0 || !(shardType in SHARD_DELTA)) return;
   s.sinners[i].shards = round2(s.sinners[i].shards + SHARD_DELTA[shardType]);
   note(`${sinnerName}: ${SHARD_DELTA[shardType] >= 0 ? "+" : ""}${SHARD_DELTA[shardType]} shard (${shardType}) -> ${s.sinners[i].shards}`);
+}
+// subtract/add an arbitrary shard amount to a sinner (e.g. spinchain crafting)
+function shardAddDirect(s, sinnerName, amount) {
+  const i = sinnerIndexByName(sinnerName);
+  if (i < 0) return;
+  s.sinners[i].shards = round2(s.sinners[i].shards + amount);
 }
 
 // ---------- manager level / XP curve ----------
@@ -228,7 +234,20 @@ export const ACTIONS = {
     if (u.threads) threadAdd(s, u.threads);
     if (u.lunacy) fLCH(s, u.lunacy);
     if (u.shard) changeShard(s, u.shard, s.uptie.sinner);
+    // also bump the selected ID's uptie level (IDs page)
+    const id = s.ids[s.uptie.idIdx];
+    if (id && UPTIE_LEVEL[key] != null) { id.uptie = UPTIE_LEVEL[key]; note(`${id.name}: UT -> ${id.uptie}`); }
     note(`${u.label}: ${u.threads ? u.threads + " threads" : ""}${u.lunacy ? ", +" + u.lunacy + " lunacy" : ""}`);
+  },
+
+  // --- TS5: craft spinchains from EGO shard (1:1) or thread (2:1) ---
+  threadspinTS5: (s, grade, method) => {
+    const cost = SPINCHAIN[grade] || 0;
+    if (method === "thread") threadAdd(s, -cost * SPINCHAIN_PER_THREAD);
+    else shardAddDirect(s, s.uptie.sinner, -cost);          // 1 spinchain = 1 EGO shard
+    const ego = s.egos[s.uptie.egoIdx];
+    if (ego) { ego.threadspin = 5; note(`${ego.name}: TS -> 5`); }
+    note(`${grade} TS5: ${cost} spinchain (${method === "thread" ? cost * SPINCHAIN_PER_THREAD + " threads" : cost + " shards"})`);
   },
 
   // --- Thread spinning ---
@@ -236,6 +255,9 @@ export const ACTIONS = {
     const g = THREADSPIN[grade];
     threadAdd(s, g[step]);
     if (step === "TS4") changeShard(s, g.shard, s.uptie.sinner);
+    // also set the selected EGO's TS level (EGOs page)
+    const ego = s.egos[s.uptie.egoIdx];
+    if (ego && TS_STEP_LEVEL[step] != null) { ego.threadspin = TS_STEP_LEVEL[step]; note(`${ego.name}: TS -> ${ego.threadspin}`); }
     note(`${grade} ${step}: ${g[step]} threads`);
   },
 
