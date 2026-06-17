@@ -31,10 +31,10 @@ export function mdSchedule(s, count = 7) {
 }
 export function nextMDIsHard(s) { return mdSchedule(s, 1)[0]; }
 
-// Manager XP forecast. Each row = one more daily run AND that day's scheduled
-// MD: "After N Daily" = N dailies; "after MD" = that plus the first N scheduled
-// MDs (cumulative). `cumMD` is the MD XP added so far, `mdHard` flags that row's
-// MD type, `levels` flags any value that reaches the next-level XP.
+// Manager XP forecast: two independent projections from the current XP. "After N
+// Daily" = current + N dailies; "after MD" = current + the first N scheduled MDs
+// (cumulative). `cumMD` is the MD XP added so far, `mdHard` flags that row's MD
+// type, `levels` flags any value that reaches the next-level XP.
 export function managerForecast(s) {
   const daily = s.constants.dailyManagerXP;
   const cur = s.manager.currentXP;
@@ -46,7 +46,7 @@ export function managerForecast(s) {
     const hard = sched[i - 1];
     cumMD += hard ? 120 : 100;
     const afterDaily = round2(cur + daily * i);
-    const afterMD = round2(afterDaily + cumMD);
+    const afterMD = round2(cur + cumMD);   // MD-only projection from current XP (independent of dailies)
     rows.push({
       n: i, afterDaily, afterMD, mdHard: hard, cumMD,
       dailyLevels: afterDaily >= nextXP, mdLevels: afterMD >= nextXP,
