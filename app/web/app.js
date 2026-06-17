@@ -335,11 +335,13 @@ function renderDashboard() {
           <div class="kv">
             <div class="k">Current Day</div><div class="v"><span class="tag" style="${styleAttr(dayColor(s.currentDay))}">${esc(s.currentDay)}</span></div>
             <div class="k">Current Patch</div><div class="v">${esc(s.lunacy.currentDate)}</div>
-            <div class="k">Uptying Sinner</div><div class="v">${selectHtml("st-uptie", SINNER_ORDER, s.uptie.sinner, sinnerColor(s.uptie.sinner), sinnerColor, "sinner")}</div>
-            <div class="k">Gacha Sinner</div><div class="v">${selectHtml("st-gsinner", SINNER_ORDER, s.gacha.sinner, sinnerColor(s.gacha.sinner), sinnerColor, "sinner")}</div>
-            <div class="k">Gacha Tier</div><div class="v">${selectHtml("st-gtier", GACHA_TIERS, s.gacha.tier, gachaTierColor(s.gacha.tier), gachaTierColor, "tier")}</div>
             <div class="k">Rental Week</div><div class="v">${fmt(s.md.rentalWeek)}</div>
             <div class="k">Event Currency</div><div class="v"><input type="number" class="qty" id="st-currency" value="${fmt(s.event.currency)}"/></div>
+          </div>
+          <div class="stat-fields">
+            <div class="field"><label>Uptying Sinner</label>${selectHtml("st-uptie", SINNER_ORDER, s.uptie.sinner, sinnerColor(s.uptie.sinner), sinnerColor, "sinner")}</div>
+            <div class="field"><label>Gacha Sinner</label>${selectHtml("st-gsinner", SINNER_ORDER, s.gacha.sinner, sinnerColor(s.gacha.sinner), sinnerColor, "sinner")}</div>
+            <div class="field"><label>Gacha Tier</label>${selectHtml("st-gtier", GACHA_TIERS, s.gacha.tier, gachaTierColor(s.gacha.tier), gachaTierColor, "tier")}</div>
           </div>
           <div class="btnrow" style="margin-top:10px;">
             <button class="act primary" id="st-applyGacha" title="Add a shard to the Gacha Sinner at the Gacha Tier">Apply Gacha Shard</button>

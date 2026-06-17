@@ -230,6 +230,9 @@ select, input[type=number] {
 }
 .field { display: flex; align-items: center; gap: 8px; }
 .field label { color: var(--muted); font-size: 12px; min-width: 56px; }
+/* dashboard Status card: dropdowns as .field controls (same as the Gacha panel) */
+.stat-fields { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+.stat-fields .field label { min-width: 104px; }
 .field select { flex: 1; min-width: 0; border-radius: 0; }
 .qty { width: 70px; border-radius: 0; }
 
