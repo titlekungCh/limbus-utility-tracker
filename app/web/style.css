@@ -274,6 +274,13 @@ table.sheet td select option { background: var(--panel); color: var(--text); }
 /* gacha quick-add: compact icon-only sinner buttons */
 button.act.qa-sinner { padding: 4px 6px; line-height: 0; }
 button.act.qa-sinner .opt-ico { width: 26px; height: 26px; margin: 0; }
+/* one quick-add grid per tier: 6-wide sinner grid + a tier-icon tag on the right */
+.qa-tier { display: flex; align-items: stretch; gap: 8px; margin-bottom: 8px; }
+.qa-tier:last-child { margin-bottom: 0; }
+.qa-grid { display: grid; grid-template-columns: repeat(6, auto); gap: 6px; }
+.qa-tier-ico { display: flex; align-items: center; justify-content: center; padding: 0 16px;
+  border-radius: 6px; font-weight: 700; font-size: 12px; }
+.qa-tier-ico .opt-ico { width: 34px; height: 34px; margin: 0; }
 
 /* per-word status chips (IF SS7 keyword cells + legend) */
 .chip { display: inline-block; padding: 1px 7px; margin: 1px; border-radius: 9px; font-size: 11px; white-space: nowrap; }

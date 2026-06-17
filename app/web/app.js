@@ -732,31 +732,28 @@ function renderActions() {
     btn("Undo Weekly Normal MD", () => act(ACTIONS.undowNormal), "undo"),
   );
 
-  // Gacha
+  // Gacha — one quick-add grid of all 12 sinners per tier; click adds that
+  // tier's shard straight to the sinner. Each grid is tagged with its tier icon.
   b = panel("Sinner Gacha Result");
-  const gTierSel = `<select style="${styleAttr(gachaTierColor(state.gacha.tier))}">${GACHA_TIERS.map((t) => `<option ${t === state.gacha.tier ? "selected" : ""}${optStyle(gachaTierColor(t))}>${esc(t)}</option>`).join("")}</select>`;
-  const gTier = el(`<div class="field"><label>Tier</label>${cselHtml(gTierSel, "tier", state.gacha.tier, gachaTierColor(state.gacha.tier))}</div>`);
-  gTier.querySelector("select").addEventListener("change", (e) => setSelection("gacha.tier", e.target.value));
-  const gSinnerSel = `<select style="${styleAttr(sinnerColor(state.gacha.sinner))}">${SINNER_ORDER.map((n) => `<option ${n === state.gacha.sinner ? "selected" : ""}${optStyle(sinnerColor(n))}>${esc(n)}</option>`).join("")}</select>`;
-  const gSinner = el(`<div class="field"><label>Sinner</label>${cselHtml(gSinnerSel, "sinner", state.gacha.sinner, sinnerColor(state.gacha.sinner))}</div>`);
-  gSinner.querySelector("select").addEventListener("change", (e) => setSelection("gacha.sinner", e.target.value));
-  b.append(gTier, gSinner);
-  r = row(b);
-  r.append(btn("Apply to Selected Sinner", () => act(ACTIONS.gachaSelected), "primary"));
-  b.appendChild(el(`<div class="subhead">Quick add (uses tier above)</div>`));
-  // one colour-coded button per sinner, in DataSheet order, split YS..HL / HC..GG
-  const qaBtn = (n) => {
+  const qaBtn = (n, tier) => {
     const ac = state.sinners.find((x) => x.name === n)?.acronym || n;
-    const bn = btn(ac, () => act((s) => ACTIONS.gachaFor(s, n)), "qa-sinner");
+    const bn = btn(ac, () => act((s) => ACTIONS.gachaTierFor(s, tier, n)), "qa-sinner");
     const ico = optIcon("sinner", n);
     if (ico) bn.innerHTML = ico;   // sinner icon (w/ inverted-colour shadow) instead of text
-    bn.title = n;
+    bn.title = `${n} — +${tier} shard`;
     const c = sinnerColor(n);
     if (c) bn.style.cssText = `background:${c.fill};color:${c.font};border-color:${c.fill};`;
     return bn;
   };
-  const qaR1 = row(b); SINNER_ORDER.slice(0, 6).forEach((n) => qaR1.append(qaBtn(n)));
-  const qaR2 = row(b); SINNER_ORDER.slice(6).forEach((n) => qaR2.append(qaBtn(n)));
+  GACHA_TIERS.forEach((tier) => {
+    const blk = el(`<div class="qa-tier"></div>`);
+    const grid = el(`<div class="qa-grid"></div>`);
+    SINNER_ORDER.forEach((n) => grid.append(qaBtn(n, tier)));
+    const tc = gachaTierColor(tier);
+    const tag = el(`<div class="qa-tier-ico" title="${esc(tier)}"${tc ? ` style="background:${tc.fill};color:${tc.font};"` : ""}>${optIcon("tier", tier) || esc(tier)}</div>`);
+    blk.append(grid, tag);
+    b.appendChild(blk);
+  });
 
   // Extractions / Lunacy
   b = panel("Extractions (Lunacy)");
