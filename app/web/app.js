@@ -359,7 +359,7 @@ function renderForecast() {
         <div class="body" style="padding:0;">
           <table class="sheet">
             <thead><tr><th>Run</th><th style="white-space:nowrap">After N Daily</th><th style="white-space:nowrap">after MD</th></tr></thead>
-            <tbody>${mf.rows.map((r) => `<tr><td style="white-space:nowrap">${r.n} Daily</td><td class="num">${fmt(r.afterDaily)}${lvlGlyph(r.dailyLevels)}</td><td class="num">${fmt(r.afterMD)} <span class="count">(+${mf.mdBonus})</span>${lvlGlyph(r.mdLevels)}</td></tr>`).join("")}</tbody>
+            <tbody>${mf.rows.map((r) => `<tr><td style="white-space:nowrap">${r.n} Daily</td><td class="num">${fmt(r.afterDaily)}${lvlGlyph(r.dailyLevels)}</td><td class="num"><span class="mdtype ${r.mdHard ? "h" : "n"}" title="${r.mdHard ? "Hard MD (+120)" : "Normal/Rental MD (+100)"}">${r.mdHard ? "H" : "N"}</span> ${fmt(r.afterMD)} <span class="count">(+${r.cumMD})</span>${lvlGlyph(r.mdLevels)}</td></tr>`).join("")}</tbody>
           </table>
         </div>
         <div class="body"><div class="kv">${kv([["Next Level XP", mf.nextLevelXP], ["Next Lvl Enkephalin", mf.enk]])}</div></div>

@@ -3,45 +3,58 @@
 import { THREADSPIN, SHARD_DELTA } from "./constants.js";
 const round2 = (n) => Math.round(n * 100) / 100;
 
-// Is the next Mirror Dungeon run to be done a Hard one? The weekly cycle is
-// (Hard > Easy) x3, then a Rental on rental weeks (rental counts as Easy), then
-// it repeats. A run is still pending when its flag is `true` (its pill on the
-// Mirror Dungeon card isn't struck through); the next run is the first pending
-// one in that order. If everything is done the cycle restarts on a Hard.
-export function nextMDIsHard(s) {
-  const md = s.md;
-  const seq = [];
-  for (let i = 0; i < 3; i++) {
-    seq.push(["hard", !!(md.hard && md.hard[i])]);
-    seq.push(["easy", !!(md.normal && md.normal[i])]);
-  }
-  if (md.rentalWeek === 0) seq.push(["easy", !!md.rental]); // rental = Easy, rental weeks only
-  const next = seq.find(([, pending]) => pending);
-  return next ? next[0] === "hard" : true;
-}
+// Rental runs every other week; the 2026-06-11 patch week (a Thursday) is a
+// NON-rental week. weeksFromAnchor counts weeks from that Thursday.
+const RENTAL_ANCHOR = Date.parse("2026-06-11T00:00:00");
+const weeksFromAnchor = (iso) =>
+  Math.round((Date.parse((iso || "2026-06-11") + "T00:00:00") - RENTAL_ANCHOR) / (7 * 24 * 3600 * 1000));
+const isRentalWeek = (wk) => (((wk % 2) + 2) % 2) === 1; // anchor week even -> no rental
+// A week's MD types in run order: (Hard, Normal) x3, then a Rental (counts as
+// Normal) on rental weeks. "H" = Hard (+120 XP), "N"/"R" = +100 XP.
+const weekTypes = (rental) => (rental ? ["H", "N", "H", "N", "H", "N", "R"] : ["H", "N", "H", "N", "H", "N"]);
 
-// Manager XP: "After 1..7 Daily" and "after MD" (Inventory I10:I16 / J10:J16),
-// plus the next-level enkephalin flag (K9). The MD column adds the next run's
-// reward: +120 if the next MD is Hard, +100 if Easy/Rental. A `levels` flag is
-// set on any value that reaches the next level XP.
+// The next `count` Mirror Dungeon runs (true = Hard), rolled up from the first
+// run not yet done this week (read off the Mirror Dungeon card) and continuing
+// into following weeks (rental alternates). Week starts Thursday.
+export function mdSchedule(s, count = 7) {
+  const md = s.md;
+  const w0 = weeksFromAnchor(s.lunacy && s.lunacy.currentDate);
+  const rental0 = isRentalWeek(w0);
+  const pending = []; // true = still to do (its pill on the MD card isn't struck)
+  for (let i = 0; i < 3; i++) { pending.push(!!(md.hard && md.hard[i])); pending.push(!!(md.normal && md.normal[i])); }
+  if (rental0) pending.push(!!md.rental);
+  let start = pending.findIndex((p) => p);
+  if (start < 0) start = pending.length;            // all done -> start next week
+  const types = weekTypes(rental0).slice(start);
+  for (let k = 1; types.length < count; k++) types.push(...weekTypes(isRentalWeek(w0 + k)));
+  return types.slice(0, count).map((t) => t === "H");
+}
+export function nextMDIsHard(s) { return mdSchedule(s, 1)[0]; }
+
+// Manager XP forecast. Each row = one more daily run AND that day's scheduled
+// MD: "After N Daily" = N dailies; "after MD" = that plus the first N scheduled
+// MDs (cumulative). `cumMD` is the MD XP added so far, `mdHard` flags that row's
+// MD type, `levels` flags any value that reaches the next-level XP.
 export function managerForecast(s) {
   const daily = s.constants.dailyManagerXP;
   const cur = s.manager.currentXP;
   const nextXP = s.manager.nextLevelXP;
-  const mdHard = nextMDIsHard(s);
-  const mdBonus = mdHard ? 120 : 100;
+  const sched = mdSchedule(s, 7);
   const rows = [];
+  let cumMD = 0;
   for (let i = 1; i <= 7; i++) {
+    const hard = sched[i - 1];
+    cumMD += hard ? 120 : 100;
     const afterDaily = round2(cur + daily * i);
-    const afterMD = round2(afterDaily + mdBonus);
+    const afterMD = round2(afterDaily + cumMD);
     rows.push({
-      n: i, afterDaily, afterMD,
+      n: i, afterDaily, afterMD, mdHard: hard, cumMD,
       dailyLevels: afterDaily >= nextXP, mdLevels: afterMD >= nextXP,
     });
   }
   const nextRow = s.constants.managerCurve.find((r) => r.level === s.manager.level + 1);
   const enk = nextRow && nextRow.maxIncrease !== 0 ? "+1" : "0";
-  return { rows, nextLevelXP: nextXP, enk, mdHard, mdBonus };
+  return { rows, nextLevelXP: nextXP, enk };
 }
 
 // Crate + Pass forecasts (Inventory C/D 17-23 and E/F 17-23).
