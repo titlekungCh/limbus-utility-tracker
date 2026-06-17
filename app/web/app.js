@@ -751,8 +751,14 @@ function renderActions() {
     const rr = row(b);
     ["TS2", "TS3", "TS3_1", "TS4"].forEach((step) =>
       rr.append(btn(`${step.replace("_1", " (from 1)")} (${Math.abs(THREADSPIN[grade][step])})`, () => act((s) => ACTIONS.threadspin(s, grade, step)))));
-    rr.append(btn(`TS5 (${SPINCHAIN[grade]} SC ◆shard)`, () => act((s) => ACTIONS.threadspinTS5(s, grade, "shard"))));
-    rr.append(btn(`TS5 (${SPINCHAIN[grade] * 2}🧵 thread)`, () => act((s) => ACTIONS.threadspinTS5(s, grade, "thread"))));
+    const ts5Btn = (method) => {
+      const spent = method === "thread" ? SPINCHAIN[grade] * 2 : SPINCHAIN[grade];
+      const bn = btn("", () => act((s) => ACTIONS.threadspinTS5(s, grade, method)));
+      bn.innerHTML = `TS5 ${icoTag(RESOURCE_ICON.spinchain)}${SPINCHAIN[grade]} = ${icoTag(method === "thread" ? RESOURCE_ICON.thread : RESOURCE_ICON.egoshard)}${spent}`;
+      bn.title = `TS5: ${SPINCHAIN[grade]} spinchain via ${method === "thread" ? "thread (2:1)" : "EGO shard (1:1)"}`;
+      return bn;
+    };
+    rr.append(ts5Btn("shard"), ts5Btn("thread"));
   });
 
   // Intervallo shop lives on its own "Event Shop" tab (full editable planner).
