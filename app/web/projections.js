@@ -174,13 +174,14 @@ export function egoThreadspin(s, idx, target) {
   const grade = ego.tier;
   const cum = tsCumulative(grade);
   const curRaw = ego.threadspin;
-  const clamp = (v) => Math.max(1, Math.min(TS_MAX, Math.round(Number(v) || 1)));
+  const maxTS = ego.ts5 ? TS_MAX : 4;        // TS5 only if released for this EGO
+  const clamp = (v) => Math.max(1, Math.min(maxTS, Math.round(Number(v) || 1)));
   const cur = clamp(curRaw), tgt = clamp(target);
   let threads = 0, shard = 0, spinchain = 0;
   if (cum) {
     threads = Math.max(0, cum[tgt] - cum[cur]);
     shard = (cur < 4 && tgt >= 4) ? Math.abs(SHARD_DELTA[grade] || 0) : 0; // TS4 shards once
-    spinchain = (cur < 5 && tgt >= 5) ? (SPINCHAIN[grade] || 0) : 0;       // TS5 spinchain cost
+    spinchain = (ego.ts5 && cur < 5 && tgt >= 5) ? (SPINCHAIN[grade] || 0) : 0; // TS5 spinchain cost
   }
   // EGO shard comes from the sinner the EGO belongs to.
   const sinnerObj = s.sinners.find((x) => x.name === ego.sinner);

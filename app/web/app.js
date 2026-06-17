@@ -535,7 +535,7 @@ function renderEgoThreadspin() {
         `<select id="egots-name" style="${selSt}">${state.egos.map((x, i) => [x, i]).filter(([x]) => x.acquired).map(([x, i]) => `<option value="${i}"${i === egoTSel.idx ? " selected" : ""}${optStyle(sinnerColor(x.sinner))} data-sinner="${esc(x.sinner)}">[${esc(x.name)}] ${esc(x.sinner)}</option>`).join("")}</select>`,
         "sinner", selEgo ? `[${selEgo.name}] ${selEgo.sinner}` : "", selEgo ? sinnerColor(selEgo.sinner) : null, selEgo ? optIcon("sinner", selEgo.sinner) : "")}</div>
     <div class="field"><label>Target TS</label>
-      <input type="number" id="egots-target" class="qty" min="1" max="5" value="${egoTSel.target}"/></div>
+      <input type="number" id="egots-target" class="qty" min="1" max="${selEgo && selEgo.ts5 ? 5 : 4}" value="${egoTSel.target}"/></div>
     <div class="kv" style="margin-top:6px;">
       <div class="k">Grade</div><div class="v" style="${gradeSt}">${res ? esc(res.grade || "—") : "—"}</div>
       <div class="k">Current TS</div><div class="v" style="${curSt}">${res ? esc(res.current ?? "—") : "—"}</div>
@@ -799,7 +799,7 @@ function renderActions() {
       bn.title = `TS5: ${SPINCHAIN[grade]} spinchain via ${method === "thread" ? "thread (2:1)" : "EGO shard (1:1)"}`;
       return bn;
     };
-    if (tsCur < 5) rr.append(ts5Btn("shard"), ts5Btn("thread"));
+    if (tsCur < 5 && state.egos[state.uptie.egoIdx]?.ts5) rr.append(ts5Btn("shard"), ts5Btn("thread"));
   });
 
   // Intervallo shop lives on its own "Event Shop" tab (full editable planner).
@@ -1105,8 +1105,9 @@ function renderEGOs() {
     { label: "Threadspin", key: "threadspin", type: "num", color: (v) => scaleColor(v) },
     { label: "Released", key: "release", type: "date" },
     { label: "Int. ID", key: "internalId", type: "num" },
+    { label: "TS5", key: "ts5", type: "check" },
   ], ["name", "sinner", "sin", "keyword", "extraKeyword", "season"],
-    () => ({ name: "", sinner: "Yi Sang", sin: "", tier: "ZAYIN", season: "", keyword: "", extraKeyword: "", acquired: false, threadspin: null, release: "", internalId: null }));
+    () => ({ name: "", sinner: "Yi Sang", sin: "", tier: "ZAYIN", season: "", keyword: "", extraKeyword: "", acquired: false, threadspin: null, release: "", internalId: null, ts5: false }));
 }
 
 // ---------- editable free-form grids (Teams / IF SS7) ----------
