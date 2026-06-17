@@ -948,8 +948,9 @@ function renderEditableList(viewId, arrayName, columns, searchKeys, makeBlank) {
   const chipHtml = (tc, t) => { const c = tc && tc(t); return c ? `<span class="chip" style="background:${c.fill};color:${c.font}">${esc(t)}</span>` : `<span class="chip plain">${esc(t)}</span>`; };
   const tagSummary = (col, tags) => {
     if (col.cellColor) return `<span class="tag" style="${styleAttr(col.cellColor(tags))}">${tags.length ? esc(tags.join(", ")) : "—"}</span>`;
+    // Keyword / Extra Keyword: icon-only summary (icon if one exists, else the name)
+    if (col.iconCat === "keyword") return tags.length ? tags.map((t) => optIcon("keyword", t) || esc(t)).join(" ") : "—";
     if (col.tagColor) return tags.length ? tags.map((t) => optIcon(col.iconCat, t) + chipHtml(col.tagColor, t)).join(" ") : "—";
-    // icon-only summary (e.g. Extra Keyword) — icon if one exists, else the name
     if (col.iconCat) return tags.length ? tags.map((t) => optIcon(col.iconCat, t) || esc(t)).join(" ") : "—";
     return tags.length ? esc(tags.join(", ")) : "—";
   };
