@@ -1331,12 +1331,13 @@ window.addEventListener("beforeunload", (e) => { if (dirty) { e.preventDefault()
 // Curves whose cumulative column is computed (not edited) from a per-step source,
 // mirroring the original sheet: ID Level Total XP = running sum of Exp increase;
 // Manager Max Enkephalin = base 60 + running sum of Max Increase.
-const COMPUTED_COLS = { idLevelCurve: ["totalXP"], managerCurve: ["maxEnk"] };
+const COMPUTED_COLS = { idLevelCurve: ["totalXP"], managerCurve: ["nextXP", "maxEnk"] };
 const COMPUTED_SCALARS = ["dailyManagerXP"]; // computed, read-only in the Data page
 function recomputeDerived(s) {
   const c = s.constants || {};
   const cum = (arr, src, dst, base) => { if (!Array.isArray(arr)) return; let t = base; arr.forEach((r) => { t += Number(r[src]) || 0; r[dst] = t; }); };
   cum(c.idLevelCurve, "increase", "totalXP", 0);
+  cum(c.managerCurve, "nextDiff", "nextXP", 0);     // nextXP = running sum of per-level difference (sheet AE)
   cum(c.managerCurve, "maxIncrease", "maxEnk", 60);
   // Daily Manager XP = (Thread Lux Skip * 3) + XP Lux  (sheet DataSheet J39 = (J38*3)+J35)
   if (c.threadLuxSkip != null && c.xpLux != null)
@@ -1368,8 +1369,14 @@ function migrateConstants(s) {
       return { level: r.level, increase: inc, totalXP: r.totalXP };
     });
   }
-  if (Array.isArray(c.managerCurve))         // order Max Enkephalin (computed) last
-    c.managerCurve = c.managerCurve.map((r) => ({ level: r.level, nextXP: r.nextXP, maxIncrease: r.maxIncrease, maxEnk: r.maxEnk }));
+  if (Array.isArray(c.managerCurve)) {       // add `nextDiff` (sheet AE); nextXP/maxEnk are computed running sums
+    let prevX = 0;
+    c.managerCurve = c.managerCurve.map((r) => {
+      const nx = Number(r.nextXP) || 0, diff = r.nextDiff != null ? Number(r.nextDiff) : nx - prevX;
+      prevX = nx;
+      return { level: r.level, nextDiff: diff, nextXP: r.nextXP, maxIncrease: r.maxIncrease, maxEnk: r.maxEnk };
+    });
+  }
   recomputeDerived(s);
 }
 
