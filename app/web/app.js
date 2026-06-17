@@ -230,7 +230,7 @@ function renderDashboard() {
   // editable number row (writes to a dotted state path on change); optional colour + icon
   const erow = (label, path, val, big, color, ico) => {
     const st = color ? `background:${color.fill};color:${color.font};` : "";
-    return `<div class="k" style="${st}">${ico ? icoTag(ico) : ""}${esc(label)}</div><div class="v${big ? " big" : ""}"><input type="number" class="kv-num" data-path="${path}" value="${val ?? ""}" style="${st}"/></div>`;
+    return `<div class="k" style="${st}">${ico ? icoTag(ico, color ? invertHex(color.fill) : null) : ""}${esc(label)}</div><div class="v${big ? " big" : ""}"><input type="number" class="kv-num" data-path="${path}" value="${val ?? ""}" style="${st}"/></div>`;
   };
   const invColor = (path) => {
     const m = /^inventory\.tickets\.(\w+)$/.exec(path);   // tickets get their editable colour from constants.tickets
@@ -241,7 +241,7 @@ function renderDashboard() {
     return fillColor(INVENTORY_FILL[path.replace("inventory.", "")]);
   };
   // colored read-only row (e.g. derived Free Lunacy)
-  const srow = (label, val, big, color, ico) => { const st = color ? `background:${color.fill};color:${color.font};` : ""; return `<div class="k" style="${st}">${ico ? icoTag(ico) : ""}${esc(label)}</div><div class="v${big ? " big" : ""}" style="${st}">${esc(fmt(val))}</div>`; };
+  const srow = (label, val, big, color, ico) => { const st = color ? `background:${color.fill};color:${color.font};` : ""; return `<div class="k" style="${st}">${ico ? icoTag(ico, color ? invertHex(color.fill) : null) : ""}${esc(label)}</div><div class="v${big ? " big" : ""}" style="${st}">${esc(fmt(val))}</div>`; };
   const checks = (arr, labels) => arr.map((on, i) => `<span class="pill ${on ? "on" : "off"}">${esc(labels[i])}</span>`).join("");
 
   $("#dashboard").innerHTML = `
@@ -275,7 +275,7 @@ function renderDashboard() {
 
       <div class="card">
         <h2>Lunacy & Pulls</h2>
-        <div class="body"><div class="kv">
+        <div class="body"><div class="kv kv-narrow">
           ${erow("Total Lunacy", "lunacy.total", s.lunacy.total, true, fillColor(LUNACY_FILL.lunacy), RESOURCE_ICON.lunacy)}
           ${erow("Paid Lunacy", "lunacy.paid", s.lunacy.paid, false, fillColor(LUNACY_FILL.lunacy), RESOURCE_ICON.lunacy)}
           ${srow("Free Lunacy", free, false, fillColor(LUNACY_FILL.lunacy), RESOURCE_ICON.lunacy)}
@@ -740,7 +740,12 @@ function renderActions() {
   if (state.uptie.idIdx == null) { const i = state.ids.findIndex((x) => x.acquired); state.uptie.idIdx = i >= 0 ? i : 0; }
   b.appendChild(ownedPicker("ID", state.ids, state.uptie.idIdx, (i) => { state.uptie.idIdx = i; setSelection("uptie.sinner", state.ids[i].sinner); }));
   r = row(b);
-  Object.keys(UPTIE).forEach((k) => r.append(btn(UPTIE[k].label, () => act((s) => ACTIONS.uptie(s, k)))));
+  Object.keys(UPTIE).forEach((k) => {
+    const bn = btn("", () => act((s) => ACTIONS.uptie(s, k)));
+    // the (N) in the label is the thread cost -> show the thread icon by it
+    bn.innerHTML = esc(UPTIE[k].label).replace(/\((\d+)\)/, (m, n) => `(${icoTag(RESOURCE_ICON.thread)}${n})`);
+    r.append(bn);
+  });
 
   // Thread spinning
   b = panel("Thread Spinning (sets the EGO's TS level)");
@@ -749,8 +754,11 @@ function renderActions() {
   Object.keys(THREADSPIN).forEach((grade) => {
     b.appendChild(el(`<div class="subhead">${grade}</div>`));
     const rr = row(b);
-    ["TS2", "TS3", "TS3_1", "TS4"].forEach((step) =>
-      rr.append(btn(`${step.replace("_1", " (from 1)")} (${Math.abs(THREADSPIN[grade][step])})`, () => act((s) => ACTIONS.threadspin(s, grade, step)))));
+    ["TS2", "TS3", "TS3_1", "TS4"].forEach((step) => {
+      const bn = btn("", () => act((s) => ACTIONS.threadspin(s, grade, step)));
+      bn.innerHTML = `${esc(step.replace("_1", " (from 1)"))} (${icoTag(RESOURCE_ICON.thread)}${Math.abs(THREADSPIN[grade][step])})`;
+      rr.append(bn);
+    });
     const ts5Btn = (method) => {
       const spent = method === "thread" ? SPINCHAIN[grade] * 2 : SPINCHAIN[grade];
       const bn = btn("", () => act((s) => ACTIONS.threadspinTS5(s, grade, method)));
