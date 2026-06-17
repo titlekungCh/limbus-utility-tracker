@@ -446,8 +446,9 @@ function renderForecast() {
 
 function renderIdLeveling() {
   if (idLevelSel.idx == null && state.ids.length) {
-    // default to a leveled, owned ID if available
-    const i = state.ids.findIndex((x) => x.acquired && x.level);
+    // default to a leveled, owned ID; else first owned (the list is owned-only)
+    let i = state.ids.findIndex((x) => x.acquired && x.level);
+    if (i < 0) i = state.ids.findIndex((x) => x.acquired);
     idLevelSel.idx = i >= 0 ? i : 0;
   }
   const res = idLeveling(state, idLevelSel.idx, idLevelSel.target);
@@ -464,7 +465,7 @@ function renderIdLeveling() {
   body.innerHTML = `
     <div class="field"><label>ID</label>
       ${cselHtml(
-        `<select id="idlevel-name" style="${selSt}">${state.ids.map((x, i) => `<option value="${i}"${i === idLevelSel.idx ? " selected" : ""}${optStyle(sinnerColor(x.sinner))} data-sinner="${esc(x.sinner)}">[${esc(x.name)}] ${esc(x.sinner)}</option>`).join("")}</select>`,
+        `<select id="idlevel-name" style="${selSt}">${state.ids.map((x, i) => [x, i]).filter(([x]) => x.acquired).map(([x, i]) => `<option value="${i}"${i === idLevelSel.idx ? " selected" : ""}${optStyle(sinnerColor(x.sinner))} data-sinner="${esc(x.sinner)}">[${esc(x.name)}] ${esc(x.sinner)}</option>`).join("")}</select>`,
         "sinner", selId ? `[${selId.name}] ${selId.sinner}` : "", selId ? sinnerColor(selId.sinner) : null, selId ? optIcon("sinner", selId.sinner) : "")}</div>
     <div class="field"><label>Target Lv</label>
       <input type="number" id="idlevel-target" class="qty" min="1" max="100" value="${idLevelSel.target}" style="${tgtSt}"/></div>
@@ -494,7 +495,7 @@ function renderEgoThreadspin() {
   body.innerHTML = `
     <div class="field"><label>EGO</label>
       ${cselHtml(
-        `<select id="egots-name" style="${selSt}">${state.egos.map((x, i) => `<option value="${i}"${i === egoTSel.idx ? " selected" : ""}${optStyle(sinnerColor(x.sinner))} data-sinner="${esc(x.sinner)}">[${esc(x.name)}] ${esc(x.sinner)}</option>`).join("")}</select>`,
+        `<select id="egots-name" style="${selSt}">${state.egos.map((x, i) => [x, i]).filter(([x]) => x.acquired).map(([x, i]) => `<option value="${i}"${i === egoTSel.idx ? " selected" : ""}${optStyle(sinnerColor(x.sinner))} data-sinner="${esc(x.sinner)}">[${esc(x.name)}] ${esc(x.sinner)}</option>`).join("")}</select>`,
         "sinner", selEgo ? `[${selEgo.name}] ${selEgo.sinner}` : "", selEgo ? sinnerColor(selEgo.sinner) : null, selEgo ? optIcon("sinner", selEgo.sinner) : "")}</div>
     <div class="field"><label>Target TS</label>
       <input type="number" id="egots-target" class="qty" min="1" max="5" value="${egoTSel.target}"/></div>
