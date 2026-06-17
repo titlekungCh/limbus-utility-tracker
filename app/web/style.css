@@ -179,6 +179,19 @@ td.shard-low-cell::after {
 }
 /* level-up marker next to a forecast value that reaches next-level XP */
 .lvlup { color: var(--gold); font-weight: 700; font-size: 11px; }
+/* rental MD has no fixed keyword: cycle all 7 status icons (~300ms each) */
+.rental-cycle { display: inline-block; width: 16px; height: 16px; vertical-align: middle; margin-right: 4px;
+  background-size: contain; background-repeat: no-repeat; background-position: center;
+  filter: drop-shadow(0 0 1.5px rgba(0, 0, 0, 0.65)); animation: rental-cycle 2.1s infinite; }
+@keyframes rental-cycle {
+  0%      { background-image: url(icons/keyword/burn.webp); }
+  14.28%  { background-image: url(icons/keyword/bleed.webp); }
+  28.57%  { background-image: url(icons/keyword/tremor.webp); }
+  42.85%  { background-image: url(icons/keyword/rupture.webp); }
+  57.14%  { background-image: url(icons/keyword/sinking.webp); }
+  71.42%  { background-image: url(icons/keyword/poise.webp); }
+  85.71%  { background-image: url(icons/keyword/charge.webp); }
+}
 /* per-row Mirror Dungeon type badge in the Manager XP forecast */
 .mdtype { display: inline-block; min-width: 13px; text-align: center; font-size: 10px; font-weight: 700;
   border-radius: 3px; padding: 0 3px; }

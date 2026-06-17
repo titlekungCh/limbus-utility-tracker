@@ -695,14 +695,18 @@ function renderActions() {
   b = panel("Manager XP");
   r = row(b);
   // status keyword (glyphs) of the next pending Hard / Normal MD on the dashboard
-  // status of the next pending pill; "" when all done (next is rental/next week, which has no keyword)
+  // glyphs for the next pending Hard/Normal MD's status. Once all are done the next
+  // normal is the Rental (no fixed keyword) -> cycle all 7 status icons.
   const nextStatus = (doneArr, statusArr) => { const i = (doneArr || []).findIndex((v) => v); return i < 0 ? "" : (statusArr || [])[i] || ""; };
   const statusGlyphs = (text) => String(text || "").split(/\s+/).filter(Boolean).map((w) => optIcon("keyword", w)).join("");
-  const mdBtn = (label, status, fn, cls) => { const bn = btn(label, () => act(fn), cls); const g = statusGlyphs(status); if (g) { bn.innerHTML = `${esc(label)} ${g}`; bn.title = `${label} — next: ${status}`; } return bn; };
+  const mdBtn = (label, glyph, fn) => { const bn = btn(label, () => act(fn)); if (glyph) bn.innerHTML = `${esc(label)} ${glyph}`; return bn; };
+  const allNormalDone = (state.md.normal || []).every((v) => !v);
+  const ns = nextStatus(state.md.normal, state.md.normalStatus);
+  const normalGlyph = ns ? statusGlyphs(ns) : (allNormalDone && state.md.rental ? `<span class="rental-cycle" title="Rental (rotating)"></span>` : "");
   r.append(
     btn("Daily Luxcavation", () => act(ACTIONS.addDailyXP), "primary"),
-    mdBtn("1 Normal MD", nextStatus(state.md.normal, state.md.normalStatus), ACTIONS.addNMDXP),
-    mdBtn("1 Weekly Hard MD", nextStatus(state.md.hard, state.md.hardStatus), ACTIONS.addWBMDXP),
+    mdBtn("1 Normal MD", normalGlyph, ACTIONS.addNMDXP),
+    mdBtn("1 Weekly Hard MD", statusGlyphs(nextStatus(state.md.hard, state.md.hardStatus)), ACTIONS.addWBMDXP),
     btn("3 Hard MD at once", () => act(ACTIONS.add3HMD)),
     btn("1 Weekly Normal MD", () => act(ACTIONS.addwNormal)),
   );
