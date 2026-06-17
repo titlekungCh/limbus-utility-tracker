@@ -934,14 +934,30 @@ function statusChips(text) {
 }
 
 // ---------- ID / EGO editable, colour-coded tables ----------
+// Per-session list filters (keyword / extra keyword), keyed by viewId. Kept in
+// memory only — intentionally NOT saved to state, so they reset on refresh.
+const listFilters = {};
+let listFilterWired = false;
+function wireListFilterClose() {
+  if (listFilterWired) return;
+  listFilterWired = true;
+  document.addEventListener("click", (e) => {
+    document.querySelectorAll("details.list-filter[open]").forEach((d) => { if (!d.contains(e.target)) d.open = false; });
+  });
+}
 function renderEditableList(viewId, arrayName, columns, searchKeys, makeBlank) {
   const root = $("#" + viewId);
   const colByKey = Object.fromEntries(columns.map((c) => [c.key, c]));
+  // filterable tag columns (keyword / extra keyword); each gets a Set of picks
+  const filterCols = columns.filter((c) => c.type === "tags" && (c.key === "keyword" || c.key === "extraKeyword"));
+  const fstate = listFilters[viewId] || (listFilters[viewId] = {});
+  filterCols.forEach((c) => { if (!fstate[c.key]) fstate[c.key] = new Set(); });
 
   root.innerHTML = `
     <div class="list-controls">
       <input type="text" placeholder="Search…" id="${viewId}-search" />
       <label class="count"><input type="checkbox" id="${viewId}-owned" /> Owned only</label>
+      <span class="list-filters" id="${viewId}-filters"></span>
       <button class="act primary" id="${viewId}-add">+ Add</button>
       <span class="count" id="${viewId}-count"></span>
     </div>
@@ -1030,6 +1046,11 @@ function renderEditableList(viewId, arrayName, columns, searchKeys, makeBlank) {
     const ownedOnly = $("#" + viewId + "-owned").checked;
     const rows = arr.map((it, idx) => ({ it, idx })).filter(({ it }) => {
       if (ownedOnly && !it.acquired) return false;
+      // keyword / extra-keyword filters: row must contain ALL picked tags
+      for (const key in fstate) {
+        const set = fstate[key];
+        if (set.size) { const tags = splitTags(it[key]); for (const t of set) if (!tags.includes(t)) return false; }
+      }
       if (!q) return true;
       return searchKeys.some((k) => String(it[k] ?? "").toLowerCase().includes(q));
     });
@@ -1106,12 +1127,55 @@ function renderEditableList(viewId, arrayName, columns, searchKeys, makeBlank) {
       opt.style.display = opt.textContent.toLowerCase().includes(q) ? "" : "none";
     });
   });
+  // ----- keyword / extra-keyword filters (per session) -----
+  const fbadge = (n) => (n ? ` <span class="fbadge">${n}</span>` : "");
+  const buildFilters = () => {
+    const host = $("#" + viewId + "-filters"); if (!host) return;
+    host.innerHTML = filterCols.map((col) => {
+      const present = new Set();
+      state[arrayName].forEach((it) => splitTags(it[col.key]).forEach((t) => present.add(t)));
+      const opts = distinctTags(col.key, col.optOrder).filter((t) => present.has(t));
+      const set = fstate[col.key];
+      const optHtml = opts.length
+        ? opts.map((t) => `<label class="ms-opt"><input type="checkbox" data-ftag="${esc(t)}" ${set.has(t) ? "checked" : ""}/> ${optIcon(col.iconCat, t) || ""}${esc(t)}</label>`).join("")
+        : '<div class="hint">none in list</div>';
+      return `<details class="list-filter" data-fkey="${col.key}"><summary>${esc(col.label)}${fbadge(set.size)}</summary>
+        <div class="filter-panel">${opts.length > 10 ? '<input type="text" class="ms-search" placeholder="search…"/>' : ""}${optHtml}
+          <div class="ms-add"><button type="button" class="reset filter-clear">Clear</button></div></div></details>`;
+    }).join("");
+  };
+  const host = $("#" + viewId + "-filters");
+  host.addEventListener("change", (e) => {
+    if (!e.target.matches("input[data-ftag]")) return;
+    const det = e.target.closest(".list-filter"), key = det.dataset.fkey, set = fstate[key];
+    if (e.target.checked) set.add(e.target.dataset.ftag); else set.delete(e.target.dataset.ftag);
+    det.querySelector("summary").innerHTML = `${esc(colByKey[key].label)}${fbadge(set.size)}`;
+    draw();
+  });
+  host.addEventListener("click", (e) => {
+    if (!e.target.classList.contains("filter-clear")) return;
+    const det = e.target.closest(".list-filter"), key = det.dataset.fkey;
+    fstate[key].clear();
+    det.querySelectorAll("input[data-ftag]:checked").forEach((c) => (c.checked = false));
+    det.querySelector("summary").innerHTML = `${esc(colByKey[key].label)}${fbadge(0)}`;
+    draw();
+  });
+  host.addEventListener("input", (e) => {
+    if (!e.target.classList.contains("ms-search")) return;
+    const qq = e.target.value.toLowerCase();
+    e.target.closest(".filter-panel").querySelectorAll(".ms-opt").forEach((o) => { o.style.display = o.textContent.toLowerCase().includes(qq) ? "" : "none"; });
+  });
+  buildFilters();
+  wireListFilterClose();
+
   $("#" + viewId + "-search").addEventListener("input", draw);
   $("#" + viewId + "-owned").addEventListener("change", draw);
   $("#" + viewId + "-add").addEventListener("click", () => {
     state[arrayName].push(makeBlank());
     $("#" + viewId + "-search").value = "";
     $("#" + viewId + "-owned").checked = false;
+    filterCols.forEach((c) => fstate[c.key].clear());  // a blank row has no tags
+    buildFilters();
     draw();
     autosave();
     body.querySelector("tr:last-child input")?.focus();
