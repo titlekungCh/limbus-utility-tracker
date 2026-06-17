@@ -1,6 +1,6 @@
 import { ACTIONS, run, recompute } from "./logic.js";
 import {
-  UPTIE, THREADSPIN, SPINCHAIN, LUNACY_ACTIONS, TICKET_ACTIONS, GACHA_TIERS,
+  UPTIE, THREADSPIN, SPINCHAIN, UPTIE_LEVEL, TS_STEP_LEVEL, LUNACY_ACTIONS, TICKET_ACTIONS, GACHA_TIERS,
   SINNER_ORDER, SINNER_COLORS, LEVEL_FILL, LEVEL_FILL_DEFAULT, SCALE_STOPS,
   SHARD_TYPE_FILL, GACHA_TIER_FILL, DAY_FILL,
   EVENT_ITEM_FILL, EVENT_REWARD_FILL, SIN_ORDER, SIN_FILL,
@@ -740,13 +740,20 @@ function renderActions() {
   if (state.uptie.idIdx == null) { const i = state.ids.findIndex((x) => x.acquired); state.uptie.idIdx = i >= 0 ? i : 0; }
   b.appendChild(ownedPicker("ID", state.ids, state.uptie.idIdx, (i) => { state.uptie.idIdx = i; setSelection("uptie.sinner", state.ids[i].sinner); }));
   r = row(b);
-  // only show the UT options for the selected ID's rarity (0 / 00 / 000)
-  const uStars = state.ids[state.uptie.idIdx]?.tierStars;
-  Object.keys(UPTIE).filter((k) => UPTIE[k].stars === 0 || uStars == null || UPTIE[k].stars === uStars).forEach((k) => {
+  // show only the UT options that match the ID's rarity AND still advance it
+  const uId2 = state.ids[state.uptie.idIdx], uStars = uId2?.tierStars, uCur = Number(uId2?.uptie) || 1;
+  Object.keys(UPTIE).filter((k) => {
+    const e = UPTIE[k];
+    if (e.stars !== 0 && uStars != null && e.stars !== uStars) return false;   // wrong rarity
+    if (e.from != null) return uCur === e.from;                                // "from UT1" / module
+    return uCur < UPTIE_LEVEL[k];                                              // step would advance the ID
+  }).forEach((k) => {
     const bn = btn("", () => act((s) => ACTIONS.uptie(s, k)));
     const starIco = UPTIE[k].stars ? icoTag(OPTION_ICONS.tier["★".repeat(UPTIE[k].stars)]) : "";
-    // rarity icon replaces the leading "0/00/000"; thread icon by the (N) cost
-    bn.innerHTML = starIco + esc(UPTIE[k].label.replace(/^0+\s*/, "")).replace(/\((\d+)\)/, (m, n) => `(${icoTag(RESOURCE_ICON.thread)}${n})`);
+    // rarity icon for the 0/00/000 prefix; thread icon by (N); EGO shard icon by "+N Shard"
+    bn.innerHTML = starIco + esc(UPTIE[k].label.replace(/^0+\s*/, ""))
+      .replace(/\((\d+)\)/, (m, n) => `(${icoTag(RESOURCE_ICON.thread)}${n})`)
+      .replace(/\+(\d+)\s*Shard/, (m, n) => `+${icoTag(RESOURCE_ICON.egoshard)}${n}`);
     r.append(bn);
   });
 
@@ -758,10 +765,12 @@ function renderActions() {
   const egoGrade = state.egos[state.uptie.egoIdx]?.tier;
   const tsGrades = egoGrade ? (THREADSPIN[egoGrade] ? [egoGrade] : []) : Object.keys(THREADSPIN);
   if (egoGrade && !tsGrades.length) b.appendChild(el(`<div class="hint">No thread-spin steps for grade ${esc(egoGrade)}.</div>`));
+  const tsCur = Number(state.egos[state.uptie.egoIdx]?.threadspin) || 1;
   tsGrades.forEach((grade) => {
     b.appendChild(el(`<div class="subhead">${grade}</div>`));
     const rr = row(b);
-    ["TS2", "TS3", "TS3_1", "TS4"].forEach((step) => {
+    // show only the TS steps that still advance the EGO ("from 1" only at TS1)
+    ["TS2", "TS3", "TS3_1", "TS4"].filter((step) => step === "TS3_1" ? tsCur === 1 : tsCur < TS_STEP_LEVEL[step]).forEach((step) => {
       const bn = btn("", () => act((s) => ACTIONS.threadspin(s, grade, step)));
       bn.innerHTML = `${esc(step.replace("_1", " (from 1)"))} (${icoTag(RESOURCE_ICON.thread)}${Math.abs(THREADSPIN[grade][step])})`;
       rr.append(bn);
@@ -773,7 +782,7 @@ function renderActions() {
       bn.title = `TS5: ${SPINCHAIN[grade]} spinchain via ${method === "thread" ? "thread (2:1)" : "EGO shard (1:1)"}`;
       return bn;
     };
-    rr.append(ts5Btn("shard"), ts5Btn("thread"));
+    if (tsCur < 5) rr.append(ts5Btn("shard"), ts5Btn("thread"));
   });
 
   // Intervallo shop lives on its own "Event Shop" tab (full editable planner).

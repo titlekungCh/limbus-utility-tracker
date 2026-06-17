@@ -30,12 +30,12 @@ export const UPTIE = {
   ut2_00:     { label: "00 UT2 (10)",                threads: -10, stars: 2 },
   ut3_00:     { label: "00 UT3 (40)",                threads: -40, lunacy: 40, stars: 2 },
   ut4_00:     { label: "00 UT4 (100) +30 Shard",     threads: -100, shard: "2SUT4", stars: 2 },
-  ut3_00Ft1:  { label: "00 UT3 from UT1 (50)",       threads: -50, lunacy: 40, stars: 2 },
+  ut3_00Ft1:  { label: "00 UT3 from UT1 (50)",       threads: -50, lunacy: 40, stars: 2, from: 1 },
   ut2_000:    { label: "000 UT2 (20)",               threads: -20, stars: 3 },
   ut3_000:    { label: "000 UT3 (80)",               threads: -80, lunacy: 40, stars: 3 },
   ut4_000:    { label: "000 UT4 (150) +50 Shard",    threads: -150, shard: "3SUT4", stars: 3 },
-  ut3_000Ft1: { label: "000 UT3 from UT1 (100)",     threads: -100, lunacy: 40, stars: 3 },
-  ut4_module: { label: "UT4 Module",                 threads: 0, lunacy: 40, stars: 3 },
+  ut3_000Ft1: { label: "000 UT3 from UT1 (100)",     threads: -100, lunacy: 40, stars: 3, from: 1 },
+  ut4_module: { label: "UT4 Module",                 threads: 0, lunacy: 40, stars: 3, from: 1 },
 };
 
 // Thread-spinning menu, grouped by EGO grade. 4th step also shards the uptie sinner.
