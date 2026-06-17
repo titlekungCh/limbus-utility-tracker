@@ -154,6 +154,10 @@ table.sheet th { background: var(--panel-2); color: var(--gold); position: stick
 table.sheet td.num { font-family: var(--mono); text-align: right; }
 table.sheet tr:nth-child(even) td { background: #1f1a15; }
 table.sheet tr:hover td { background: #2a221b; }
+/* Owned ID/EGO rows: tint the row background so it reads at a glance.
+   Coloured input/select cells paint over this, so only the row shows. */
+table.editlist tr.owned td { background: #1e2c14; }
+table.editlist tr.owned:hover td { background: #28391b; }
 .shard-low { color: var(--crimson-bright); }
 .shard-ok { color: #bfe0a8; }
 /* Shard Planning: keep the data columns compact; let Target take the slack */

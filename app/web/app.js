@@ -6,7 +6,7 @@ import {
   EVENT_ITEM_FILL, EVENT_REWARD_FILL, SIN_ORDER, SIN_FILL,
   STATUS_ORDER, STATUS_FILL, FACTION_COLORS, SCALE_MAX5, SEASON_FILL, TIER_FILL,
   SEASON_NUMBER_FILL, KEYWORD_FILL, KEYWORD_ORDER, DAYS, INVENTORY_FILL, LUNACY_FILL,
-  DAILY_LEFT_FILL, WEEKLY_LEFT_FILL, RESOURCE_ICON, EXTRA_KEYWORD_ID, EXTRA_KEYWORD_EGO,
+  DAILY_LEFT_FILL, WEEKLY_LEFT_FILL, RESOURCE_ICON, EXTRA_KEYWORD_ALL,
 } from "./constants.js";
 import { OPTION_ICONS, GRADE_GLYPH } from "./icons-map.js";
 
@@ -1023,7 +1023,7 @@ function renderEditableList(viewId, arrayName, columns, searchKeys, makeBlank) {
       return (a.it.internalId ?? 1e9) - (b.it.internalId ?? 1e9);
     });
     $("#" + viewId + "-body").innerHTML = rows.map(({ it, idx }) =>
-      `<tr data-row="${idx}">${columns.map((c) => cellHtml(c, it, idx)).join("")}` +
+      `<tr data-row="${idx}"${it.acquired ? ' class="owned"' : ""}>${columns.map((c) => cellHtml(c, it, idx)).join("")}` +
       `<td style="text-align:center"><button class="reset" data-del="${idx}" title="delete">✕</button></td></tr>`).join("");
     $("#" + viewId + "-count").textContent = `${rows.length} / ${arr.length}`;
   };
@@ -1109,7 +1109,7 @@ function renderIDs() {
     { label: "Tier", key: "tier", type: "select", options: ["★", "★★", "★★★"], color: (v) => tierColor(v), iconCat: "tier" },
     { label: "Season", key: "season", type: "tags", tagColor: seasonTagColor, iconCat: "season" },
     { label: "Keyword", key: "keyword", type: "tags", tagColor: keywordTagColor, optOrder: KEYWORD_ORDER, iconCat: "keyword" },
-    { label: "Extra Keyword", key: "extraKeyword", type: "tags", iconCat: "keyword", optOrder: EXTRA_KEYWORD_ID },
+    { label: "Extra Keyword", key: "extraKeyword", type: "tags", iconCat: "keyword", optOrder: EXTRA_KEYWORD_ALL },
     { label: "Owned", key: "acquired", type: "check" },
     { label: "Lv", key: "level", type: "num", color: (v) => levelColor(v) },
     { label: "LvExt", key: "levelExtra", type: "num" },
@@ -1127,7 +1127,7 @@ function renderEGOs() {
     { label: "Grade", key: "tier", type: "select", options: ["ZAYIN", "TETH", "HE", "WAW", "ALEPH"], color: (v) => shardTypeColor(v), iconCat: "grade" },
     { label: "Season", key: "season", type: "tags", tagColor: seasonTagColor, iconCat: "season" },
     { label: "Keyword", key: "keyword", type: "tags", tagColor: keywordTagColor, optOrder: KEYWORD_ORDER, iconCat: "keyword" },
-    { label: "Extra Keyword", key: "extraKeyword", type: "tags", iconCat: "keyword", optOrder: EXTRA_KEYWORD_EGO },
+    { label: "Extra Keyword", key: "extraKeyword", type: "tags", iconCat: "keyword", optOrder: EXTRA_KEYWORD_ALL },
     { label: "Owned", key: "acquired", type: "check" },
     { label: "TS", key: "threadspin", type: "num", color: (v) => scaleColor(v) },
     { label: "Released", key: "release", type: "date" },
