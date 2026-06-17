@@ -904,7 +904,7 @@ function renderEditableList(viewId, arrayName, columns, searchKeys, makeBlank) {
       <button class="act primary" id="${viewId}-add">+ Add</button>
       <span class="count" id="${viewId}-count"></span>
     </div>
-    <div class="table-wrap"><table class="sheet"><thead><tr>${
+    <div class="table-wrap"><table class="sheet editlist"><thead><tr>${
       columns.map((c) => `<th>${esc(c.label)}</th>`).join("")}<th></th></tr></thead>
       <tbody id="${viewId}-body"></tbody></table></div>`;
 
@@ -1084,11 +1084,11 @@ function renderIDs() {
     { label: "Keyword", key: "keyword", type: "tags", tagColor: keywordTagColor, optOrder: KEYWORD_ORDER, iconCat: "keyword" },
     { label: "Extra Keyword", key: "extraKeyword", type: "tags", iconCat: "keyword" },
     { label: "Owned", key: "acquired", type: "check" },
-    { label: "Level", key: "level", type: "num", color: (v) => levelColor(v) },
-    { label: "Lv Extra", key: "levelExtra", type: "num" },
-    { label: "Uptie", key: "uptie", type: "num", color: (v) => scaleColor(v) },
+    { label: "Lv", key: "level", type: "num", color: (v) => levelColor(v) },
+    { label: "LvExt", key: "levelExtra", type: "num" },
+    { label: "UT", key: "uptie", type: "num", color: (v) => scaleColor(v) },
     { label: "Released", key: "release", type: "date" },
-    { label: "Int. ID", key: "internalId", type: "num" },
+    { label: "IID", key: "internalId", type: "num" },
   ], ["name", "sinner", "keyword", "extraKeyword", "season"],
     () => ({ name: "", sinner: "Yi Sang", tier: "★★★", tierStars: 3, season: "", keyword: "", extraKeyword: "", acquired: false, level: null, levelExtra: 0, uptie: null, release: "", internalId: null }));
 }
@@ -1102,9 +1102,9 @@ function renderEGOs() {
     { label: "Keyword", key: "keyword", type: "tags", tagColor: keywordTagColor, optOrder: KEYWORD_ORDER, iconCat: "keyword" },
     { label: "Extra Keyword", key: "extraKeyword", type: "tags", iconCat: "keyword" },
     { label: "Owned", key: "acquired", type: "check" },
-    { label: "Threadspin", key: "threadspin", type: "num", color: (v) => scaleColor(v) },
+    { label: "TS", key: "threadspin", type: "num", color: (v) => scaleColor(v) },
     { label: "Released", key: "release", type: "date" },
-    { label: "Int. ID", key: "internalId", type: "num" },
+    { label: "IID", key: "internalId", type: "num" },
     { label: "TS5", key: "ts5", type: "check" },
   ], ["name", "sinner", "sin", "keyword", "extraKeyword", "season"],
     () => ({ name: "", sinner: "Yi Sang", sin: "", tier: "ZAYIN", season: "", keyword: "", extraKeyword: "", acquired: false, threadspin: null, release: "", internalId: null, ts5: false }));

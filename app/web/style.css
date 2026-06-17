@@ -221,10 +221,12 @@ table.sheet td input[type=text], table.sheet td input[type=number], table.sheet 
   font-family: inherit;
 }
 table.sheet td input[type=date] { color-scheme: dark; min-width: 120px; }
-/* Internal ID / Lv Extra: no number spinner arrows (saves space), still numeric */
-input[data-key="internalId"], input[data-key="levelExtra"] { -moz-appearance: textfield; appearance: textfield; }
+/* Internal ID / Lv Extra / Level / Threadspin: no spinner arrows (saves space) */
+input[data-key="internalId"], input[data-key="levelExtra"], input[data-key="level"], input[data-key="threadspin"] { -moz-appearance: textfield; appearance: textfield; }
 input[data-key="internalId"]::-webkit-outer-spin-button, input[data-key="internalId"]::-webkit-inner-spin-button,
-input[data-key="levelExtra"]::-webkit-outer-spin-button, input[data-key="levelExtra"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+input[data-key="levelExtra"]::-webkit-outer-spin-button, input[data-key="levelExtra"]::-webkit-inner-spin-button,
+input[data-key="level"]::-webkit-outer-spin-button, input[data-key="level"]::-webkit-inner-spin-button,
+input[data-key="threadspin"]::-webkit-outer-spin-button, input[data-key="threadspin"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 table.sheet td input[type=text]:focus, table.sheet td input[type=number]:focus, table.sheet td input[type=date]:focus, table.sheet td select:focus {
   border-color: var(--gold); outline: none; background: #000a;
 }
@@ -296,7 +298,12 @@ table.sheet td:has(> details.csel) { padding: 0; }
    the open dropdown list still shows names */
 table.sheet .csel[data-iconcat="sinner"] .csel-val,
 table.sheet .csel[data-iconcat="tier"] .csel-val,
-table.sheet .csel[data-iconcat="sin"] .csel-val { display: none; }
+table.sheet .csel[data-iconcat="sin"] .csel-val,
+table.sheet .csel[data-iconcat="grade"] .csel-val { display: none; }
+/* IDs/EGOs tables: name column (1st) absorbs the freed width; headers stay 1 line */
+table.editlist { table-layout: auto; }
+table.editlist th { white-space: nowrap; }
+table.editlist th:first-child, table.editlist td:first-child { width: 100%; }
 .csel-panel {
   margin-top: 3px; max-height: 240px; overflow: auto; min-width: 130px;
   background: var(--panel-2); border: 1px solid var(--gold); border-radius: 6px; padding: 4px;
