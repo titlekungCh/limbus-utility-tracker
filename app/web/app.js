@@ -80,8 +80,22 @@ const refreshAcell = (input) => {
   const view = cell.querySelector(".acell-view");
   if (view) view.innerHTML = acellView(input.value, mode);
 };
+// Keyword icons resolve through the user-managed list (state.extraKeywords)
+// first, then the built-in OPTION_ICONS map. The list also drives the Extra
+// Keyword option set (managed on the Data page).
+const keywordIcon = (val) => {
+  const ek = (state && state.extraKeywords) || [];
+  const hit = ek.find((k) => k && k.name === val && k.icon);
+  return hit ? hit.icon : (OPTION_ICONS.keyword || {})[val] || "";
+};
+const extraKeywordNames = () =>
+  (state && state.extraKeywords && state.extraKeywords.length
+    ? state.extraKeywords.map((k) => k && k.name).filter(Boolean)
+    : EXTRA_KEYWORD_ALL);
 // icon shown before a dropdown option (not part of its text); "" when none maps
-const optIcon = (cat, val) => (cat === "sinner" ? sinnerIco(val) : icoTag(cat && OPTION_ICONS[cat] && OPTION_ICONS[cat][val]));
+const optIcon = (cat, val) => (cat === "sinner" ? sinnerIco(val)
+  : cat === "keyword" ? icoTag(keywordIcon(val))
+  : icoTag(cat && OPTION_ICONS[cat] && OPTION_ICONS[cat][val]));
 // decoration before an option: image icon, or (for grade) the Hebrew glyph
 const optDeco = (cat, val) => (cat === "grade"
   ? (GRADE_GLYPH[val] ? `<span class="grade-glyph">${esc(GRADE_GLYPH[val])}</span>` : "")
@@ -173,6 +187,18 @@ async function saveNow() {
     const res = await fetch("/api/state", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(state) });
     if (res.ok) markSaved(); else markDirty();
   } catch { markDirty(); }
+}
+
+// Ask the server to download an icon URL into icons/keyword/; returns the path.
+async function fetchIconTo(url, name) {
+  const res = await fetch("/api/fetch-icon", {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ url, name }),
+  });
+  let j = {};
+  try { j = await res.json(); } catch { /* non-JSON error body */ }
+  if (!res.ok || !j.ok) throw new Error(j.error || `HTTP ${res.status}`);
+  return j.path;
 }
 
 // Run a logic action, then refresh + autosave.
@@ -1109,7 +1135,7 @@ function renderIDs() {
     { label: "Tier", key: "tier", type: "select", options: ["★", "★★", "★★★"], color: (v) => tierColor(v), iconCat: "tier" },
     { label: "Season", key: "season", type: "tags", tagColor: seasonTagColor, iconCat: "season" },
     { label: "Keyword", key: "keyword", type: "tags", tagColor: keywordTagColor, optOrder: KEYWORD_ORDER, iconCat: "keyword" },
-    { label: "Extra Keyword", key: "extraKeyword", type: "tags", iconCat: "keyword", optOrder: EXTRA_KEYWORD_ALL },
+    { label: "Extra Keyword", key: "extraKeyword", type: "tags", iconCat: "keyword", optOrder: extraKeywordNames() },
     { label: "Owned", key: "acquired", type: "check" },
     { label: "Lv", key: "level", type: "num", color: (v) => levelColor(v) },
     { label: "LvExt", key: "levelExtra", type: "num" },
@@ -1127,7 +1153,7 @@ function renderEGOs() {
     { label: "Grade", key: "tier", type: "select", options: ["ZAYIN", "TETH", "HE", "WAW", "ALEPH"], color: (v) => shardTypeColor(v), iconCat: "grade" },
     { label: "Season", key: "season", type: "tags", tagColor: seasonTagColor, iconCat: "season" },
     { label: "Keyword", key: "keyword", type: "tags", tagColor: keywordTagColor, optOrder: KEYWORD_ORDER, iconCat: "keyword" },
-    { label: "Extra Keyword", key: "extraKeyword", type: "tags", iconCat: "keyword", optOrder: EXTRA_KEYWORD_ALL },
+    { label: "Extra Keyword", key: "extraKeyword", type: "tags", iconCat: "keyword", optOrder: extraKeywordNames() },
     { label: "Owned", key: "acquired", type: "check" },
     { label: "TS", key: "threadspin", type: "num", color: (v) => scaleColor(v) },
     { label: "Released", key: "release", type: "date" },
@@ -1340,6 +1366,18 @@ function renderData() {
   const root = $("#data");
   if (!root) return;
   const c = state.constants || {};
+  if (!Array.isArray(state.extraKeywords))
+    state.extraKeywords = EXTRA_KEYWORD_ALL.map((name) => ({ name, icon: (OPTION_ICONS.keyword || {})[name] || "" }));
+  // Extra Keyword manager: name + icon source (a local path or an image URL the
+  // server downloads into icons/keyword/). Drives the IDs/EGOs pickers.
+  const ekwRows = () => state.extraKeywords.map((k, i) =>
+    `<tr data-i="${i}">
+      <td style="text-align:center;width:34px">${k.icon ? icoTag(k.icon) : '<span class="hint">—</span>'}</td>
+      <td><input class="ekw-name" data-i="${i}" value="${esc(k.name ?? "")}"/></td>
+      <td><input class="ekw-icon" data-i="${i}" value="${esc(k.icon ?? "")}" placeholder="icons/keyword/… or https://…" style="width:100%"/></td>
+      <td style="text-align:center"><button class="act ekw-fetch" data-i="${i}" title="download the icon at that URL for offline use">⤓</button></td>
+      <td style="text-align:center"><button class="reset ekw-del" data-i="${i}" title="remove keyword">✕</button></td>
+    </tr>`).join("");
   const isScalar = (v) => v === null || ["number", "string", "boolean"].includes(typeof v);
   const coerce = (s) => { if (s === "") return ""; const n = Number(s); return (!isNaN(n) && s.trim() !== "") ? n : s; };
   const field = (label, path, val) =>
@@ -1387,6 +1425,20 @@ function renderData() {
   }).join("");
 
   root.innerHTML = `
+    <h2 class="section-title">Extra Keywords <span class="count">(the option list for the IDs/EGOs Extra Keyword pickers — name + icon)</span></h2>
+    <div class="card" style="grid-column:1/-1;"><div class="body">
+      <div class="hint">Add or rename keywords here, and set each one's icon. For the icon, paste an image URL and click <b>⤓</b> to download it into <code>icons/keyword/</code> (works offline after), or type a local path like <code>icons/keyword/foo.webp</code>.</div>
+      <div class="table-wrap" style="max-height:360px;margin-top:8px;">
+        <table class="sheet"><thead><tr><th>Icon</th><th>Keyword</th><th>Icon source (URL or path)</th><th>Fetch</th><th></th></tr></thead>
+        <tbody id="ekw-body">${ekwRows()}</tbody></table>
+      </div>
+      <div class="field" style="margin-top:8px;">
+        <input type="text" id="ekw-newname" placeholder="new keyword" style="min-width:160px"/>
+        <input type="text" id="ekw-newurl" placeholder="icon URL or path (optional)" style="min-width:240px"/>
+        <button class="act primary" id="ekw-add">+ Add keyword</button>
+        <span class="count" id="ekw-count">${state.extraKeywords.length} keywords</span>
+      </div>
+    </div></div>
     <h2 class="section-title">Dataset <span class="count">(named ranges — edit values & rows directly; changes feed every calculation)</span></h2>
     <div class="grid">${sections}</div>
     <h2 class="section-title">Add a named range</h2>
@@ -1436,6 +1488,46 @@ function renderData() {
     try { state.constants = JSON.parse($("#data-rawall").value); renderData(); afterEdit(); toast(["Dataset replaced"]); }
     catch (err) { toast([`Invalid JSON: ${err.message}`]); }
   });
+
+  // ----- Extra Keyword manager -----
+  // Refresh just the keyword table + the IDs/EGOs pickers (which read the list).
+  const redrawEkw = () => {
+    const tb = $("#ekw-body"); if (tb) tb.innerHTML = ekwRows();
+    const cnt = $("#ekw-count"); if (cnt) cnt.textContent = `${state.extraKeywords.length} keywords`;
+    renderIDs(); renderEGOs(); autosave();
+  };
+  const ekwBody = $("#ekw-body");
+  ekwBody.addEventListener("change", (e) => {
+    const i = +e.target.dataset.i; const k = state.extraKeywords[i]; if (!k) return;
+    if (e.target.classList.contains("ekw-name")) { k.name = e.target.value.trim(); redrawEkw(); }
+    else if (e.target.classList.contains("ekw-icon")) { k.icon = e.target.value.trim(); redrawEkw(); }
+  });
+  ekwBody.addEventListener("click", async (e) => {
+    const btn = e.target.closest("button"); if (!btn) return;
+    const i = +btn.dataset.i; const k = state.extraKeywords[i]; if (!k) return;
+    if (btn.classList.contains("ekw-del")) { state.extraKeywords.splice(i, 1); redrawEkw(); return; }
+    if (btn.classList.contains("ekw-fetch")) {
+      const src = (k.icon || "").trim();
+      if (!/^https?:\/\//i.test(src)) { toast(["Put an http(s) image URL in the icon field first"]); return; }
+      btn.disabled = true; btn.textContent = "…";
+      try { k.icon = await fetchIconTo(src, k.name); redrawEkw(); toast([`Saved icon for ${k.name}`]); }
+      catch (err) { toast([`Icon fetch failed: ${err.message}`]); btn.disabled = false; btn.textContent = "⤓"; }
+    }
+  });
+  $("#ekw-add").addEventListener("click", async () => {
+    const name = ($("#ekw-newname").value || "").trim();
+    const url = ($("#ekw-newurl").value || "").trim();
+    if (!name) { toast(["Enter a keyword name"]); return; }
+    if (state.extraKeywords.some((k) => k.name === name)) { toast([`"${name}" already exists`]); return; }
+    let icon = url;
+    if (/^https?:\/\//i.test(url)) {
+      try { icon = await fetchIconTo(url, name); }
+      catch (err) { toast([`Added "${name}", but icon fetch failed: ${err.message}`]); icon = ""; }
+    }
+    state.extraKeywords.push({ name, icon });
+    $("#ekw-newname").value = ""; $("#ekw-newurl").value = "";
+    redrawEkw(); toast([`Added ${name}`]);
+  });
 }
 
 // ---------- tabs ----------
@@ -1476,6 +1568,10 @@ function recomputeDerived(s) {
 // becomes the computed running sum).
 function migrateConstants(s) {
   const c = s.constants || (s.constants = {});
+  // Extra-keyword option list (name + icon), managed on the Data page. Seed it
+  // once from the built-in list so old keywords are editable/removable too.
+  if (!Array.isArray(s.extraKeywords))
+    s.extraKeywords = EXTRA_KEYWORD_ALL.map((name) => ({ name, icon: (OPTION_ICONS.keyword || {})[name] || "" }));
   if (Array.isArray(c.shardTable))
     c.shardTable.forEach((r) => { if (!r.color) r.color = SHARD_TYPE_FILL[r.type] || ""; });
   if (!Array.isArray(c.tickets)) {
