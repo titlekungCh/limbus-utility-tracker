@@ -673,12 +673,12 @@ function renderActions() {
   const validGain = (arr, idx) => arr[idx] && isExtractible(arr[idx]);
   if (!validGain(state.ids, state.gacha.gainIdIdx)) state.gacha.gainIdIdx = firstIdx(state.ids, isExtractible);
   if (!validGain(state.egos, state.gacha.gainEgoIdx)) state.gacha.gainEgoIdx = firstIdx(state.egos, isExtractible);
-  b.appendChild(idPicker("ID", state.ids, state.gacha.gainIdIdx, isExtractible, (i) => { state.gacha.gainIdIdx = i; renderActions(); }));
-  r = row(b);
-  r.append(btn("Acquired", () => act((s) => ACTIONS.acquireId(s, s.gacha.gainIdIdx)), "primary"));
-  b.appendChild(idPicker("EGO", state.egos, state.gacha.gainEgoIdx, isExtractible, (i) => { state.gacha.gainEgoIdx = i; renderActions(); }));
-  r = row(b);
-  r.append(btn("Acquired", () => act((s) => ACTIONS.acquireEgo(s, s.gacha.gainEgoIdx)), "primary"));
+  const gIdField = idPicker("ID", state.ids, state.gacha.gainIdIdx, isExtractible, (i) => { state.gacha.gainIdIdx = i; renderActions(); });
+  gIdField.appendChild(btn("Acquired", () => act((s) => ACTIONS.acquireId(s, s.gacha.gainIdIdx)), "primary"));
+  b.appendChild(gIdField);
+  const gEgoField = idPicker("EGO", state.egos, state.gacha.gainEgoIdx, isExtractible, (i) => { state.gacha.gainEgoIdx = i; renderActions(); });
+  gEgoField.appendChild(btn("Acquired", () => act((s) => ACTIONS.acquireEgo(s, s.gacha.gainEgoIdx)), "primary"));
+  b.appendChild(gEgoField);
 
   // Manager XP
   b = panel("Manager XP");
