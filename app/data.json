@@ -4,40 +4,40 @@
     "version": 1
   },
   "inventory": {
-    "crate": 2184,
-    "pass": 1096.5,
-    "threads": 3402,
+    "crate": 2232,
+    "pass": 1113,
+    "threads": 3456,
     "tickets": {
       "I": 52,
-      "II": 265,
-      "III": 273,
-      "IV": 183
+      "II": 271,
+      "III": 279,
+      "IV": 189
     }
   },
   "manager": {
     "level": 82,
-    "currentXP": 3123,
+    "currentXP": 3683,
     "nextLevelXP": 4212
   },
   "lunacy": {
-    "total": 35539,
+    "total": 35763,
     "paid": 3010,
     "extTickets": 23,
     "decaTickets": 0,
     "currentDate": "2026-06-11"
   },
   "md": {
-    "dailyLeft": 1,
-    "weeklyLeft": 0,
-    "normalLeftTotal": 40,
+    "dailyLeft": 7,
+    "weeklyLeft": 5,
+    "normalLeftTotal": 38,
     "hard": [
-      false,
-      false,
+      true,
+      true,
       true
     ],
     "normal": [
-      false,
-      false,
+      true,
+      true,
       true
     ],
     "hardStatus": [
@@ -53,16 +53,16 @@
     "rental": true,
     "rentalWeek": 1,
     "schedule": [
-      true,
-      true,
-      true,
-      true,
+      false,
+      false,
+      false,
+      false,
       false,
       false
     ]
   },
-  "currentDay": "Tue",
-  "weekTilSeasonEnd": 9,
+  "currentDay": "Wed",
+  "weekTilSeasonEnd": 8,
   "uptie": {
     "sinner": "Faust"
   },
@@ -71,7 +71,7 @@
     "tier": "1Star"
   },
   "event": {
-    "currency": 222,
+    "currency": 742,
     "rewardType": "000 ID",
     "items": [
       {
@@ -155,12 +155,6 @@
     "dailyManagerXP": 240,
     "threadLuxSkip": 60,
     "dailyThreads": 54,
-    "dailyLuxTickets": {
-      "I": 0,
-      "II": 6,
-      "III": 6,
-      "IV": 6
-    },
     "managerCurve": [
       {
         "level": 1,
@@ -1361,68 +1355,686 @@
         "nextXP": 19811,
         "maxEnk": 183,
         "maxIncrease": 0
+      },
+      {
+        "level": 201,
+        "nextXP": 19964,
+        "maxEnk": 183,
+        "maxIncrease": 0
+      },
+      {
+        "level": 202,
+        "nextXP": 20117,
+        "maxEnk": 184,
+        "maxIncrease": 1
+      },
+      {
+        "level": 203,
+        "nextXP": 20270,
+        "maxEnk": 184,
+        "maxIncrease": 0
+      },
+      {
+        "level": 204,
+        "nextXP": 20424,
+        "maxEnk": 184,
+        "maxIncrease": 0
+      },
+      {
+        "level": 205,
+        "nextXP": 20578,
+        "maxEnk": 185,
+        "maxIncrease": 1
+      },
+      {
+        "level": 206,
+        "nextXP": 20732,
+        "maxEnk": 185,
+        "maxIncrease": 0
+      },
+      {
+        "level": 207,
+        "nextXP": 20887,
+        "maxEnk": 185,
+        "maxIncrease": 0
+      },
+      {
+        "level": 208,
+        "nextXP": 21042,
+        "maxEnk": 186,
+        "maxIncrease": 1
+      },
+      {
+        "level": 209,
+        "nextXP": 21197,
+        "maxEnk": 186,
+        "maxIncrease": 0
+      },
+      {
+        "level": 210,
+        "nextXP": 21353,
+        "maxEnk": 186,
+        "maxIncrease": 0
+      },
+      {
+        "level": 211,
+        "nextXP": 21509,
+        "maxEnk": 187,
+        "maxIncrease": 1
+      },
+      {
+        "level": 212,
+        "nextXP": 21665,
+        "maxEnk": 187,
+        "maxIncrease": 0
+      },
+      {
+        "level": 213,
+        "nextXP": 21822,
+        "maxEnk": 187,
+        "maxIncrease": 0
+      },
+      {
+        "level": 214,
+        "nextXP": 21979,
+        "maxEnk": 188,
+        "maxIncrease": 1
+      },
+      {
+        "level": 215,
+        "nextXP": 22136,
+        "maxEnk": 188,
+        "maxIncrease": 0
+      },
+      {
+        "level": 216,
+        "nextXP": 22294,
+        "maxEnk": 188,
+        "maxIncrease": 0
+      },
+      {
+        "level": 217,
+        "nextXP": 22452,
+        "maxEnk": 189,
+        "maxIncrease": 1
+      },
+      {
+        "level": 218,
+        "nextXP": 22610,
+        "maxEnk": 189,
+        "maxIncrease": 0
+      },
+      {
+        "level": 219,
+        "nextXP": 22769,
+        "maxEnk": 189,
+        "maxIncrease": 0
+      },
+      {
+        "level": 220,
+        "nextXP": 22928,
+        "maxEnk": 190,
+        "maxIncrease": 1
+      },
+      {
+        "level": 221,
+        "nextXP": 23087,
+        "maxEnk": 190,
+        "maxIncrease": 0
+      },
+      {
+        "level": 222,
+        "nextXP": 23247,
+        "maxEnk": 190,
+        "maxIncrease": 0
+      },
+      {
+        "level": 223,
+        "nextXP": 23407,
+        "maxEnk": 191,
+        "maxIncrease": 1
+      },
+      {
+        "level": 224,
+        "nextXP": 23567,
+        "maxEnk": 191,
+        "maxIncrease": 0
+      },
+      {
+        "level": 225,
+        "nextXP": 23728,
+        "maxEnk": 191,
+        "maxIncrease": 0
+      },
+      {
+        "level": 226,
+        "nextXP": 23889,
+        "maxEnk": 192,
+        "maxIncrease": 1
+      },
+      {
+        "level": 227,
+        "nextXP": 24050,
+        "maxEnk": 192,
+        "maxIncrease": 0
+      },
+      {
+        "level": 228,
+        "nextXP": 24212,
+        "maxEnk": 192,
+        "maxIncrease": 0
+      },
+      {
+        "level": 229,
+        "nextXP": 24374,
+        "maxEnk": 193,
+        "maxIncrease": 1
+      },
+      {
+        "level": 230,
+        "nextXP": 24536,
+        "maxEnk": 193,
+        "maxIncrease": 0
+      },
+      {
+        "level": 231,
+        "nextXP": 24699,
+        "maxEnk": 193,
+        "maxIncrease": 0
+      },
+      {
+        "level": 232,
+        "nextXP": 24862,
+        "maxEnk": 194,
+        "maxIncrease": 1
+      },
+      {
+        "level": 233,
+        "nextXP": 25025,
+        "maxEnk": 194,
+        "maxIncrease": 0
+      },
+      {
+        "level": 234,
+        "nextXP": 25189,
+        "maxEnk": 194,
+        "maxIncrease": 0
+      },
+      {
+        "level": 235,
+        "nextXP": 25353,
+        "maxEnk": 195,
+        "maxIncrease": 1
+      },
+      {
+        "level": 236,
+        "nextXP": 25517,
+        "maxEnk": 195,
+        "maxIncrease": 0
+      },
+      {
+        "level": 237,
+        "nextXP": 25682,
+        "maxEnk": 195,
+        "maxIncrease": 0
+      },
+      {
+        "level": 238,
+        "nextXP": 25847,
+        "maxEnk": 196,
+        "maxIncrease": 1
+      },
+      {
+        "level": 239,
+        "nextXP": 26012,
+        "maxEnk": 196,
+        "maxIncrease": 0
+      },
+      {
+        "level": 240,
+        "nextXP": 26178,
+        "maxEnk": 196,
+        "maxIncrease": 0
+      },
+      {
+        "level": 241,
+        "nextXP": 26344,
+        "maxEnk": 197,
+        "maxIncrease": 1
+      },
+      {
+        "level": 242,
+        "nextXP": 26510,
+        "maxEnk": 197,
+        "maxIncrease": 0
+      },
+      {
+        "level": 243,
+        "nextXP": 26677,
+        "maxEnk": 197,
+        "maxIncrease": 0
+      },
+      {
+        "level": 244,
+        "nextXP": 26844,
+        "maxEnk": 198,
+        "maxIncrease": 1
+      },
+      {
+        "level": 245,
+        "nextXP": 27011,
+        "maxEnk": 198,
+        "maxIncrease": 0
+      },
+      {
+        "level": 246,
+        "nextXP": 27179,
+        "maxEnk": 198,
+        "maxIncrease": 0
+      },
+      {
+        "level": 247,
+        "nextXP": 27347,
+        "maxEnk": 199,
+        "maxIncrease": 1
+      },
+      {
+        "level": 248,
+        "nextXP": 27515,
+        "maxEnk": 199,
+        "maxIncrease": 0
+      },
+      {
+        "level": 249,
+        "nextXP": 27684,
+        "maxEnk": 199,
+        "maxIncrease": 0
+      },
+      {
+        "level": 250,
+        "nextXP": 27853,
+        "maxEnk": 200,
+        "maxIncrease": 1
+      },
+      {
+        "level": 251,
+        "nextXP": 28022,
+        "maxEnk": 200,
+        "maxIncrease": 0
+      },
+      {
+        "level": 252,
+        "nextXP": 28192,
+        "maxEnk": 200,
+        "maxIncrease": 0
+      },
+      {
+        "level": 253,
+        "nextXP": 28362,
+        "maxEnk": 201,
+        "maxIncrease": 1
+      },
+      {
+        "level": 254,
+        "nextXP": 28532,
+        "maxEnk": 201,
+        "maxIncrease": 0
+      },
+      {
+        "level": 255,
+        "nextXP": 28703,
+        "maxEnk": 201,
+        "maxIncrease": 0
+      },
+      {
+        "level": 256,
+        "nextXP": 28874,
+        "maxEnk": 202,
+        "maxIncrease": 1
+      },
+      {
+        "level": 257,
+        "nextXP": 29045,
+        "maxEnk": 202,
+        "maxIncrease": 0
+      },
+      {
+        "level": 258,
+        "nextXP": 29217,
+        "maxEnk": 202,
+        "maxIncrease": 0
+      },
+      {
+        "level": 259,
+        "nextXP": 29389,
+        "maxEnk": 203,
+        "maxIncrease": 1
+      },
+      {
+        "level": 260,
+        "nextXP": 29561,
+        "maxEnk": 203,
+        "maxIncrease": 0
+      },
+      {
+        "level": 261,
+        "nextXP": 29734,
+        "maxEnk": 203,
+        "maxIncrease": 0
+      },
+      {
+        "level": 262,
+        "nextXP": 29907,
+        "maxEnk": 204,
+        "maxIncrease": 1
+      },
+      {
+        "level": 263,
+        "nextXP": 30080,
+        "maxEnk": 204,
+        "maxIncrease": 0
+      },
+      {
+        "level": 264,
+        "nextXP": 30254,
+        "maxEnk": 204,
+        "maxIncrease": 0
+      },
+      {
+        "level": 265,
+        "nextXP": 30428,
+        "maxEnk": 205,
+        "maxIncrease": 1
+      },
+      {
+        "level": 266,
+        "nextXP": 30602,
+        "maxEnk": 205,
+        "maxIncrease": 0
+      },
+      {
+        "level": 267,
+        "nextXP": 30777,
+        "maxEnk": 205,
+        "maxIncrease": 0
+      },
+      {
+        "level": 268,
+        "nextXP": 30952,
+        "maxEnk": 206,
+        "maxIncrease": 1
+      },
+      {
+        "level": 269,
+        "nextXP": 31127,
+        "maxEnk": 206,
+        "maxIncrease": 0
+      },
+      {
+        "level": 270,
+        "nextXP": 31303,
+        "maxEnk": 206,
+        "maxIncrease": 0
+      },
+      {
+        "level": 271,
+        "nextXP": 31479,
+        "maxEnk": 207,
+        "maxIncrease": 1
+      },
+      {
+        "level": 272,
+        "nextXP": 31655,
+        "maxEnk": 207,
+        "maxIncrease": 0
+      },
+      {
+        "level": 273,
+        "nextXP": 31832,
+        "maxEnk": 207,
+        "maxIncrease": 0
+      },
+      {
+        "level": 274,
+        "nextXP": 32009,
+        "maxEnk": 208,
+        "maxIncrease": 1
+      },
+      {
+        "level": 275,
+        "nextXP": 32186,
+        "maxEnk": 208,
+        "maxIncrease": 0
+      },
+      {
+        "level": 276,
+        "nextXP": 32364,
+        "maxEnk": 208,
+        "maxIncrease": 0
+      },
+      {
+        "level": 277,
+        "nextXP": 32542,
+        "maxEnk": 209,
+        "maxIncrease": 1
+      },
+      {
+        "level": 278,
+        "nextXP": 32720,
+        "maxEnk": 209,
+        "maxIncrease": 0
+      },
+      {
+        "level": 279,
+        "nextXP": 32899,
+        "maxEnk": 209,
+        "maxIncrease": 0
+      },
+      {
+        "level": 280,
+        "nextXP": 33078,
+        "maxEnk": 210,
+        "maxIncrease": 1
+      },
+      {
+        "level": 281,
+        "nextXP": 33257,
+        "maxEnk": 210,
+        "maxIncrease": 0
+      },
+      {
+        "level": 282,
+        "nextXP": 33437,
+        "maxEnk": 210,
+        "maxIncrease": 0
+      },
+      {
+        "level": 283,
+        "nextXP": 33617,
+        "maxEnk": 211,
+        "maxIncrease": 1
+      },
+      {
+        "level": 284,
+        "nextXP": 33797,
+        "maxEnk": 211,
+        "maxIncrease": 0
+      },
+      {
+        "level": 285,
+        "nextXP": 33978,
+        "maxEnk": 211,
+        "maxIncrease": 0
+      },
+      {
+        "level": 286,
+        "nextXP": 34159,
+        "maxEnk": 212,
+        "maxIncrease": 1
+      },
+      {
+        "level": 287,
+        "nextXP": 34340,
+        "maxEnk": 212,
+        "maxIncrease": 0
+      },
+      {
+        "level": 288,
+        "nextXP": 34522,
+        "maxEnk": 212,
+        "maxIncrease": 0
+      },
+      {
+        "level": 289,
+        "nextXP": 34704,
+        "maxEnk": 213,
+        "maxIncrease": 1
+      },
+      {
+        "level": 290,
+        "nextXP": 34886,
+        "maxEnk": 213,
+        "maxIncrease": 0
+      },
+      {
+        "level": 291,
+        "nextXP": 35069,
+        "maxEnk": 213,
+        "maxIncrease": 0
+      },
+      {
+        "level": 292,
+        "nextXP": 35252,
+        "maxEnk": 214,
+        "maxIncrease": 1
+      },
+      {
+        "level": 293,
+        "nextXP": 35435,
+        "maxEnk": 214,
+        "maxIncrease": 0
+      },
+      {
+        "level": 294,
+        "nextXP": 35619,
+        "maxEnk": 214,
+        "maxIncrease": 0
+      },
+      {
+        "level": 295,
+        "nextXP": 35803,
+        "maxEnk": 215,
+        "maxIncrease": 1
+      },
+      {
+        "level": 296,
+        "nextXP": 35987,
+        "maxEnk": 215,
+        "maxIncrease": 0
+      },
+      {
+        "level": 297,
+        "nextXP": 36172,
+        "maxEnk": 215,
+        "maxIncrease": 0
+      },
+      {
+        "level": 298,
+        "nextXP": 36357,
+        "maxEnk": 216,
+        "maxIncrease": 1
+      },
+      {
+        "level": 299,
+        "nextXP": 36542,
+        "maxEnk": 216,
+        "maxIncrease": 0
+      },
+      {
+        "level": 300,
+        "nextXP": 36728,
+        "maxEnk": 216,
+        "maxIncrease": 0
       }
     ],
     "shardTable": [
       {
         "type": "EGO/3 Star",
         "shardNeeded": 400,
-        "threadNeeded": 0
+        "threadNeeded": 0,
+        "color": "#FF9E00"
       },
       {
         "type": "2 3 Star + UT4",
         "shardNeeded": 900,
-        "threadNeeded": 500
+        "threadNeeded": 500,
+        "color": "#FFF243"
       },
       {
         "type": "2 Star",
         "shardNeeded": 150,
-        "threadNeeded": 0
+        "threadNeeded": 0,
+        "color": "#B10202"
       },
       {
         "type": "000 UT4",
         "shardNeeded": 50,
-        "threadNeeded": 150
+        "threadNeeded": 150,
+        "color": "#FFE5A0"
       },
       {
         "type": "ZAYIN",
         "shardNeeded": 80,
-        "threadNeeded": 110
+        "threadNeeded": 110,
+        "color": "#D4EDBC"
       },
       {
         "type": "TETH",
         "shardNeeded": 90,
-        "threadNeeded": 130
+        "threadNeeded": 130,
+        "color": "#BFE1F6"
       },
       {
         "type": "HE",
         "shardNeeded": 100,
-        "threadNeeded": 150
+        "threadNeeded": 150,
+        "color": "#C6DBE1"
       },
       {
         "type": "WAW",
         "shardNeeded": 150,
-        "threadNeeded": 170
+        "threadNeeded": 170,
+        "color": "#E6CFF2"
       },
       {
         "type": "None",
         "shardNeeded": 0,
-        "threadNeeded": 0
+        "threadNeeded": 0,
+        "color": "#E8EAED"
       },
       {
         "type": "3 Star UT",
         "shardNeeded": 450,
-        "threadNeeded": 250
+        "threadNeeded": 250,
+        "color": "#FFE400"
       },
       {
         "type": "00 UT4",
         "shardNeeded": 30,
-        "threadNeeded": 100
+        "threadNeeded": 100,
+        "color": "#B10202"
       },
       {
         "type": "2 3 Star",
         "shardNeeded": 800,
-        "threadNeeded": 0
+        "threadNeeded": 0,
+        "color": "#FFF243"
+      },
+      {
+        "type": "1 3StarUT + 13Star",
+        "shardNeeded": 850,
+        "threadNeeded": 250,
+        "color": "#fff539"
       }
     ],
     "idLevelCurve": [
@@ -1827,12 +2439,32 @@
         "totalXP": 300109
       }
     ],
-    "ticketXP": {
-      "I": 50,
-      "II": 200,
-      "III": 1000,
-      "IV": 3000
-    }
+    "tickets": [
+      {
+        "tier": "I",
+        "xp": 50,
+        "dailyLux": 0,
+        "color": "#C87329"
+      },
+      {
+        "tier": "II",
+        "xp": 200,
+        "dailyLux": 6,
+        "color": "#BDBDBD"
+      },
+      {
+        "tier": "III",
+        "xp": 1000,
+        "dailyLux": 6,
+        "color": "#FFC000"
+      },
+      {
+        "tier": "IV",
+        "xp": 3000,
+        "dailyLux": 6,
+        "color": "#02CFCB"
+      }
+    ]
   },
   "sinners": [
     {
@@ -1898,7 +2530,7 @@
     {
       "name": "Outis",
       "acronym": "OT",
-      "shards": 66,
+      "shards": 69,
       "cell": "J11"
     },
     {
@@ -1915,7 +2547,7 @@
       "target": "Walp SS7"
     },
     {
-      "type": "2 3 Star + UT4",
+      "type": "1 3StarUT + 13Star",
       "enabled": true,
       "target": "Index Proselyte+UT / Ring Apprentice+UT"
     },
@@ -1945,12 +2577,12 @@
       "target": "Thumb Apprentice+UT"
     },
     {
-      "type": "2 3 Star",
+      "type": "1 3StarUT + 13Star",
       "enabled": true,
       "target": "LCD Osir / Kurokumo"
     },
     {
-      "type": "2 3 Star",
+      "type": "1 3StarUT + 13Star",
       "enabled": true,
       "target": "Into the Sunset / Thumb Mother"
     },
@@ -8937,10 +9569,6 @@
       null,
       null,
       null,
-      null,
-      null,
-      null,
-      null,
       null
     ],
     [
@@ -8955,11 +9583,7 @@
       "T DQ",
       "FA&S RS",
       "Thumb MS",
-      "D20 HL",
-      null,
-      null,
-      null,
-      null
+      "D20 HL"
     ],
     [
       "Heishou HC",
@@ -8973,11 +9597,7 @@
       "Thumb RD",
       "Thumb SC",
       "Magic Bullet OT",
-      "Firefist GG",
-      null,
-      null,
-      null,
-      null
+      "Firefist GG"
     ],
     [
       "Bleed",
@@ -8991,10 +9611,6 @@
       null,
       null,
       null,
-      null,
-      null,
-      null,
-      null,
       null
     ],
     [
@@ -9009,11 +9625,7 @@
       "Mancha DQ",
       "Awe RS",
       "Mancha MS",
-      "Ring HL",
-      null,
-      null,
-      null,
-      null
+      "Ring HL"
     ],
     [
       "KK HC",
@@ -9027,11 +9639,7 @@
       "Mancha RD",
       "Thumb SC",
       "T OT",
-      "Night Awl GG",
-      null,
-      null,
-      null,
-      null
+      "Night Awl GG"
     ],
     [
       "Tremor",
@@ -9044,10 +9652,6 @@
       "Sinking",
       "Burn",
       "Bleed",
-      null,
-      null,
-      null,
-      null,
       null,
       null
     ],
@@ -9063,11 +9667,7 @@
       "T DQ",
       "FA&S RS",
       "Thumb MS",
-      "D20 HL",
-      null,
-      null,
-      null,
-      null
+      "D20 HL"
     ],
     [
       "Oufi HC",
@@ -9081,11 +9681,7 @@
       "Thumb RD",
       "Thumb SC",
       "Udjat OT",
-      "Night Awl GG",
-      null,
-      null,
-      null,
-      null
+      "Night Awl GG"
     ],
     [
       "Rupture",
@@ -9097,10 +9693,6 @@
       "Heishou",
       "Poise",
       "Rupture",
-      null,
-      null,
-      null,
-      null,
       null,
       null,
       null
@@ -9117,11 +9709,7 @@
       "Heishou DQ",
       "Daiyu RS",
       "Cinq MS",
-      "Lord HL",
-      null,
-      null,
-      null,
-      null
+      "Lord HL"
     ],
     [
       "7 HC",
@@ -9135,11 +9723,7 @@
       "Heishou RD",
       "Heishou SC",
       "Heishou OT",
-      "Heishou GG",
-      null,
-      null,
-      null,
-      null
+      "Heishou GG"
     ],
     [
       "Sinking",
@@ -9151,10 +9735,6 @@
       "Sinking Hybrid",
       "Tremor",
       "Poise",
-      null,
-      null,
-      null,
-      null,
       null,
       null,
       null
@@ -9171,11 +9751,7 @@
       "Index DQ",
       "FA&S RS",
       "Dieci MS",
-      "Dieci HL",
-      null,
-      null,
-      null,
-      null
+      "Dieci HL"
     ],
     [
       "WH HC",
@@ -9189,11 +9765,7 @@
       "KoD RD",
       "Mariachi SC",
       "Udjat OT",
-      "Lamp GG",
-      null,
-      null,
-      null,
-      null
+      "Lamp GG"
     ],
     [
       "Poise",
@@ -9204,10 +9776,6 @@
       null,
       "Poise",
       "Sinking",
-      null,
-      null,
-      null,
-      null,
       null,
       null,
       null,
@@ -9225,11 +9793,7 @@
       "Index DQ",
       "FA&S RS",
       "Cinq MS",
-      "FS HL",
-      null,
-      null,
-      null,
-      null
+      "FS HL"
     ],
     [
       "FS HC",
@@ -9243,11 +9807,7 @@
       "KoD RD",
       "Pinky/Yan SC",
       "WH OT",
-      "WH/Lamp GG",
-      null,
-      null,
-      null,
-      null
+      "WH/Lamp GG"
     ],
     [
       "Charge",
@@ -9258,10 +9818,6 @@
       null,
       "Charge",
       "Bleed",
-      null,
-      null,
-      null,
-      null,
       null,
       null,
       null,
@@ -9279,11 +9835,7 @@
       "W DQ",
       "RE&P RS",
       "Ring MS",
-      "Ring HL",
-      null,
-      null,
-      null,
-      null
+      "Ring HL"
     ],
     [
       "MC HC",
@@ -9297,11 +9849,7 @@
       "Ring RD",
       "Pinky SC",
       "Ring OT",
-      "AEDD GG",
-      null,
-      null,
-      null,
-      null
+      "AEDD GG"
     ],
     [
       "Lust",
@@ -9314,10 +9862,6 @@
       "Middle",
       "Bleed",
       "Burn",
-      null,
-      null,
-      null,
-      null,
       null,
       null
     ],
@@ -9333,11 +9877,7 @@
       "Middle DQ",
       "RE&P RS",
       "Hornet MS",
-      "Ring HL",
-      null,
-      null,
-      null,
-      null
+      "Ring HL"
     ],
     [
       null,
@@ -9351,11 +9891,7 @@
       "KoD RD",
       "Middle SC",
       "Middle OT",
-      "Firefist GG",
-      null,
-      null,
-      null,
-      null
+      "Firefist GG"
     ],
     [
       "Wrath",
@@ -9369,10 +9905,6 @@
       "Poise",
       "Sinking",
       null,
-      null,
-      null,
-      null,
-      null,
       null
     ],
     [
@@ -9385,10 +9917,6 @@
       "Index YS",
       "Index FT",
       "Index DQ",
-      null,
-      null,
-      null,
-      null,
       null,
       null,
       null
@@ -9405,10 +9933,6 @@
       null,
       "Index Yan SC?",
       "Index Weaver OT",
-      null,
-      null,
-      null,
-      null,
       null
     ],
     [
@@ -9421,10 +9945,6 @@
       "Poise",
       "Bleed",
       "Blade Lineage",
-      null,
-      null,
-      null,
-      null,
       null,
       null,
       null
@@ -9441,11 +9961,7 @@
       "Index DQ",
       "Araya RS",
       "BL MS",
-      "S Corp HL",
-      null,
-      null,
-      null,
-      null
+      "S Corp HL"
     ],
     [
       "Thumb HC",
@@ -9459,11 +9975,7 @@
       "Thumb RD",
       "Pinky SC",
       "Middle OT",
-      "Priest GG",
-      null,
-      null,
-      null,
-      null
+      "Priest GG"
     ],
     [
       "Charge",
@@ -9475,10 +9987,6 @@
       "Charge",
       "Rupture",
       "Sinking",
-      null,
-      null,
-      null,
-      null,
       null,
       null,
       null
@@ -9495,11 +10003,7 @@
       "QoH DQ",
       "FA&S RS",
       "Cinq MS",
-      "Base HL",
-      null,
-      null,
-      null,
-      null
+      "Base HL"
     ],
     [
       "R HC",
@@ -9513,11 +10017,7 @@
       "KoD RD",
       "Red Sheet SC",
       "W OT",
-      "AEDD GG",
-      null,
-      null,
-      null,
-      null
+      "AEDD GG"
     ],
     [
       "Tremor",
@@ -9530,10 +10030,6 @@
       "Sinking",
       "Bleed",
       "+ 1 Charge Bleed Sinking",
-      null,
-      null,
-      null,
-      null,
       null,
       null
     ],
@@ -9549,11 +10045,7 @@
       "QoH DQ",
       "LCCB RS",
       "Ring Fauvist MS",
-      "Ring HL",
-      null,
-      null,
-      null,
-      null
+      "Ring HL"
     ],
     [
       "W HC",
@@ -9567,11 +10059,7 @@
       "Ring Fauvist RD",
       "Thumb SC",
       "Udjat OT",
-      "Pirate GG",
-      null,
-      null,
-      null,
-      null
+      "Pirate GG"
     ],
     [
       "Tremor",
@@ -9583,10 +10071,6 @@
       "Burn",
       "Bleed",
       "Poise",
-      null,
-      null,
-      null,
-      null,
       null,
       null,
       null
@@ -9603,11 +10087,7 @@
       "Cinq E DQ",
       "Araya RS",
       "Hornet MS",
-      "S Corp HL",
-      null,
-      null,
-      null,
-      null
+      "S Corp HL"
     ],
     [
       null,
@@ -9621,10 +10101,6 @@
       null,
       "Pinky SC",
       "Middle OT",
-      null,
-      null,
-      null,
-      null,
       null
     ]
   ]
