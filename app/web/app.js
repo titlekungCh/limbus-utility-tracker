@@ -695,7 +695,8 @@ function renderActions() {
   b = panel("Manager XP");
   r = row(b);
   // status keyword (glyphs) of the next pending Hard / Normal MD on the dashboard
-  const nextStatus = (doneArr, statusArr) => { let i = (doneArr || []).findIndex((v) => v); if (i < 0) i = 0; return (statusArr || [])[i] || ""; };
+  // status of the next pending pill; "" when all done (next is rental/next week, which has no keyword)
+  const nextStatus = (doneArr, statusArr) => { const i = (doneArr || []).findIndex((v) => v); return i < 0 ? "" : (statusArr || [])[i] || ""; };
   const statusGlyphs = (text) => String(text || "").split(/\s+/).filter(Boolean).map((w) => optIcon("keyword", w)).join("");
   const mdBtn = (label, status, fn, cls) => { const bn = btn(label, () => act(fn), cls); const g = statusGlyphs(status); if (g) { bn.innerHTML = `${esc(label)} ${g}`; bn.title = `${label} — next: ${status}`; } return bn; };
   r.append(
