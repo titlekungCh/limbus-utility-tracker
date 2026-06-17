@@ -256,7 +256,7 @@ function renderDashboard() {
   // editable number row (writes to a dotted state path on change); optional colour + icon
   const erow = (label, path, val, big, color, ico) => {
     const st = color ? `background:${color.fill};color:${color.font};` : "";
-    return `<div class="k" style="${st}">${ico ? icoTag(ico, color ? invertHex(color.fill) : null) : ""}${esc(label)}</div><div class="v${big ? " big" : ""}"><input type="number" class="kv-num" data-path="${path}" value="${val ?? ""}" style="${st}"/></div>`;
+    return `<div class="k" style="${st}">${ico ? icoTag(ico, color ? color.fill : null) : ""}${esc(label)}</div><div class="v${big ? " big" : ""}"><input type="number" class="kv-num" data-path="${path}" value="${val ?? ""}" style="${st}"/></div>`;
   };
   const invColor = (path) => {
     const m = /^inventory\.tickets\.(\w+)$/.exec(path);   // tickets get their editable colour from constants.tickets
@@ -267,7 +267,7 @@ function renderDashboard() {
     return fillColor(INVENTORY_FILL[path.replace("inventory.", "")]);
   };
   // colored read-only row (e.g. derived Free Lunacy)
-  const srow = (label, val, big, color, ico) => { const st = color ? `background:${color.fill};color:${color.font};` : ""; return `<div class="k" style="${st}">${ico ? icoTag(ico, color ? invertHex(color.fill) : null) : ""}${esc(label)}</div><div class="v${big ? " big" : ""}" style="${st}">${esc(fmt(val))}</div>`; };
+  const srow = (label, val, big, color, ico) => { const st = color ? `background:${color.fill};color:${color.font};` : ""; return `<div class="k" style="${st}">${ico ? icoTag(ico, color ? color.fill : null) : ""}${esc(label)}</div><div class="v${big ? " big" : ""}" style="${st}">${esc(fmt(val))}</div>`; };
   const checks = (arr, labels) => arr.map((on, i) => `<span class="pill ${on ? "on" : "off"}">${esc(labels[i])}</span>`).join("");
 
   $("#dashboard").innerHTML = `
