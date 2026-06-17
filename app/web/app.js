@@ -327,7 +327,7 @@ function renderDashboard() {
         <div class="body" style="padding:0;">
           <table class="sheet">
             <thead><tr><th>Sinner</th>${SINNER_ORDER.map((n) => { const ac = state.sinners.find((x) => x.name === n)?.acronym || n; return `<th style="${styleAttr(sinnerColor(n))}" title="${esc(n)}"><div class="shard-hdr">${optIcon("sinner", n) || esc(ac)}<span>${esc(n)}</span></div></th>`; }).join("")}</tr></thead>
-            <tbody><tr><td>Shards</td>${SINNER_ORDER.map((n) => {
+            <tbody><tr><td style="white-space:nowrap">${icoTag(RESOURCE_ICON.egoshard)}Shards</td>${SINNER_ORDER.map((n) => {
               const i = state.sinners.findIndex((x) => x.name === n);
               const sh = state.sinners[i]?.shards ?? 0;
               return `<td class="num${sh < 50 ? " shard-low-cell" : ""}" title="${sh < 50 ? "Low shards (<50)" : ""}"><input type="number" class="kv-num" data-path="sinners.${i}.shards" value="${sh}" style="${styleAttr(sinnerColor(n))}"/></td>`;
@@ -541,10 +541,10 @@ function renderEgoThreadspin() {
       <div class="k">Current TS</div><div class="v" style="${curSt}">${res ? esc(res.current ?? "—") : "—"}</div>
       <div class="k">${icoTag(RESOURCE_ICON.thread)}Threads Needed</div><div class="v big">${res ? fmt(res.threads) : "—"}</div>
       <div class="k">${icoTag(RESOURCE_ICON.thread)}Threads Left After</div><div class="v">${res ? fmt(res.threadsLeft) : "—"}</div>
-      <div class="k">EGO Shard Needed</div><div class="v">${res ? fmt(res.shard) : "—"}</div>
-      <div class="k">${res ? esc(res.sinner) : ""} Shard Left After</div><div class="v" style="${selSt}">${res ? fmt(res.shardLeft) : "—"}</div>
+      <div class="k">${icoTag(RESOURCE_ICON.egoshard)}EGO Shard Needed</div><div class="v">${res ? fmt(res.shard) : "—"}</div>
+      <div class="k">${icoTag(RESOURCE_ICON.egoshard)}${res ? esc(res.sinner) : ""} Shard Left After</div><div class="v" style="${selSt}">${res ? fmt(res.shardLeft) : "—"}</div>
       ${res && res.spinchain ? `<div class="k">${icoTag(RESOURCE_ICON.spinchain)}Spinchain Needed (TS5)</div><div class="v big">${fmt(res.spinchain)}</div>
-      <div class="k">= EGO Shard (1:1)</div><div class="v">${fmt(res.scShard)}</div>
+      <div class="k">${icoTag(RESOURCE_ICON.egoshard)}= EGO Shard (1:1)</div><div class="v">${fmt(res.scShard)}</div>
       <div class="k">${icoTag(RESOURCE_ICON.thread)}= Thread (2:1)</div><div class="v">${fmt(res.scThread)}</div>` : ""}
     </div>`;
   $("#egots-name").addEventListener("change", (e) => { egoTSel.idx = +e.target.value; renderEgoThreadspin(); });

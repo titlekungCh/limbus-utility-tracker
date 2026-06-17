@@ -207,6 +207,7 @@ export const TIER_FILL = { 1: "#966537", 2: "#FF1C00", 3: "#FFEC00" };
 export const RESOURCE_ICON = {
   thread: "icons/resource/thread.webp",
   spinchain: "icons/resource/spinchain.webp",
+  egoshard: "icons/resource/egoshard.webp",
   lunacy: "icons/resource/lunacy.webp",
   extraction: "icons/resource/extraction.webp",
   deca: "icons/resource/deca.png",
