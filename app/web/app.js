@@ -949,6 +949,8 @@ function renderEditableList(viewId, arrayName, columns, searchKeys, makeBlank) {
   const tagSummary = (col, tags) => {
     if (col.cellColor) return `<span class="tag" style="${styleAttr(col.cellColor(tags))}">${tags.length ? esc(tags.join(", ")) : "—"}</span>`;
     if (col.tagColor) return tags.length ? tags.map((t) => optIcon(col.iconCat, t) + chipHtml(col.tagColor, t)).join(" ") : "—";
+    // icon-only summary (e.g. Extra Keyword) — icon if one exists, else the name
+    if (col.iconCat) return tags.length ? tags.map((t) => optIcon(col.iconCat, t) || esc(t)).join(" ") : "—";
     return tags.length ? esc(tags.join(", ")) : "—";
   };
 
