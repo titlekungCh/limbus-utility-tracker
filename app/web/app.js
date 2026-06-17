@@ -192,6 +192,7 @@ function setByPath(obj, path, val) {
   for (let i = 0; i < p.length - 1; i++) o = o[p[i]];
   o[p[p.length - 1]] = val;
 }
+const getByPath = (obj, path) => path.split(".").reduce((o, k) => (o == null ? o : o[k]), obj);
 // Delegated handler for editable number inputs on the Dashboard (data-path).
 function dashboardEdit(e) {
   const t = e.target;
@@ -1227,7 +1228,10 @@ function renderData() {
       // array of objects -> editable table (scrollable for big curves)
       if (v.length && v.every((o) => o && typeof o === "object" && !Array.isArray(o))) {
         const cols = [...new Set(v.flatMap((o) => Object.keys(o)))];
+        const computedCols = COMPUTED_COLS[key] || [];
         const dcell = (col, i, val) => {
+          if (computedCols.includes(col))
+            return `<td><input class="data-computed" data-path="constants.${key}.${i}.${col}" value="${esc(val ?? "")}" readonly disabled title="computed (running sum)"/></td>`;
           const isColor = col === "color" || /^#[0-9a-fA-F]{6}$/.test(String(val ?? ""));
           return isColor
             ? `<td><input type="color" class="data-edit" data-path="constants.${key}.${i}.${col}" value="${esc(normHex(val))}"/></td>`
@@ -1236,8 +1240,9 @@ function renderData() {
         const body = v.map((o, i) =>
           `<tr>${cols.map((col) => dcell(col, i, o[col])).join("")}` +
           `<td style="text-align:center"><button class="reset" data-delconst="${key}.${i}">✕</button></td></tr>`).join("");
+        const head = cols.map((col) => `<th>${esc(col)}${computedCols.includes(col) ? ' <span class="count">(calc)</span>' : ""}</th>`).join("") + "<th></th>";
         return card(key,
-          `<div class="body" style="padding:0;"><div class="table-wrap" style="max-height:340px;"><table class="sheet"><thead><tr>${cols.map((col) => `<th>${esc(col)}</th>`).join("")}<th></th></tr></thead><tbody>${body}</tbody></table></div></div>
+          `<div class="body" style="padding:0;"><div class="table-wrap" style="max-height:340px;"><table class="sheet"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div></div>
            <div class="body"><button class="act" data-addconst="${key}">+ Row</button> <span class="count">${v.length} rows</span></div>`, true);
       }
       // array of primitives -> editable list
@@ -1266,10 +1271,12 @@ function renderData() {
         <button class="act" id="data-applyall" style="margin-top:6px;">Apply all</button>
       </div></div></details>`;
 
-  const afterEdit = () => { recompute(state); renderDashboard(); autosave(); };
+  const afterEdit = () => { recomputeCurves(state); recompute(state); renderDashboard(); autosave(); };
   root.querySelectorAll(".data-edit").forEach((inp) => inp.addEventListener("change", (e) => {
     setByPath(state, e.target.dataset.path, coerce(e.target.value));
     afterEdit();
+    // refresh the computed (running-sum) cells in place
+    root.querySelectorAll("input.data-computed").forEach((el) => { const x = getByPath(state, el.dataset.path); el.value = x == null ? "" : x; });
   }));
   root.querySelectorAll("[data-addconst]").forEach((b) => b.addEventListener("click", () => {
     const key = b.dataset.addconst, arr = state.constants[key], blank = {};
@@ -1317,8 +1324,20 @@ $("#saveBtn").addEventListener("click", saveNow);
 window.addEventListener("beforeunload", (e) => { if (dirty) { e.preventDefault(); e.returnValue = ""; } });
 
 // ---------- boot ----------
-// Bring older data.json up to date: give shardTable rows an editable colour, and
-// merge ticketXP + dailyLuxTickets (+ colour) into a single editable `tickets` table.
+// Curves whose cumulative column is computed (not edited) from a per-step source,
+// mirroring the original sheet: ID Level Total XP = running sum of Exp increase;
+// Manager Max Enkephalin = base 60 + running sum of Max Increase.
+const COMPUTED_COLS = { idLevelCurve: ["totalXP"], managerCurve: ["maxEnk"] };
+function recomputeCurves(s) {
+  const c = s.constants || {};
+  const cum = (arr, src, dst, base) => { if (!Array.isArray(arr)) return; let t = base; arr.forEach((r) => { t += Number(r[src]) || 0; r[dst] = t; }); };
+  cum(c.idLevelCurve, "increase", "totalXP", 0);
+  cum(c.managerCurve, "maxIncrease", "maxEnk", 60);
+}
+
+// Bring older data.json up to date: editable shardTable colour, a single tickets
+// table, and an editable per-level `increase` on the ID Level curve (Total XP
+// becomes the computed running sum).
 function migrateConstants(s) {
   const c = s.constants || (s.constants = {});
   if (Array.isArray(c.shardTable))
@@ -1333,6 +1352,17 @@ function migrateConstants(s) {
     }));
     delete c.ticketXP; delete c.dailyLuxTickets;
   }
+  if (Array.isArray(c.idLevelCurve)) {       // add `increase` (col B), order it before Total XP
+    let prev = 0;
+    c.idLevelCurve = c.idLevelCurve.map((r) => {
+      const tot = Number(r.totalXP) || 0, inc = r.increase != null ? Number(r.increase) : tot - prev;
+      prev = tot;
+      return { level: r.level, increase: inc, totalXP: r.totalXP };
+    });
+  }
+  if (Array.isArray(c.managerCurve))         // order Max Enkephalin (computed) last
+    c.managerCurve = c.managerCurve.map((r) => ({ level: r.level, nextXP: r.nextXP, maxIncrease: r.maxIncrease, maxEnk: r.maxEnk }));
+  recomputeCurves(s);
 }
 
 (async function boot() {

@@ -116,6 +116,7 @@ table.sheet td input.kv-num { width: 100%; box-sizing: border-box; text-align: r
 table.sheet td:has(> input[type=color]) { padding: 2px 4px; }
 table.sheet td input[type=color] { width: 100%; height: 24px; padding: 0; cursor: pointer;
   border: 1px solid var(--line); border-radius: 3px; background: transparent; }
+table.sheet td input.data-computed { color: var(--muted); font-style: italic; cursor: not-allowed; }
 .dlist-row { display: flex; gap: 6px; align-items: center; margin-bottom: 4px; }
 .dlist-row input { flex: 1; }
 .data-advanced { margin-top: 14px; }
