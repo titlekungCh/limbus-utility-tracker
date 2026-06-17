@@ -120,7 +120,9 @@ function wLPXP(s, t) {
 
 function manualXPLux(s, t) {
   const mult = t === "normal" ? 1 : -1;
-  const tk = s.constants.dailyLuxTickets;
+  const tk = Array.isArray(s.constants.tickets)
+    ? Object.fromEntries(s.constants.tickets.map((t) => [t.tier, t.dailyLux]))
+    : s.constants.dailyLuxTickets;
   tA(s, "I", tk.I * mult);
   tA(s, "II", tk.II * mult);
   tA(s, "III", tk.III * mult);

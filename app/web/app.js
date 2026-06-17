@@ -229,7 +229,14 @@ function renderDashboard() {
     const st = color ? `background:${color.fill};color:${color.font};` : "";
     return `<div class="k" style="${st}">${esc(label)}</div><div class="v${big ? " big" : ""}"><input type="number" class="kv-num" data-path="${path}" value="${val ?? ""}" style="${st}"/></div>`;
   };
-  const invColor = (path) => fillColor(INVENTORY_FILL[path.replace("inventory.", "")]);
+  const invColor = (path) => {
+    const m = /^inventory\.tickets\.(\w+)$/.exec(path);   // tickets get their editable colour from constants.tickets
+    if (m && state.constants && state.constants.tickets) {
+      const row = state.constants.tickets.find((t) => t.tier === m[1]);
+      if (row && row.color) return fillColor(row.color);
+    }
+    return fillColor(INVENTORY_FILL[path.replace("inventory.", "")]);
+  };
   // colored read-only row (e.g. derived Free Lunacy)
   const srow = (label, val, big, color) => { const st = color ? `background:${color.fill};color:${color.font};` : ""; return `<div class="k" style="${st}">${esc(label)}</div><div class="v${big ? " big" : ""}" style="${st}">${esc(fmt(val))}</div>`; };
   const checks = (arr, labels) => arr.map((on, i) => `<span class="pill ${on ? "on" : "off"}">${esc(labels[i])}</span>`).join("");
@@ -733,7 +740,13 @@ function contrastFont(hex) {
   return (0.299 * r + 0.587 * g + 0.114 * b) > 150 ? "#202124" : "#ffffff";
 }
 const fillColor = (hex) => (hex ? { fill: hex, font: contrastFont(hex) } : null);
-const shardTypeColor = (t) => fillColor(SHARD_TYPE_FILL[t]);
+// normalise to #rrggbb for an <input type=color>
+const normHex = (v) => { const m = /^#?([0-9a-fA-F]{6})$/.exec(String(v ?? "")); return m ? "#" + m[1] : "#000000"; };
+// shard-type colour: editable per-row colour in constants.shardTable, else the default palette
+const shardTypeColor = (t) => {
+  const row = state.constants && state.constants.shardTable && state.constants.shardTable.find((r) => r.type === t);
+  return fillColor((row && row.color) || SHARD_TYPE_FILL[t]);
+};
 const gachaTierColor = (t) => fillColor(GACHA_TIER_FILL[t]);
 const dayColor = (d) => fillColor(DAY_FILL[d]);
 const sinColor = (s) => fillColor(SIN_FILL[s]);
@@ -1214,8 +1227,14 @@ function renderData() {
       // array of objects -> editable table (scrollable for big curves)
       if (v.length && v.every((o) => o && typeof o === "object" && !Array.isArray(o))) {
         const cols = [...new Set(v.flatMap((o) => Object.keys(o)))];
+        const dcell = (col, i, val) => {
+          const isColor = col === "color" || /^#[0-9a-fA-F]{6}$/.test(String(val ?? ""));
+          return isColor
+            ? `<td><input type="color" class="data-edit" data-path="constants.${key}.${i}.${col}" value="${esc(normHex(val))}"/></td>`
+            : `<td><input class="data-edit" data-path="constants.${key}.${i}.${col}" value="${esc(val ?? "")}"/></td>`;
+        };
         const body = v.map((o, i) =>
-          `<tr>${cols.map((col) => `<td><input class="data-edit" data-path="constants.${key}.${i}.${col}" value="${esc(o[col] ?? "")}"/></td>`).join("")}` +
+          `<tr>${cols.map((col) => dcell(col, i, o[col])).join("")}` +
           `<td style="text-align:center"><button class="reset" data-delconst="${key}.${i}">✕</button></td></tr>`).join("");
         return card(key,
           `<div class="body" style="padding:0;"><div class="table-wrap" style="max-height:340px;"><table class="sheet"><thead><tr>${cols.map((col) => `<th>${esc(col)}</th>`).join("")}<th></th></tr></thead><tbody>${body}</tbody></table></div></div>
@@ -1298,6 +1317,24 @@ $("#saveBtn").addEventListener("click", saveNow);
 window.addEventListener("beforeunload", (e) => { if (dirty) { e.preventDefault(); e.returnValue = ""; } });
 
 // ---------- boot ----------
+// Bring older data.json up to date: give shardTable rows an editable colour, and
+// merge ticketXP + dailyLuxTickets (+ colour) into a single editable `tickets` table.
+function migrateConstants(s) {
+  const c = s.constants || (s.constants = {});
+  if (Array.isArray(c.shardTable))
+    c.shardTable.forEach((r) => { if (!r.color) r.color = SHARD_TYPE_FILL[r.type] || ""; });
+  if (!Array.isArray(c.tickets)) {
+    const xp = c.ticketXP || {}, lux = c.dailyLuxTickets || {};
+    const order = ["I", "II", "III", "IV"];
+    const tiers = order.concat(Object.keys(xp).filter((t) => !order.includes(t)));
+    c.tickets = tiers.map((tier) => ({
+      tier, xp: xp[tier] ?? 0, dailyLux: lux[tier] ?? 0,
+      color: INVENTORY_FILL["tickets." + tier] || "#FFE599",
+    }));
+    delete c.ticketXP; delete c.dailyLuxTickets;
+  }
+}
+
 (async function boot() {
   try {
     const res = await fetch("/api/state");
@@ -1311,6 +1348,7 @@ window.addEventListener("beforeunload", (e) => { if (dirty) { e.preventDefault()
   // on launch: refresh current day, and set current patch = latest Thursday
   state.currentDay = DAYS[new Date().getDay()];
   state.lunacy.currentDate = currentPatchISO();
+  migrateConstants(state);
   recompute(state);
   $("#dashboard").addEventListener("change", dashboardEdit); // once; #dashboard persists across re-renders
   initCustomSelects(); // one-time delegated wiring for the custom icon dropdowns

@@ -136,7 +136,9 @@ export function idLeveling(s, idx, target) {
   const xpNeeded = Math.max(0, round2(atTarget - atCur - (id.levelExtra || 0)));
 
   // Greedy EXP-ticket breakdown (Inventory M11:M14): IV=3000, III=1000, II=200, I=50.
-  const xp = s.constants.ticketXP;
+  const xp = Array.isArray(s.constants.tickets)
+    ? Object.fromEntries(s.constants.tickets.map((t) => [t.tier, t.xp]))
+    : s.constants.ticketXP;
   let rem = xpNeeded;
   const need = {};
   for (const tier of ["IV", "III", "II", "I"]) {
