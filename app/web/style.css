@@ -316,10 +316,10 @@ table.sheet td:has(> details.csel) { padding: 0; }
 .csel-caret { margin-left: auto; opacity: .55; font-size: 9px; padding-left: 6px; }
 /* IDs/EGOs tables: show icon only for Sinner/Tier/Sin (frees the name column);
    the open dropdown list still shows names */
-table.sheet .csel[data-iconcat="sinner"] .csel-val,
-table.sheet .csel[data-iconcat="tier"] .csel-val,
-table.sheet .csel[data-iconcat="sin"] .csel-val,
-table.sheet .csel[data-iconcat="grade"] .csel-val { display: none; }
+table.editlist .csel[data-iconcat="sinner"] .csel-val,
+table.editlist .csel[data-iconcat="tier"] .csel-val,
+table.editlist .csel[data-iconcat="sin"] .csel-val,
+table.editlist .csel[data-iconcat="grade"] .csel-val { display: none; }
 /* IDs/EGOs tables: name column (1st) absorbs the freed width; headers stay 1 line */
 table.editlist { table-layout: auto; }
 table.editlist th { white-space: nowrap; }
