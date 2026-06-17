@@ -154,6 +154,12 @@ table.sheet tr:nth-child(even) td { background: #1f1a15; }
 table.sheet tr:hover td { background: #2a221b; }
 .shard-low { color: var(--crimson-bright); }
 .shard-ok { color: #bfe0a8; }
+/* Shard Planning: keep the data columns compact; let Target take the slack */
+#planTable th, #planTable td { white-space: nowrap; }
+#planTable th:last-child, #planTable td:last-child { width: 100%; }
+#planTable td select[data-f="type"] { min-width: 0; }
+.target-cell { display: flex; flex-direction: column; gap: 3px; min-width: 150px; }
+.target-cell select, .target-cell input { width: 100%; box-sizing: border-box; }
 /* low-shard cue that reads on any sinner-coloured cell: a ringed red corner dot */
 td.shard-low-cell { position: relative; }
 td.shard-low-cell::after {

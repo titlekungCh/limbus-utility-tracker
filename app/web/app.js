@@ -356,6 +356,13 @@ function renderForecast() {
   const mf = managerForecast(s);
   const rf = resourceForecast(s);
   const plan = shardPlanRows(s);
+  // Shard-plan target list: the un-owned IDs + EGOs you'd shard toward (mirrors the
+  // sheet's Extraction + Need-to-Shard lists = everything not acquired).
+  const targetList = [...new Set([
+    ...s.ids.filter((x) => !x.acquired && x.name).map((x) => `[${x.name}] ${x.sinner}`),
+    ...s.egos.filter((x) => !x.acquired && x.name).map((x) => `[${x.name}] ${x.sinner}`),
+  ])];
+  const targetOpts = (sel) => ["", ...targetList].map((o) => `<option${o === (sel ?? "") ? " selected" : ""}>${esc(o)}</option>`).join("");
   const kv = (rows) => rows.map(([k, v, big]) => `<div class="k">${esc(k)}</div><div class="v${big ? " big" : ""}">${esc(fmt(v))}</div>`).join("");
   // level-up marker: shown next to any forecast value that reaches next-level XP
   const lvlGlyph = (on) => (on ? ` <span class="lvlup" title="reaches next level">▲</span>` : "");
@@ -423,7 +430,14 @@ function renderForecast() {
                 <td class="num ${p.shardShort > 0 ? "shard-low" : "shard-ok"}">${fmt(p.shardShort)}</td>
                 <td class="num">${fmt(p.crateNeeded)}</td>
                 <td class="num">${fmt(p.threadNeeded)}</td>
-                <td><input type="text" data-i="${p.index}" data-f="target" value="${esc(p.target)}"/></td>
+                <td>${(() => {
+                  const m = p.targetMode || "text";
+                  const modeSel = `<select data-i="${p.index}" data-f="targetMode">${[["text", "Text"], ["one", "1 ID/EGO"], ["two", "2 ID/EGO"]].map(([v, l]) => `<option value="${v}"${v === m ? " selected" : ""}>${l}</option>`).join("")}</select>`;
+                  const body = m === "one" ? `<select data-i="${p.index}" data-f="targetA">${targetOpts(p.targetA)}</select>`
+                    : m === "two" ? `<select data-i="${p.index}" data-f="targetA">${targetOpts(p.targetA)}</select><select data-i="${p.index}" data-f="targetB">${targetOpts(p.targetB)}</select>`
+                    : `<input type="text" data-i="${p.index}" data-f="target" value="${esc(p.target)}"/>`;
+                  return `<div class="target-cell">${modeSel}${body}</div>`;
+                })()}</td>
               </tr>`).join("")}</tbody>
           </table>
         </div>
