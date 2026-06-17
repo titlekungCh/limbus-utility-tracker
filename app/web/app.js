@@ -338,15 +338,6 @@ function renderDashboard() {
             <div class="k">Rental Week</div><div class="v">${fmt(s.md.rentalWeek)}</div>
             <div class="k">Event Currency</div><div class="v"><input type="number" class="qty" id="st-currency" value="${fmt(s.event.currency)}"/></div>
           </div>
-          <div class="stat-fields">
-            <div class="field"><label>Uptying Sinner</label>${selectHtml("st-uptie", SINNER_ORDER, s.uptie.sinner, sinnerColor(s.uptie.sinner), sinnerColor, "sinner")}</div>
-            <div class="field"><label>Gacha Sinner</label>${selectHtml("st-gsinner", SINNER_ORDER, s.gacha.sinner, sinnerColor(s.gacha.sinner), sinnerColor, "sinner")}</div>
-            <div class="field"><label>Gacha Tier</label>${selectHtml("st-gtier", GACHA_TIERS, s.gacha.tier, gachaTierColor(s.gacha.tier), gachaTierColor, "tier")}</div>
-          </div>
-          <div class="btnrow" style="margin-top:10px;">
-            <button class="act primary" id="st-applyGacha" title="Add a shard to the Gacha Sinner at the Gacha Tier">Apply Gacha Shard</button>
-          </div>
-          <div class="hint">These feed the Gacha &amp; Uptying Quick Buttons.</div>
         </div>
       </div>
 
@@ -367,15 +358,8 @@ function renderDashboard() {
     <h2 class="section-title">Projections</h2>
     <div id="forecast"></div>`;
 
-  // Status-card dropdowns (sync with the Quick Buttons selectors)
-  const wire = (id, path) => { const e = $("#" + id); if (e) e.addEventListener("change", (ev) => setSelection(path, ev.target.value)); };
-  wire("st-uptie", "uptie.sinner");
-  wire("st-gsinner", "gacha.sinner");
-  wire("st-gtier", "gacha.tier");
   const cur = $("#st-currency");
   if (cur) cur.addEventListener("change", (ev) => setSelection("event.currency", Number(ev.target.value) || 0));
-  const ag = $("#st-applyGacha");
-  if (ag) ag.addEventListener("click", () => act(ACTIONS.gachaSelected));
 
   renderForecast();
 }
