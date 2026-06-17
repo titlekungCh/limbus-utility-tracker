@@ -116,6 +116,9 @@ export function shardPlanRows(s) {
       crateNeeded: p.enabled ? round2(shardShort / 2) : 0,
       threadNeeded: t.threadNeeded ?? 0,
       target: p.target || "",
+      targetMode: p.targetMode || "text",
+      targetA: p.targetA || "",
+      targetB: p.targetB || "",
     };
   });
 }
