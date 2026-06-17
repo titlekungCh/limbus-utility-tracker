@@ -320,7 +320,7 @@ function renderDashboard() {
             <tbody><tr><td>Shards</td>${SINNER_ORDER.map((n) => {
               const i = state.sinners.findIndex((x) => x.name === n);
               const sh = state.sinners[i]?.shards ?? 0;
-              return `<td class="num"><input type="number" class="kv-num" data-path="sinners.${i}.shards" value="${sh}" style="${styleAttr(shardColor(sh))}"/></td>`;
+              return `<td class="num"><input type="number" class="kv-num" data-path="sinners.${i}.shards" value="${sh}" style="${styleAttr(sinnerColor(n))}"/></td>`;
             }).join("")}</tr></tbody>
           </table>
         </div>
@@ -726,17 +726,6 @@ function scaleColor(v) {
   const mix = lo.rgb.map((c, i) => Math.round(c + (hi.rgb[i] - c) * t));
   return { fill: `rgb(${mix.join(",")})`, font: "#202124" };
 }
-// Colour a sinner's shard count: red (0) -> yellow (50, the "low" threshold) -> green (100+).
-function shardColor(v) {
-  const n = Math.min(100, Math.max(0, Number(v) || 0));
-  const stops = [[0, [177, 2, 2]], [50, [255, 242, 67]], [100, [52, 168, 83]]];
-  let lo = stops[0], hi = stops[stops.length - 1];
-  for (let i = 0; i < stops.length - 1; i++) if (n >= stops[i][0] && n <= stops[i + 1][0]) { lo = stops[i]; hi = stops[i + 1]; break; }
-  const span = hi[0] - lo[0], t = span ? (n - lo[0]) / span : 0;
-  const mix = lo[1].map((c, i) => Math.round(c + (hi[1][i] - c) * t));
-  const lum = 0.299 * mix[0] + 0.587 * mix[1] + 0.114 * mix[2];
-  return { fill: `rgb(${mix.join(",")})`, font: lum > 150 ? "#202124" : "#fff" };
-}
 // Pick a readable font for an arbitrary fill (used by the non-sinner palettes).
 function contrastFont(hex) {
   const c = hex.replace("#", "");
@@ -1109,30 +1098,6 @@ function renderIFSS7() {
   for (let r = 14; r <= 20 && r < g.length; r++)
     legendRows.push(`<tr>${[13, 14, 15].map((c) => `<td>${statusChips(g[r][c])}</td>`).join("")}</tr>`);
 
-  // Registered teams: 12 columns = a left team (cols 0-5) and a right team
-  // (cols 6-11), grouped into bands of 3 rows (header keyword/faction row + two
-  // member rows). Trailing blank columns are dropped.
-  const teamStart = 22, TEAM_W = 12;
-  for (let r = teamStart; r < g.length; r++) if (g[r].length > TEAM_W) g[r] = g[r].slice(0, TEAM_W); // drop trailing blank cols
-  while ((g.length - teamStart) % 3 !== 0) g.push(Array(TEAM_W).fill("")); // keep bands of 3
-  const teamRows = [];
-  for (let r = teamStart; r < g.length; r++) {
-    const head = (r - teamStart) % 3 === 0;
-    const cells = [];
-    for (let c = 0; c < TEAM_W; c++) {
-      const v = g[r][c] ?? "";
-      const div = c === 6 ? " team-div" : "";
-      const inp = `<input type="text" data-tr="${r}" data-tc="${c}" value="${esc(v)}"/>`;
-      cells.push(head
-        ? `<td class="team-kw${div}">${wrapAcell(inp, v, null, "keyword")}</td>`
-        : `<td class="${div.trim()}">${wrapAcell(inp, v, acronymColor(v))}</td>`);
-    }
-    cells.push(head
-      ? `<td class="team-del"><button class="reset" data-delband="${r}" title="delete team">✕</button></td>`
-      : `<td></td>`);
-    teamRows.push(`<tr class="${head ? "team-head" : ""}">${cells.join("")}</tr>`);
-  }
-
   root.innerHTML = `
     <div class="table-wrap ifss7-scroll" style="margin-bottom:14px;">
       <table class="sheet"><thead><tr>
@@ -1153,10 +1118,7 @@ function renderIFSS7() {
       <div class="card"><h2>Status Combo Legend <span class="count">(possible 2-status looks)</span></h2><div class="body" style="padding:0;">
         <table class="sheet"><tbody>${legendRows.join("")}</tbody></table>
       </div></div>
-    </div>
-    <h2 class="section-title">Registered Teams</h2>
-    <div class="list-controls"><button class="act primary" id="ifss7-addteam">+ Team Row</button></div>
-    <div class="table-wrap ifss7-scroll"><table class="sheet"><tbody id="ifss7-teams">${teamRows.join("")}</tbody></table></div>`;
+    </div>`;
 
   // main block edits -> re-render so computed stats update
   const main = $("#ifss7-main");
@@ -1179,8 +1141,41 @@ function renderIFSS7() {
     inp.addEventListener("blur", () => { g[r][c] = inp.value; renderIFSS7(); autosave(); });
     inp.addEventListener("keydown", (ev) => { if (ev.key === "Enter") { ev.preventDefault(); inp.blur(); } });
   });
-  // team edits -> inline recolour (don't affect stats)
-  const teams = $("#ifss7-teams");
+}
+
+// ---------- MD Teams (registered teams; shares state.ifss7 rows 22+) ----------
+// 12 columns = a left team (cols 0-5) and a right team (cols 6-11), grouped into
+// bands of 3 rows: a header keyword/faction row + two member rows.
+function renderMDTeams() {
+  const root = $("#mdteams");
+  if (!root) return;
+  const g = state.ifss7;
+  const teamStart = 22, TEAM_W = 12;
+  for (let r = teamStart; r < g.length; r++) if (g[r].length > TEAM_W) g[r] = g[r].slice(0, TEAM_W); // drop trailing blank cols
+  while ((g.length - teamStart) % 3 !== 0) g.push(Array(TEAM_W).fill("")); // keep bands of 3
+  const teamRows = [];
+  for (let r = teamStart; r < g.length; r++) {
+    const head = (r - teamStart) % 3 === 0;
+    const cells = [];
+    for (let c = 0; c < TEAM_W; c++) {
+      const v = g[r][c] ?? "";
+      const div = c === 6 ? " team-div" : "";
+      const inp = `<input type="text" data-tr="${r}" data-tc="${c}" value="${esc(v)}"/>`;
+      cells.push(head
+        ? `<td class="team-kw${div}">${wrapAcell(inp, v, null, "keyword")}</td>`
+        : `<td class="${div.trim()}">${wrapAcell(inp, v, acronymColor(v))}</td>`);
+    }
+    cells.push(head
+      ? `<td class="team-del"><button class="reset" data-delband="${r}" title="delete team">✕</button></td>`
+      : `<td></td>`);
+    teamRows.push(`<tr class="${head ? "team-head" : ""}">${cells.join("")}</tr>`);
+  }
+  root.innerHTML = `
+    <h2 class="section-title">MD Teams <span class="count">(left team = cols 1-6, right team = cols 7-12; each band is a header keyword/faction row + 2 member rows)</span></h2>
+    <div class="list-controls"><button class="act primary" id="mdteams-addteam">+ Team Row</button></div>
+    <div class="table-wrap ifss7-scroll"><table class="sheet"><tbody id="mdteams-body">${teamRows.join("")}</tbody></table></div>`;
+
+  const teams = $("#mdteams-body");
   teams.addEventListener("change", (e) => {
     const t = e.target;
     if (t.dataset.tr == null) return;
@@ -1192,11 +1187,11 @@ function renderIFSS7() {
     const d = e.target.closest("[data-delband]");
     if (!d) return;
     g.splice(+d.dataset.delband, 3);   // remove the whole 3-row team band
-    renderIFSS7();
+    renderMDTeams();
     autosave();
   });
   // a "team row" is a 3-row band (header + 2 member rows) holding a left & right team
-  $("#ifss7-addteam").addEventListener("click", () => { for (let i = 0; i < 3; i++) g.push(Array(12).fill("")); renderIFSS7(); autosave(); });
+  $("#mdteams-addteam").addEventListener("click", () => { for (let i = 0; i < 3; i++) g.push(Array(12).fill("")); renderMDTeams(); autosave(); });
 }
 
 // ---------- Data (named ranges / constants) editor ----------
@@ -1305,6 +1300,7 @@ window.addEventListener("beforeunload", (e) => { if (dirty) { e.preventDefault()
   renderEGOs();
   renderEditableGrid("teams", "teams");
   renderIFSS7();
+  renderMDTeams();
   renderData();
   markSaved();
 })();
