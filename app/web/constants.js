@@ -202,6 +202,19 @@ export const SEASON_NUMBER_FILL = {
 
 // ID Tier (★ count) colours (sampled from the user's reference image).
 export const TIER_FILL = { 1: "#966537", 2: "#FF1C00", 3: "#FFEC00" };
+
+// Resource icons (from limbuscompany.wiki.gg), kept in app/web/icons/resource.
+export const RESOURCE_ICON = {
+  thread: "icons/resource/thread.webp",
+  spinchain: "icons/resource/spinchain.webp",
+  lunacy: "icons/resource/lunacy.webp",
+  extraction: "icons/resource/extraction.webp",
+  deca: "icons/resource/deca.png",
+  I: "icons/resource/ticket-1.webp",
+  II: "icons/resource/ticket-2.webp",
+  III: "icons/resource/ticket-3.webp",
+  IV: "icons/resource/ticket-4.webp",
+};
 // Dropdown option icons + grade glyphs live in the generated ./icons-map.js.
 
 // IF SS7 faction/source colours for the ID/EGO cells (G2:J13 conditional formatting).

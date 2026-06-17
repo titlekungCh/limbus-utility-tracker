@@ -6,7 +6,7 @@ import {
   EVENT_ITEM_FILL, EVENT_REWARD_FILL, SIN_ORDER, SIN_FILL,
   STATUS_ORDER, STATUS_FILL, FACTION_COLORS, SCALE_MAX5, SEASON_FILL, TIER_FILL,
   SEASON_NUMBER_FILL, KEYWORD_FILL, KEYWORD_ORDER, DAYS, INVENTORY_FILL, LUNACY_FILL,
-  DAILY_LEFT_FILL, WEEKLY_LEFT_FILL,
+  DAILY_LEFT_FILL, WEEKLY_LEFT_FILL, RESOURCE_ICON,
 } from "./constants.js";
 import { OPTION_ICONS, GRADE_GLYPH } from "./icons-map.js";
 
@@ -227,10 +227,10 @@ function renderDashboard() {
   const nextEnk = nextEnkRow && nextEnkRow.maxIncrease !== 0 ? "+1" : "0";
 
   const kv = (rows) => rows.map(([k, v, big]) => `<div class="k">${esc(k)}</div><div class="v${big ? " big" : ""}">${esc(fmt(v))}</div>`).join("");
-  // editable number row (writes to a dotted state path on change); optional colour
-  const erow = (label, path, val, big, color) => {
+  // editable number row (writes to a dotted state path on change); optional colour + icon
+  const erow = (label, path, val, big, color, ico) => {
     const st = color ? `background:${color.fill};color:${color.font};` : "";
-    return `<div class="k" style="${st}">${esc(label)}</div><div class="v${big ? " big" : ""}"><input type="number" class="kv-num" data-path="${path}" value="${val ?? ""}" style="${st}"/></div>`;
+    return `<div class="k" style="${st}">${ico ? icoTag(ico) : ""}${esc(label)}</div><div class="v${big ? " big" : ""}"><input type="number" class="kv-num" data-path="${path}" value="${val ?? ""}" style="${st}"/></div>`;
   };
   const invColor = (path) => {
     const m = /^inventory\.tickets\.(\w+)$/.exec(path);   // tickets get their editable colour from constants.tickets
@@ -241,7 +241,7 @@ function renderDashboard() {
     return fillColor(INVENTORY_FILL[path.replace("inventory.", "")]);
   };
   // colored read-only row (e.g. derived Free Lunacy)
-  const srow = (label, val, big, color) => { const st = color ? `background:${color.fill};color:${color.font};` : ""; return `<div class="k" style="${st}">${esc(label)}</div><div class="v${big ? " big" : ""}" style="${st}">${esc(fmt(val))}</div>`; };
+  const srow = (label, val, big, color, ico) => { const st = color ? `background:${color.fill};color:${color.font};` : ""; return `<div class="k" style="${st}">${ico ? icoTag(ico) : ""}${esc(label)}</div><div class="v${big ? " big" : ""}" style="${st}">${esc(fmt(val))}</div>`; };
   const checks = (arr, labels) => arr.map((on, i) => `<span class="pill ${on ? "on" : "off"}">${esc(labels[i])}</span>`).join("");
 
   $("#dashboard").innerHTML = `
@@ -265,22 +265,22 @@ function renderDashboard() {
         <div class="body"><div class="kv">
           ${erow("Crates", "inventory.crate", s.inventory.crate, true, invColor("inventory.crate"))}
           ${erow("Limbus Pass Lv", "inventory.pass", fmtPass(s.inventory.pass), false, invColor("inventory.pass"))}
-          ${erow("Threads", "inventory.threads", s.inventory.threads, false, invColor("inventory.threads"))}
-          ${erow("IV Ticket", "inventory.tickets.IV", t.IV, false, invColor("inventory.tickets.IV"))}
-          ${erow("III Ticket", "inventory.tickets.III", t.III, false, invColor("inventory.tickets.III"))}
-          ${erow("II Ticket", "inventory.tickets.II", t.II, false, invColor("inventory.tickets.II"))}
-          ${erow("I Ticket", "inventory.tickets.I", t.I, false, invColor("inventory.tickets.I"))}
+          ${erow("Threads", "inventory.threads", s.inventory.threads, false, invColor("inventory.threads"), RESOURCE_ICON.thread)}
+          ${erow("IV Ticket", "inventory.tickets.IV", t.IV, false, invColor("inventory.tickets.IV"), RESOURCE_ICON.IV)}
+          ${erow("III Ticket", "inventory.tickets.III", t.III, false, invColor("inventory.tickets.III"), RESOURCE_ICON.III)}
+          ${erow("II Ticket", "inventory.tickets.II", t.II, false, invColor("inventory.tickets.II"), RESOURCE_ICON.II)}
+          ${erow("I Ticket", "inventory.tickets.I", t.I, false, invColor("inventory.tickets.I"), RESOURCE_ICON.I)}
         </div></div>
       </div>
 
       <div class="card">
         <h2>Lunacy & Pulls</h2>
         <div class="body"><div class="kv">
-          ${erow("Total Lunacy", "lunacy.total", s.lunacy.total, true, fillColor(LUNACY_FILL.lunacy))}
-          ${erow("Paid Lunacy", "lunacy.paid", s.lunacy.paid, false, fillColor(LUNACY_FILL.lunacy))}
-          ${srow("Free Lunacy", free, false, fillColor(LUNACY_FILL.lunacy))}
-          ${erow("Extraction Tickets", "lunacy.extTickets", s.lunacy.extTickets, false, fillColor(LUNACY_FILL.ticket))}
-          ${erow("Deca Tickets", "lunacy.decaTickets", s.lunacy.decaTickets, false, fillColor(LUNACY_FILL.ticket))}
+          ${erow("Total Lunacy", "lunacy.total", s.lunacy.total, true, fillColor(LUNACY_FILL.lunacy), RESOURCE_ICON.lunacy)}
+          ${erow("Paid Lunacy", "lunacy.paid", s.lunacy.paid, false, fillColor(LUNACY_FILL.lunacy), RESOURCE_ICON.lunacy)}
+          ${srow("Free Lunacy", free, false, fillColor(LUNACY_FILL.lunacy), RESOURCE_ICON.lunacy)}
+          ${erow("Extraction Tickets", "lunacy.extTickets", s.lunacy.extTickets, false, fillColor(LUNACY_FILL.ticket), RESOURCE_ICON.extraction)}
+          ${erow("Deca Tickets", "lunacy.decaTickets", s.lunacy.decaTickets, false, fillColor(LUNACY_FILL.ticket), RESOURCE_ICON.deca)}
         </div></div>
       </div>
 
@@ -497,7 +497,7 @@ function renderIdLeveling() {
   const tgtSt = styleAttr(levelColor(idLevelSel.target));
   const ticketRows = res ? ["IV", "III", "II", "I"].map((tier) => {
     const st = styleAttr(fillColor(INVENTORY_FILL["tickets." + tier]));
-    return `<div class="k" style="${st}">Ticket ${tier}</div><div class="v" style="${st}">${fmt(res.need[tier])} <span class="count">(${fmt(res.left[tier])} left)</span></div>`;
+    return `<div class="k" style="${st}">${icoTag(RESOURCE_ICON[tier])}Ticket ${tier}</div><div class="v" style="${st}">${fmt(res.need[tier])} <span class="count">(${fmt(res.left[tier])} left)</span></div>`;
   }).join("") : "";
   body.innerHTML = `
     <div class="field"><label>ID</label>
@@ -539,13 +539,13 @@ function renderEgoThreadspin() {
     <div class="kv" style="margin-top:6px;">
       <div class="k">Grade</div><div class="v" style="${gradeSt}">${res ? esc(res.grade || "—") : "—"}</div>
       <div class="k">Current TS</div><div class="v" style="${curSt}">${res ? esc(res.current ?? "—") : "—"}</div>
-      <div class="k">Threads Needed</div><div class="v big">${res ? fmt(res.threads) : "—"}</div>
-      <div class="k">Threads Left After</div><div class="v">${res ? fmt(res.threadsLeft) : "—"}</div>
+      <div class="k">${icoTag(RESOURCE_ICON.thread)}Threads Needed</div><div class="v big">${res ? fmt(res.threads) : "—"}</div>
+      <div class="k">${icoTag(RESOURCE_ICON.thread)}Threads Left After</div><div class="v">${res ? fmt(res.threadsLeft) : "—"}</div>
       <div class="k">EGO Shard Needed</div><div class="v">${res ? fmt(res.shard) : "—"}</div>
       <div class="k">${res ? esc(res.sinner) : ""} Shard Left After</div><div class="v" style="${selSt}">${res ? fmt(res.shardLeft) : "—"}</div>
-      ${res && res.spinchain ? `<div class="k">Spinchain Needed (TS5)</div><div class="v big">${fmt(res.spinchain)}</div>
+      ${res && res.spinchain ? `<div class="k">${icoTag(RESOURCE_ICON.spinchain)}Spinchain Needed (TS5)</div><div class="v big">${fmt(res.spinchain)}</div>
       <div class="k">= EGO Shard (1:1)</div><div class="v">${fmt(res.scShard)}</div>
-      <div class="k">= Thread (2:1)</div><div class="v">${fmt(res.scThread)}</div>` : ""}
+      <div class="k">${icoTag(RESOURCE_ICON.thread)}= Thread (2:1)</div><div class="v">${fmt(res.scThread)}</div>` : ""}
     </div>`;
   $("#egots-name").addEventListener("change", (e) => { egoTSel.idx = +e.target.value; renderEgoThreadspin(); });
   $("#egots-target").addEventListener("change", (e) => { egoTSel.target = Number(e.target.value) || 1; renderEgoThreadspin(); });
