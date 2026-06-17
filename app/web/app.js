@@ -38,6 +38,16 @@ const invertHex = (hex) => {
   if (h.length < 6) return "#000000";
   return "#" + [0, 2, 4].map((i) => (255 - parseInt(h.slice(i, i + 2), 16)).toString(16).padStart(2, "0")).join("");
 };
+// brighten a hex toward white by `t` (0..1) — used for icon glows that sit on a
+// cell of the same colour, so the halo still reads.
+const lightenHex = (hex, t = 0.55) => {
+  const h = String(hex || "").replace("#", "");
+  if (h.length < 6) return hex || "#ffffff";
+  return "#" + [0, 2, 4].map((i) => {
+    const v = parseInt(h.slice(i, i + 2), 16);
+    return Math.round(v + (255 - v) * t).toString(16).padStart(2, "0");
+  }).join("");
+};
 // <img> tag for an icon path (or "" when falsy); optional drop-shadow colour
 const icoTag = (p, shadow) => (p ? `<img class="opt-ico" src="${esc(p)}" alt="" loading="lazy"${shadow ? ` style="filter:drop-shadow(0 0 2px ${shadow})"` : ""}>` : "");
 // sinner icon with a drop shadow in the inverse of the sinner's colour
@@ -256,7 +266,7 @@ function renderDashboard() {
   // editable number row (writes to a dotted state path on change); optional colour + icon
   const erow = (label, path, val, big, color, ico) => {
     const st = color ? `background:${color.fill};color:${color.font};` : "";
-    return `<div class="k" style="${st}">${ico ? icoTag(ico, color ? color.fill : null) : ""}${esc(label)}</div><div class="v${big ? " big" : ""}"><input type="number" class="kv-num" data-path="${path}" value="${val ?? ""}" style="${st}"/></div>`;
+    return `<div class="k" style="${st}">${ico ? icoTag(ico, color ? lightenHex(color.fill) : null) : ""}${esc(label)}</div><div class="v${big ? " big" : ""}"><input type="number" class="kv-num" data-path="${path}" value="${val ?? ""}" style="${st}"/></div>`;
   };
   const invColor = (path) => {
     const m = /^inventory\.tickets\.(\w+)$/.exec(path);   // tickets get their editable colour from constants.tickets
@@ -267,7 +277,7 @@ function renderDashboard() {
     return fillColor(INVENTORY_FILL[path.replace("inventory.", "")]);
   };
   // colored read-only row (e.g. derived Free Lunacy)
-  const srow = (label, val, big, color, ico) => { const st = color ? `background:${color.fill};color:${color.font};` : ""; return `<div class="k" style="${st}">${ico ? icoTag(ico, color ? color.fill : null) : ""}${esc(label)}</div><div class="v${big ? " big" : ""}" style="${st}">${esc(fmt(val))}</div>`; };
+  const srow = (label, val, big, color, ico) => { const st = color ? `background:${color.fill};color:${color.font};` : ""; return `<div class="k" style="${st}">${ico ? icoTag(ico, color ? lightenHex(color.fill) : null) : ""}${esc(label)}</div><div class="v${big ? " big" : ""}" style="${st}">${esc(fmt(val))}</div>`; };
   const checks = (arr, labels) => arr.map((on, i) => `<span class="pill ${on ? "on" : "off"}">${esc(labels[i])}</span>`).join("");
 
   $("#dashboard").innerHTML = `
