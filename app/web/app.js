@@ -256,6 +256,9 @@ function setSelection(path, value) {
 function renderDashboard() {
   const s = state;
   const free = s.lunacy.total - s.lunacy.paid;
+  // Total Rolls (Lunacy sheet F2:F4): 1300 lunacy / 10 ext tickets / 1 deca = one 10-roll chunk each.
+  const rolls10 = (Math.floor(free / 1300) + Math.floor(s.lunacy.extTickets / 10) + s.lunacy.decaTickets) * 10; // F3
+  const rollsTotal = rolls10 + Math.floor((free % 1300) / 130) + (s.lunacy.extTickets % 10);                    // F2 = F3 + F4
   const pct = Math.max(0, Math.min(100, (s.manager.currentXP / s.manager.nextLevelXP) * 100));
   const t = s.inventory.tickets;
   // does the next manager level grant +1 max enkephalin? (sheet K9)
@@ -317,6 +320,8 @@ function renderDashboard() {
           ${srow("Free Lunacy", free, false, fillColor(LUNACY_FILL.lunacy), RESOURCE_ICON.lunacy)}
           ${erow("Extraction Tickets", "lunacy.extTickets", s.lunacy.extTickets, false, fillColor(LUNACY_FILL.ticket), RESOURCE_ICON.extraction)}
           ${erow("Deca Tickets", "lunacy.decaTickets", s.lunacy.decaTickets, false, fillColor(LUNACY_FILL.ticket), RESOURCE_ICON.deca)}
+          ${srow("Rolls (10-roll)", rolls10)}
+          ${srow("Total Rolls", rollsTotal, true)}
         </div></div>
       </div>
 
