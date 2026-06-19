@@ -3,12 +3,16 @@
 import { THREADSPIN, SHARD_DELTA, SPINCHAIN, SPINCHAIN_PER_THREAD } from "./constants.js";
 const round2 = (n) => Math.round(n * 100) / 100;
 
-// Rental runs every other week; the 2026-06-11 patch week (a Thursday) is a
+// Rental runs every other week; the 2026-06-18 patch week (a Thursday) is a
 // NON-rental week. weeksFromAnchor counts weeks from that Thursday.
-const RENTAL_ANCHOR = Date.parse("2026-06-11T00:00:00");
+const RENTAL_ANCHOR = Date.parse("2026-06-18T00:00:00");
+const ANCHOR_ISO = "2026-06-18";
 const weeksFromAnchor = (iso) =>
-  Math.round((Date.parse((iso || "2026-06-11") + "T00:00:00") - RENTAL_ANCHOR) / (7 * 24 * 3600 * 1000));
+  Math.round((Date.parse((iso || ANCHOR_ISO) + "T00:00:00") - RENTAL_ANCHOR) / (7 * 24 * 3600 * 1000));
 const isRentalWeek = (wk) => (((wk % 2) + 2) % 2) === 1; // anchor week even -> no rental
+// Single source of truth for the stored md.rentalWeek flag (0 = rental week,
+// 1 = non-rental week — matches Code.gs / normalCheck), derived from the patch date.
+export const rentalWeekFlag = (iso) => (isRentalWeek(weeksFromAnchor(iso)) ? 0 : 1);
 // A week's MD types in run order: (Hard, Normal) x3, then a Rental (counts as
 // Normal) on rental weeks. "H" = Hard (+120 XP), "N"/"R" = +100 XP.
 const weekTypes = (rental) => (rental ? ["H", "N", "H", "N", "H", "N", "R"] : ["H", "N", "H", "N", "H", "N"]);

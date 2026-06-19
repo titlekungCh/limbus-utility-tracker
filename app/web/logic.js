@@ -4,6 +4,7 @@ import {
   DAYS, SHARD_DELTA, UPTIE, THREADSPIN, LUNACY_ACTIONS, TICKET_ACTIONS,
   PULL, SINNER_ORDER, SPINCHAIN, SPINCHAIN_PER_THREAD, TS_STEP_LEVEL, UPTIE_LEVEL,
 } from "./constants.js";
+import { rentalWeekFlag } from "./projections.js";
 
 // ---- transient action log (shown in the UI after each action) ----
 export let LOG = [];
@@ -73,6 +74,7 @@ function getLastDayOccurence(date, day) {
 function updateCurrentDate(s) {
   const lastThu = getLastDayOccurence(new Date(), "Thurs");
   s.lunacy.currentDate = lastThu.toISOString().slice(0, 10);
+  s.md.rentalWeek = rentalWeekFlag(s.lunacy.currentDate); // keep rental-week flag derived from the patch date
 }
 
 // ---------- MD checkbox helpers ----------
@@ -187,7 +189,6 @@ export const ACTIONS = {
   // --- Day updates ---
   cmenuDayUpdate: (s) => { updateWeekDay(s); updateCurrentDate(s); note(`Day -> ${s.currentDay}`); },
   newSeason: (s) => { s.weekTilSeasonEnd = 24; note("New season: 24 weeks to season end"); },
-  onRW: (s) => { s.md.rentalWeek = s.md.rentalWeek === 0 ? 1 : 0; note(`Rental week -> ${s.md.rentalWeek}`); },
 
   // --- Lunacy / tickets (generic, driven by constants) ---
   lunacy: (s, key) => {

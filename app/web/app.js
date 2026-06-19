@@ -18,7 +18,7 @@ function currentPatchISO() {
 }
 import {
   managerForecast, resourceForecast, shardPlanRows, idLeveling, SHARD_TYPES,
-  eventShop, REWARD_TYPES, egoThreadspin,
+  eventShop, REWARD_TYPES, egoThreadspin, rentalWeekFlag,
 } from "./projections.js";
 
 // persists across dashboard re-renders (idx into state.ids / state.egos)
@@ -348,7 +348,7 @@ function renderDashboard() {
           <div class="kv">
             <div class="k">Current Day</div><div class="v"><span class="tag" style="${styleAttr(dayColor(s.currentDay))}">${esc(s.currentDay)}</span></div>
             <div class="k">Current Patch</div><div class="v">${esc(s.lunacy.currentDate)}</div>
-            <div class="k">Rental Week</div><div class="v">${fmt(s.md.rentalWeek)}</div>
+            <div class="k">Rental Week</div><div class="v">${s.md.rentalWeek === 0 ? "Yes" : "No"}</div>
             <div class="k">Event Currency</div><div class="v"><input type="number" class="qty" id="st-currency" value="${fmt(s.event.currency)}"/></div>
           </div>
         </div>
@@ -857,7 +857,6 @@ function renderActions() {
   r = row(b);
   r.append(
     btn("New Season Start", () => act(ACTIONS.newSeason)),
-    btn("Toggle Rental Week", () => act(ACTIONS.onRW)),
   );
 }
 
@@ -1702,6 +1701,7 @@ function migrateConstants(s) {
   // on launch: refresh current day, and set current patch = latest Thursday
   state.currentDay = DAYS[new Date().getDay()];
   state.lunacy.currentDate = currentPatchISO();
+  state.md.rentalWeek = rentalWeekFlag(state.lunacy.currentDate); // derived from the rental anchor, not stored/toggled
   migrateConstants(state);
   recompute(state);
   $("#dashboard").addEventListener("change", dashboardEdit); // once; #dashboard persists across re-renders
