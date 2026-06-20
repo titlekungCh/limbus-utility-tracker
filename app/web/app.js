@@ -54,6 +54,8 @@ const icoTag = (p, shadow) => (p ? `<img class="opt-ico" src="${esc(p)}" alt="" 
 const sinnerIco = (name) => icoTag(OPTION_ICONS.sinner[name], SINNER_COLORS[name] ? invertHex(SINNER_COLORS[name].fill) : null);
 // that sinner's own shard icon (uptie/threadspin); falls back to the generic shard
 const sinnerShardIco = (name) => icoTag(SINNER_SHARD_ICON[name] || RESOURCE_ICON.egoshard);
+// progress colour 0%->red, 50%->yellow, 100%->green (owned vs needed shard marker)
+const shardPctColor = (owned, needed) => `hsl(${Math.round(120 * (needed > 0 ? Math.max(0, Math.min(1, owned / needed)) : 1))}, 90%, 52%)`;
 // sinner acronym -> sinner name (e.g. "HL" -> "Hong Lu"); built from state.sinners
 let _acroName = null;
 const acroNameMap = () => {
@@ -475,7 +477,7 @@ function renderForecast() {
                 <td><select data-i="${p.index}" data-f="type" style="${styleAttr(shardTypeColor(p.type))}">${SHARD_TYPES(s).map((t) => `<option${t === p.type ? " selected" : ""}${optStyle(shardTypeColor(t))}>${esc(t)}</option>`).join("")}</select></td>
                 <td style="text-align:center"><input type="checkbox" data-i="${p.index}" data-f="enabled" ${p.enabled ? "checked" : ""}/></td>
                 <td class="num">${fmt(p.shardNeeded)}</td>
-                <td class="num">${fmt(p.shardsOwned)}</td>
+                <td class="num${p.enabled ? " cell-mark mark-dyn" : ""}"${p.enabled ? ` style="--mark:${shardPctColor(p.shardsOwned, p.shardNeeded)}" title="${fmt(p.shardsOwned)} / ${fmt(p.shardNeeded)} needed (${Math.round((p.shardNeeded > 0 ? Math.min(1, p.shardsOwned / p.shardNeeded) : 1) * 100)}%)"` : ""}>${fmt(p.shardsOwned)}</td>
                 <td class="num ${p.shardShort > 0 ? "shard-low" : "shard-ok"}">${fmt(p.shardShort)}</td>
                 <td class="num">${fmt(p.crateNeeded)}</td>
                 <td class="num">${fmt(p.threadNeeded)}</td>
