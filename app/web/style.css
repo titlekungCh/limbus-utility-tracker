@@ -229,6 +229,13 @@ button.act.primary:hover { background: var(--crimson-bright); }
 button.act.undo { color: var(--muted); }
 button.act.undo:hover { border-color: var(--crimson); color: var(--crimson-bright); }
 .subhead { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-top: 4px; }
+.tk-adj { display: inline-flex; gap: 2px; margin-left: 6px; vertical-align: middle; }
+.tk-step {
+  font: 11px var(--mono); line-height: 1; padding: 1px 5px; cursor: pointer;
+  background: var(--cell); color: var(--text); border: 1px solid var(--line); border-radius: 4px;
+}
+.tk-step:hover:not(:disabled) { border-color: var(--gold); color: var(--gold); }
+.tk-step:disabled { opacity: .3; cursor: default; }
 select, input[type=number] {
   background: var(--cell); color: var(--text); border: 1px solid var(--line);
   border-radius: 5px; padding: 6px 8px; font-size: 13px; font-family: var(--mono);

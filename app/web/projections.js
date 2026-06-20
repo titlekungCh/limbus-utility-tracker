@@ -136,10 +136,35 @@ export function totalXPAt(s, level) {
   return c ? c.totalXP : null;
 }
 // EXP-ticket XP values (Inventory M11:M14): IV=3000, III=1000, II=200, I=50.
-function ticketXpMap(s) {
+export function ticketXpMap(s) {
   return Array.isArray(s.constants.tickets)
     ? Object.fromEntries(s.constants.tickets.map((t) => [t.tier, t.xp]))
     : s.constants.ticketXP;
+}
+const TICKET_ORDER = ["IV", "III", "II", "I"];
+
+// Shift one EXP ticket of `tier` in the planned breakdown without changing the
+// total XP covered: lowering a tier (dir<0) refills the gap with the tiers below
+// it; raising a tier (dir>0) pulls that XP back out of the lower tiers. Returns a
+// new counts object, or null if the move isn't possible (no lower tier / nothing
+// to give back). All ticket XP values are exact multiples of the smaller ones, so
+// the greedy refill always lands exactly.
+export function adjustTicketUse(s, counts, tier, dir) {
+  const xp = ticketXpMap(s);
+  const lower = TICKET_ORDER.slice(TICKET_ORDER.indexOf(tier) + 1);
+  if (!lower.length) return null;                       // Tier I: nothing below
+  const lowerXP = lower.reduce((a, t) => a + (counts[t] || 0) * xp[t], 0);
+  const next = { ...counts };
+  if (dir < 0) {
+    if ((next[tier] || 0) <= 0) return null;
+    next[tier] -= 1;
+  } else {
+    if (lowerXP < xp[tier]) return null;                // not enough below to give back
+    next[tier] += 1;
+  }
+  let remaining = lowerXP + (dir < 0 ? xp[tier] : -xp[tier]);
+  for (const t of lower) { next[t] = Math.floor(remaining / xp[t]); remaining -= next[t] * xp[t]; }
+  return next;
 }
 // Highest curve level whose cumulative totalXP is <= xp, plus the partial XP past it.
 export function levelForTotalXP(s, xp) {
@@ -177,16 +202,17 @@ export function idLeveling(s, idx, target) {
 // Spend the EXP tickets from `idLeveling` on the chosen ID: subtract them from the
 // inventory and raise the ID's level / level-extra XP. Capped at owned tickets so
 // inventory never goes negative. Returns a summary, or null if nothing to do.
-export function applyIdLeveling(s, idx, target) {
+export function applyIdLeveling(s, idx, target, counts) {
   const res = idLeveling(s, idx, target);
   if (!res || res.xpNeeded <= 0) return null;
   const id = s.ids[idx];
   const xp = ticketXpMap(s);
   const owned = s.inventory.tickets;
+  const use = counts || res.need;
   const used = {};
   let appliedXP = 0;
   for (const tier of ["IV", "III", "II", "I"]) {
-    used[tier] = Math.min(res.need[tier], owned[tier] || 0);
+    used[tier] = Math.min(use[tier] || 0, owned[tier] || 0);
     appliedXP += used[tier] * xp[tier];
     owned[tier] = (owned[tier] || 0) - used[tier];
   }

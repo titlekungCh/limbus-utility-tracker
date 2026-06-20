@@ -17,7 +17,7 @@ function currentPatchISO() {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 import {
-  managerForecast, resourceForecast, shardPlanRows, idLeveling, applyIdLeveling, SHARD_TYPES,
+  managerForecast, resourceForecast, shardPlanRows, idLeveling, applyIdLeveling, adjustTicketUse, ticketXpMap, SHARD_TYPES,
   eventShop, REWARD_TYPES, egoThreadspin, rentalWeekFlag,
 } from "./projections.js";
 
@@ -516,13 +516,27 @@ function renderIdLeveling() {
   const res = idLeveling(state, idLevelSel.idx, idLevelSel.target);
   const body = $("#idlevel-body");
   if (!body) return;
+  // Editable ticket breakdown (starts at the greedy default). Reset whenever the
+  // ID, target or current level changes so it tracks the live calculation.
+  const useKey = res ? `${idLevelSel.idx}:${idLevelSel.target}:${res.current}` : null;
+  if (!res || res.xpNeeded <= 0) { idLevelSel.useCounts = null; }
+  else if (idLevelSel.useKey !== useKey || !idLevelSel.useCounts) { idLevelSel.useCounts = { ...res.need }; }
+  idLevelSel.useKey = useKey;
+  const counts = idLevelSel.useCounts;
+  const tx = ticketXpMap(state);
+  const owned = state.inventory.tickets;
+  const affordable = counts && ["IV", "III", "II", "I"].every((t) => (owned[t] || 0) >= (counts[t] || 0));
   const selId = state.ids[idLevelSel.idx];
   const selSt = styleAttr(selId ? sinnerColor(selId.sinner) : null);   // ID dropdown -> sinner colour
   const lvlSt = res ? styleAttr(levelColor(res.current)) : "";          // current level -> bracket
   const tgtSt = styleAttr(levelColor(idLevelSel.target));
-  const ticketRows = res ? ["IV", "III", "II", "I"].map((tier) => {
+  const ticketRows = (res && counts) ? ["IV", "III", "II", "I"].map((tier) => {
     const st = styleAttr(fillColor(INVENTORY_FILL["tickets." + tier]));
-    return `<div class="k" style="${st}">${icoTag(RESOURCE_ICON[tier])}Ticket ${tier}</div><div class="v" style="${st}">${fmt(res.need[tier])} <span class="count">(${fmt(res.left[tier])} left)</span></div>`;
+    const left = (owned[tier] || 0) - (counts[tier] || 0);
+    const lowerXP = (tier === "I") ? 0 : ["IV", "III", "II", "I"].slice(["IV", "III", "II", "I"].indexOf(tier) + 1).reduce((a, t) => a + (counts[t] || 0) * tx[t], 0);
+    const adj = (tier === "I") ? "" :
+      `<span class="tk-adj"><button class="tk-step" data-tier="${tier}" data-dir="-1"${(counts[tier] || 0) <= 0 ? " disabled" : ""} title="Use one fewer Ticket ${tier} — lower tiers fill in">&lt;</button><button class="tk-step" data-tier="${tier}" data-dir="1"${lowerXP < tx[tier] ? " disabled" : ""} title="Use one more Ticket ${tier} — pulled back from lower tiers">&gt;</button></span>`;
+    return `<div class="k" style="${st}">${icoTag(RESOURCE_ICON[tier])}Ticket ${tier}${adj}</div><div class="v" style="${st}">${fmt(counts[tier] || 0)} <span class="count${left < 0 ? " shard-low" : ""}">(${fmt(left)} left)</span></div>`;
   }).join("") : "";
   body.innerHTML = `
     <div class="field"><label>ID</label>
@@ -531,7 +545,7 @@ function renderIdLeveling() {
         "sinner", selId ? `[${selId.name}] ${selId.sinner}` : "", selId ? sinnerColor(selId.sinner) : null, selId ? optIcon("sinner", selId.sinner) : "")}</div>
     <div class="field"><label>Target Lv</label>
       <input type="number" id="idlevel-target" class="qty" min="1" max="100" value="${idLevelSel.target}" style="${tgtSt}"/>
-      <button class="act primary" id="idlevel-apply"${res && res.xpNeeded > 0 && res.affordable ? "" : " disabled"} title="${res && res.xpNeeded <= 0 ? "Already at/above target" : res && !res.affordable ? "Not enough EXP tickets" : "Spend the tickets below and level this ID (stops ~1 Tier I short, no XP wasted)"}">Use Tickets</button></div>
+      <button class="act primary" id="idlevel-apply"${res && res.xpNeeded > 0 && affordable ? "" : " disabled"} title="${res && res.xpNeeded <= 0 ? "Already at/above target" : !affordable ? "Not enough EXP tickets for this breakdown" : "Spend the tickets below and level this ID (stops ~1 Tier I short, no XP wasted)"}">Use Tickets</button></div>
     <div class="kv" style="margin-top:6px;">
       <div class="k" style="${lvlSt}">Current Level</div><div class="v" style="${lvlSt}">${res ? fmt(res.current) : "—"}</div>
       <div class="k">Level Extra XP</div><div class="v">${res ? fmt(res.levelExtra) : "—"}</div>
@@ -541,9 +555,13 @@ function renderIdLeveling() {
     <div class="kv">${ticketRows}</div>`;
   $("#idlevel-name").addEventListener("change", (e) => { idLevelSel.idx = +e.target.value; renderIdLeveling(); });
   $("#idlevel-target").addEventListener("change", (e) => { idLevelSel.target = Number(e.target.value) || 1; renderIdLeveling(); });
+  body.querySelectorAll(".tk-step").forEach((b) => b.addEventListener("click", () => {
+    const next = adjustTicketUse(state, idLevelSel.useCounts, b.dataset.tier, +b.dataset.dir);
+    if (next) { idLevelSel.useCounts = next; renderIdLeveling(); }
+  }));
   const applyBtn = $("#idlevel-apply");
   if (applyBtn) applyBtn.addEventListener("click", () => {
-    const r = applyIdLeveling(state, idLevelSel.idx, idLevelSel.target);
+    const r = applyIdLeveling(state, idLevelSel.idx, idLevelSel.target, idLevelSel.useCounts);
     if (!r) return;
     renderDashboard();   // refresh calculator + Inventory ticket counts
     renderIDs();         // reflect the new level / level-extra on the IDs page
