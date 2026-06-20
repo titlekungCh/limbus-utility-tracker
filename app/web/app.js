@@ -370,8 +370,8 @@ function renderDashboard() {
             <tbody><tr><td style="white-space:nowrap">${icoTag(RESOURCE_ICON.egoshard)}Shards</td>${SINNER_ORDER.map((n) => {
               const i = state.sinners.findIndex((x) => x.name === n);
               const sh = state.sinners[i]?.shards ?? 0;
-              const mk = sh < 50 ? "mark-red" : sh < 150 ? "mark-orange" : sh < 300 ? "mark-yellow" : "";
-              const mkTitle = mk === "mark-red" ? "Very low shards (<50)" : mk === "mark-orange" ? "Low shards (<150)" : mk === "mark-yellow" ? "Shards under 300" : "";
+              const mk = sh < 50 ? "mark-red" : sh < 150 ? "mark-orange" : sh < 300 ? "mark-yellow" : sh < 400 ? "mark-lime" : "mark-green";
+              const mkTitle = mk === "mark-red" ? "Very low shards (<50)" : mk === "mark-orange" ? "Low shards (<150)" : mk === "mark-yellow" ? "Shards under 300" : mk === "mark-lime" ? "Shards under 400" : "Shards 400+";
               return `<td class="num${mk ? " cell-mark " + mk : ""}" title="${mkTitle}"><input type="number" class="kv-num" data-path="sinners.${i}.shards" value="${sh}" style="${styleAttr(sinnerColor(n))}"/></td>`;
             }).join("")}</tr></tbody>
           </table>

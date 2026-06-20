@@ -189,6 +189,7 @@ table.editlist tr.owned:hover td { background: #28391b; }
 .cell-mark.mark-red::after    { background: #ff2d2d; box-shadow: 0 0 0 1.5px #000, 0 0 3px #ff2d2d; }
 .cell-mark.mark-orange::after { background: #ff9a2d; box-shadow: 0 0 0 1.5px #000, 0 0 3px #ff9a2d; }
 .cell-mark.mark-yellow::after { background: #ffe23d; box-shadow: 0 0 0 1.5px #000, 0 0 3px #ffe23d; }
+.cell-mark.mark-lime::after   { background: #b6ff3d; box-shadow: 0 0 0 1.5px #000, 0 0 3px #b6ff3d; }
 .cell-mark.mark-green::after  { background: #3dff6a; box-shadow: 0 0 0 1.5px #000, 0 0 3px #3dff6a; }
 /* level-up marker next to a forecast value that reaches next-level XP */
 .lvlup { color: var(--gold); font-weight: 700; font-size: 11px; }
