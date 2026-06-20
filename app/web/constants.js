@@ -135,7 +135,7 @@ export const SCALE_STOPS = [
 // Shard-type fills (Inventory B18/B26:M26/I4 conditional formatting).
 export const SHARD_TYPE_FILL = {
   "EGO/3 Star": "#FF9E00", "2 3 Star + UT4": "#FFF243", "2 Star": "#B10202",
-  "000 UT4": "#FFE5A0", ZAYIN: "#D4EDBC", TETH: "#BFE1F6", HE: "#C6DBE1",
+  "000 UT4": "#FFE5A0", ZAYIN: "#D4EDBC", TETH: "#BFE1F6", HE: "#f3f3b4",
   WAW: "#E6CFF2", None: "#E8EAED", "3 Star UT": "#FFE400", "00 UT4": "#B10202",
   "2 3 Star": "#FFF243", ALEPH: "#F2CFCF",
 };
