@@ -168,7 +168,11 @@ table.editlist tr.owned:hover td { background: #28391b; }
 /* Shard Planning: keep the data columns compact; let Target take the slack */
 #planTable th, #planTable td { white-space: nowrap; }
 /* Sinner name in the mono value font so it matches the numeric columns' size */
-#planTable td:first-child { font-family: var(--mono); }
+#planTable td:first-child { font-family: var(--mono); line-height: 1; }
+/* Tighten row height: the form controls + cell padding drive it, not the name */
+#planTable td { padding-top: 2px; padding-bottom: 2px; }
+#planTable td select, #planTable td input[type=number], #planTable td input[type=text] { padding-top: 3px; padding-bottom: 3px; }
+#planTable .target-cell .csel > summary.csel-sum { padding-top: 3px; padding-bottom: 3px; }
 #planTable th:last-child, #planTable td:last-child { width: 100%; }
 #planTable td select[data-f="type"] { min-width: 0; }
 /* chooser on the left, picker(s) fill the rest — all on one line */
