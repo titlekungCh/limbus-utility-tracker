@@ -640,7 +640,7 @@ function renderEventShop() {
     if (ri >= 0 && es.rewards[ri].due > 0) { focus = { table: "rewards", idx: ri, cost: es.rewards[ri].due }; break; }
   }
   const focusColor = focus ? shardPctColor(es.currency, focus.cost) : "";
-  const focusTitle = focus ? `${fmt(Math.max(0, round2(focus.cost - es.currency)))} more than current currency (${fmt(focus.cost)} to finish, have ${fmt(es.currency)})` : "";
+  const focusTitle = focus ? `${fmt(Math.max(0, Math.round((focus.cost - es.currency) * 100) / 100))} more than current currency (${fmt(focus.cost)} to finish, have ${fmt(es.currency)})` : "";
   const focusMark = (table, i) => (focus && focus.table === table && focus.idx === i)
     ? ` cell-mark mark-dyn" style="--mark:${focusColor}" title="${focusTitle}` : "";
 
