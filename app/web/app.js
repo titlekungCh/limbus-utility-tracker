@@ -1194,9 +1194,17 @@ function renderEditableList(viewId, arrayName, columns, searchKeys, makeBlank) {
     const q = $("#" + viewId + "-search").value.trim().toLowerCase();
     const ownedOnly = $("#" + viewId + "-owned").checked;
     // space-separated terms: plain term must match (AND), "-term" must NOT match.
-    const terms = q.split(/\s+/).filter(Boolean);
-    const pos = terms.filter((t) => !t.startsWith("-"));
-    const neg = terms.filter((t) => t.startsWith("-") && t.length > 1).map((t) => t.slice(1));
+    // a "quoted phrase" (or -"quoted phrase") is kept whole instead of split.
+    const tokens = q.match(/-?"[^"]*"|\S+/g) || [];
+    const pos = [], neg = [];
+    for (let tok of tokens) {
+      if (tok === "-") continue;
+      const isNeg = tok.startsWith("-");
+      if (isNeg) tok = tok.slice(1);
+      if (tok.startsWith('"') && tok.endsWith('"')) tok = tok.slice(1, -1);
+      tok = tok.trim();
+      if (tok) (isNeg ? neg : pos).push(tok);
+    }
     const rows = arr.map((it, idx) => ({ it, idx })).filter(({ it }) => {
       if (ownedOnly && !it.acquired) return false;
       // active filters: tags must contain ALL picks; select/num value must be one of the picks
