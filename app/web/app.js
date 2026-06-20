@@ -6,7 +6,7 @@ import {
   EVENT_ITEM_FILL, EVENT_REWARD_FILL, SIN_ORDER, SIN_FILL,
   STATUS_ORDER, STATUS_FILL, FACTION_COLORS, SCALE_MAX5, SEASON_FILL, TIER_FILL,
   SEASON_NUMBER_FILL, KEYWORD_FILL, KEYWORD_ORDER, DAYS, INVENTORY_FILL, LUNACY_FILL,
-  DAILY_LEFT_FILL, WEEKLY_LEFT_FILL, RESOURCE_ICON, EXTRA_KEYWORD_ALL,
+  DAILY_LEFT_FILL, WEEKLY_LEFT_FILL, RESOURCE_ICON, SINNER_SHARD_ICON, EXTRA_KEYWORD_ALL,
 } from "./constants.js";
 import { OPTION_ICONS, GRADE_GLYPH } from "./icons-map.js";
 
@@ -52,6 +52,8 @@ const lightenHex = (hex, t = 0.55) => {
 const icoTag = (p, shadow) => (p ? `<img class="opt-ico" src="${esc(p)}" alt="" loading="lazy"${shadow ? ` style="filter:drop-shadow(0 0 2px ${shadow})"` : ""}>` : "");
 // sinner icon with a drop shadow in the inverse of the sinner's colour
 const sinnerIco = (name) => icoTag(OPTION_ICONS.sinner[name], SINNER_COLORS[name] ? invertHex(SINNER_COLORS[name].fill) : null);
+// that sinner's own shard icon (uptie/threadspin); falls back to the generic shard
+const sinnerShardIco = (name) => icoTag(SINNER_SHARD_ICON[name] || RESOURCE_ICON.egoshard);
 // sinner acronym -> sinner name (e.g. "HL" -> "Hong Lu"); built from state.sinners
 let _acroName = null;
 const acroNameMap = () => {
@@ -593,10 +595,10 @@ function renderEgoThreadspin() {
       <div class="k">Current TS</div><div class="v" style="${curSt}">${res ? esc(res.current ?? "—") : "—"}</div>
       <div class="k">${icoTag(RESOURCE_ICON.thread)}Threads Needed</div><div class="v big">${res ? fmt(res.threads) : "—"}</div>
       <div class="k">${icoTag(RESOURCE_ICON.thread)}Threads Left After</div><div class="v">${res ? fmt(res.threadsLeft) : "—"}</div>
-      <div class="k">${icoTag(RESOURCE_ICON.egoshard)}EGO Shard Needed</div><div class="v">${res ? fmt(res.shard) : "—"}</div>
-      <div class="k">${icoTag(RESOURCE_ICON.egoshard)}${res ? esc(res.sinner) : ""} Shard Left After</div><div class="v" style="${selSt}">${res ? fmt(res.shardLeft) : "—"}</div>
+      <div class="k">${sinnerShardIco(res ? res.sinner : null)}EGO Shard Needed</div><div class="v">${res ? fmt(res.shard) : "—"}</div>
+      <div class="k">${sinnerShardIco(res ? res.sinner : null)}${res ? esc(res.sinner) : ""} Shard Left After</div><div class="v" style="${selSt}">${res ? fmt(res.shardLeft) : "—"}</div>
       ${res && res.spinchain ? `<div class="k">${icoTag(RESOURCE_ICON.spinchain)}Spinchain Needed (TS5)</div><div class="v big">${fmt(res.spinchain)}</div>
-      <div class="k">${icoTag(RESOURCE_ICON.egoshard)}= EGO Shard (1:1)</div><div class="v">${fmt(res.scShard)}</div>
+      <div class="k">${sinnerShardIco(res.sinner)}= EGO Shard (1:1)</div><div class="v">${fmt(res.scShard)}</div>
       <div class="k">${icoTag(RESOURCE_ICON.thread)}= Thread (2:1)</div><div class="v">${fmt(res.scThread)}</div>` : ""}
     </div>`;
   $("#egots-name").addEventListener("change", (e) => { egoTSel.idx = +e.target.value; renderEgoThreadspin(); });
@@ -843,7 +845,7 @@ function renderActions() {
     // rarity icon for the 0/00/000 prefix; thread icon by (N); EGO shard icon by "+N Shard"
     bn.innerHTML = starIco + esc(UPTIE[k].label.replace(/^0+\s*/, ""))
       .replace(/\((\d+)\)/, (m, n) => `(${icoTag(RESOURCE_ICON.thread)}${n})`)
-      .replace(/\+(\d+)\s*Shard/, (m, n) => `+${icoTag(RESOURCE_ICON.egoshard)}${n}`);
+      .replace(/\+(\d+)\s*Shard/, (m, n) => `+${sinnerShardIco(uId2?.sinner)}${n}`);
     r.append(bn);
   });
 
@@ -868,7 +870,7 @@ function renderActions() {
     const ts5Btn = (method) => {
       const spent = method === "thread" ? SPINCHAIN[grade] * 2 : SPINCHAIN[grade];
       const bn = btn("", () => act((s) => ACTIONS.threadspinTS5(s, grade, method)));
-      bn.innerHTML = `TS5 ${icoTag(RESOURCE_ICON.spinchain)}${SPINCHAIN[grade]} = ${icoTag(method === "thread" ? RESOURCE_ICON.thread : RESOURCE_ICON.egoshard)}${spent}`;
+      bn.innerHTML = `TS5 ${icoTag(RESOURCE_ICON.spinchain)}${SPINCHAIN[grade]} = ${method === "thread" ? icoTag(RESOURCE_ICON.thread) : sinnerShardIco(state.egos[state.uptie.egoIdx]?.sinner)}${spent}`;
       bn.title = `TS5: ${SPINCHAIN[grade]} spinchain via ${method === "thread" ? "thread (2:1)" : "EGO shard (1:1)"}`;
       return bn;
     };

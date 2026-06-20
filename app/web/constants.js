@@ -225,6 +225,22 @@ export const RESOURCE_ICON = {
   III: "icons/resource/ticket-3.webp",
   IV: "icons/resource/ticket-4.webp",
 };
+// Per-sinner shard icons (used for uptie/threadspin where the shard belongs to a
+// specific sinner) — keyed by sinner name; falls back to RESOURCE_ICON.egoshard.
+export const SINNER_SHARD_ICON = {
+  "Yi Sang": "icons/sinnershard/yi-sang.webp",
+  "Faust": "icons/sinnershard/faust.webp",
+  "Don Quixote": "icons/sinnershard/don-quixote.webp",
+  "Ryoshu": "icons/sinnershard/ryoshu.webp",
+  "Meursault": "icons/sinnershard/meursault.webp",
+  "Hong Lu": "icons/sinnershard/hong-lu.webp",
+  "Heathcliff": "icons/sinnershard/heathcliff.webp",
+  "Ishmael": "icons/sinnershard/ishmael.webp",
+  "Rodion": "icons/sinnershard/rodion.webp",
+  "Sinclair": "icons/sinnershard/sinclair.webp",
+  "Outis": "icons/sinnershard/outis.webp",
+  "Gregor": "icons/sinnershard/gregor.webp",
+};
 // Dropdown option icons + grade glyphs live in the generated ./icons-map.js.
 
 // IF SS7 faction/source colours for the ID/EGO cells (G2:J13 conditional formatting).
