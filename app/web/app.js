@@ -494,7 +494,7 @@ function renderForecast() {
                 <td style="${styleAttr(sinnerColor(p.sinner))}">${optIcon("sinner", p.sinner)}${esc(p.sinner)}</td>
                 <td><select data-i="${p.index}" data-f="type" style="${styleAttr(shardTypeColor(p.type))}">${SHARD_TYPES(s).map((t) => `<option${t === p.type ? " selected" : ""}${optStyle(shardTypeColor(t))}>${esc(t)}</option>`).join("")}</select></td>
                 <td style="text-align:center"><input type="checkbox" data-i="${p.index}" data-f="enabled" ${p.enabled ? "checked" : ""}/></td>
-                <td class="num">${fmt(p.shardNeeded)}</td>
+                <td class="num">${fmt(p.shardNeeded)}${sinnerShardIco(p.sinner)}</td>
                 <td class="num${p.enabled ? " cell-mark mark-dyn" : ""}"${p.enabled ? ` style="--mark:${shardPctColor(p.shardsOwned, p.shardNeeded)}" title="${fmt(p.shardsOwned)} / ${fmt(p.shardNeeded)} needed (${Math.round((p.shardNeeded > 0 ? Math.min(1, p.shardsOwned / p.shardNeeded) : 1) * 100)}%)"` : ""}>${fmt(p.shardsOwned)}</td>
                 <td class="num ${p.shardShort > 0 ? "shard-low" : "shard-ok"}">${fmt(p.shardShort)}</td>
                 <td class="num">${fmt(p.crateNeeded)}${icoTag(RESOURCE_ICON.crate)}</td>
