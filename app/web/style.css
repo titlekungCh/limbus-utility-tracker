@@ -94,6 +94,8 @@ table.sheet tr.disabled td select { color: var(--muted); }
 }
 .kv .k { color: var(--muted); }
 .kv .v { font-family: var(--mono); text-align: right; color: var(--text); }
+.add-currency { display: inline-flex; gap: 6px; align-items: center; }
+.add-currency .qty { width: 80px; }
 .kv .v.big { color: var(--gold); font-weight: 700; }
 .kv .v { display: flex; justify-content: flex-end; align-items: center; }
 /* single-select dropdowns fill their value cell flat, like the label cell beside them */

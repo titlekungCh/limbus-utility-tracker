@@ -360,6 +360,7 @@ function renderDashboard() {
             <div class="k">Current Patch</div><div class="v">${esc(s.lunacy.currentDate)}</div>
             <div class="k">Rental Week</div><div class="v">${s.md.rentalWeek === 0 ? "Yes" : "No"}</div>
             <div class="k">Event Currency</div><div class="v"><input type="number" class="qty" id="st-currency" value="${fmt(s.event.currency)}"/></div>
+            <div class="k">Add Currency</div><div class="v"><span class="add-currency"><input type="number" class="qty" id="st-currency-add" placeholder="+ amt"/><button class="act primary" id="st-currency-addbtn">Add</button></span></div>
           </div>
         </div>
       </div>
@@ -385,6 +386,12 @@ function renderDashboard() {
 
   const cur = $("#st-currency");
   if (cur) cur.addEventListener("change", (ev) => setSelection("event.currency", Number(ev.target.value) || 0));
+  const addBtn = $("#st-currency-addbtn");
+  if (addBtn) {
+    const doAdd = () => { const n = Number($("#st-currency-add").value) || 0; if (n) setSelection("event.currency", (state.event.currency || 0) + n); };
+    addBtn.addEventListener("click", doAdd);
+    $("#st-currency-add").addEventListener("keydown", (ev) => { if (ev.key === "Enter") doAdd(); });
+  }
 
   renderForecast();
 }
@@ -1271,7 +1278,7 @@ function renderEGOs() {
   renderEditableList("egos", "egos", [
     { label: "EGO Name", key: "name", type: "text", color: (v, it) => sinnerColor(it.sinner) },
     { label: "Sinner", key: "sinner", type: "select", options: SINNER_ORDER, color: (v) => sinnerColor(v), iconCat: "sinner", filter: true },
-    { label: "Sin", key: "sin", type: "select", options: SIN_ORDER, color: (v) => sinColor(v), iconCat: "sin" },
+    { label: "Sin", key: "sin", type: "select", options: SIN_ORDER, color: (v) => sinColor(v), iconCat: "sin", filter: true },
     { label: "Grade", key: "tier", type: "select", options: ["ZAYIN", "TETH", "HE", "WAW", "ALEPH"], color: (v) => shardTypeColor(v), iconCat: "grade", filter: true },
     { label: "Season", key: "season", type: "tags", tagColor: seasonTagColor, iconCat: "season" },
     { label: "Keyword", key: "keyword", type: "tags", tagColor: keywordTagColor, optOrder: KEYWORD_ORDER, iconCat: "keyword", filter: true },
