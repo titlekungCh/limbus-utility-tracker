@@ -1363,7 +1363,7 @@ function renderIDs() {
     { label: "UT", key: "uptie", type: "num", color: (v) => scaleColor(v), filter: true },
     { label: "Released", key: "release", type: "date" },
     { label: "IID", key: "internalId", type: "num" },
-  ], ["name", "sinner", "keyword", "extraKeyword", "season"],
+  ], ["name"],
     () => ({ name: "", sinner: "Yi Sang", tier: "★★★", tierStars: 3, season: "", keyword: "", extraKeyword: "", acquired: false, level: null, levelExtra: 0, uptie: null, release: "", internalId: null }));
 }
 function renderEGOs() {
@@ -1380,7 +1380,7 @@ function renderEGOs() {
     { label: "Released", key: "release", type: "date" },
     { label: "IID", key: "internalId", type: "num" },
     { label: "TS5", key: "ts5", type: "check" },
-  ], ["name", "sinner", "sin", "keyword", "extraKeyword", "season"],
+  ], ["name"],
     () => ({ name: "", sinner: "Yi Sang", sin: "", tier: "ZAYIN", season: "", keyword: "", extraKeyword: "", acquired: false, threadspin: null, release: "", internalId: null, ts5: false }));
 }
 
