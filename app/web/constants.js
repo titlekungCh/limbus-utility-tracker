@@ -227,6 +227,7 @@ export const RESOURCE_ICON = {
   crate: "icons/resource/crate.webp",
   randomCrate: "icons/resource/random-crate.webp",
   enkephalin: "icons/resource/enkephalin.webp",
+  ego: "icons/resource/ego.webp",
 };
 // Event-shop item name -> resource icon (shown before the item name + on buy-out buttons).
 export const EVENT_ITEM_ICON = {

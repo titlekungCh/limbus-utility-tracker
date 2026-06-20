@@ -674,7 +674,11 @@ function renderEventShop() {
       <div class="card">
         <h2>Event Summary</h2>
         <div class="body">
-          <div class="field"><label>Reward Type</label>${selectHtml("ev-rtype", REWARD_TYPES, e.rewardType)}</div>
+          <div class="field"><label>Reward Type</label>${(() => {
+            const rtIcon = { "EGO": RESOURCE_ICON.ego, "000 ID": OPTION_ICONS.tier["★★★"], "00 ID": OPTION_ICONS.tier["★★"] };
+            const sel = `<select id="ev-rtype" class="kv-select">${REWARD_TYPES.map((o) => `<option${o === e.rewardType ? " selected" : ""} data-icon="${esc(rtIcon[o] || "")}">${esc(o)}</option>`).join("")}</select>`;
+            return cselHtml(sel, "rewardType", e.rewardType, null, icoTag(rtIcon[e.rewardType]));
+          })()}</div>
           <div class="kv" style="margin-top:10px;">
             <div class="k">Currency Required</div><div class="v big">${fmt(es.required)}</div>
             <div class="k">Currency Needed <span class="count">(skip Banner+Ticket)</span></div><div class="v">${fmt(es.needed)}</div>
