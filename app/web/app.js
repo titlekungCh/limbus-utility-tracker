@@ -629,21 +629,34 @@ function renderEventShop() {
   const es = eventShop(state);
   const e = state.event;
 
-  // Currency-to-finish marker: one row at a time, the highest-priority item/reward
-  // that still needs currency. Colour = how affordable it is now (red->yellow->green).
+  // Currency-to-finish markers: walk the priority list top-down, "spending" current
+  // currency on each fully-affordable row (marked white) and cascading the leftover
+  // to the next; the first row the leftover can't fully cover gets the gradient
+  // colour (red->yellow->green), and the rest stay unmarked.
   const EVENT_PRIORITY = ["ID/EGO Reward", "Extraction Ticket", "Enkephalin Box", "Random Crates", "Crates", "Threads", "III Ticket", "IV Ticket", "Announcer", "Banner Effect", "Ticket Effect", "Banner", "Ticket"];
-  let focus = null;
+  const marks = {};   // "items:0" / "rewards:1" -> { color, title }
+  let budget = es.currency;
   for (const nm of EVENT_PRIORITY) {
+    let entry = null;
     const ii = es.items.findIndex((x) => x.name === nm);
-    if (ii >= 0) { if (es.items[ii].toFinish > 0) { focus = { table: "items", idx: ii, cost: es.items[ii].toFinish }; break; } continue; }
-    const ri = es.rewards.findIndex((x) => x.name === nm);
-    if (ri >= 0 && es.rewards[ri].due > 0) { focus = { table: "rewards", idx: ri, cost: es.rewards[ri].due }; break; }
+    if (ii >= 0) { if (es.items[ii].toFinish > 0) entry = { t: "items", i: ii, cost: es.items[ii].toFinish }; }
+    else { const ri = es.rewards.findIndex((x) => x.name === nm); if (ri >= 0 && es.rewards[ri].due > 0) entry = { t: "rewards", i: ri, cost: es.rewards[ri].due }; }
+    if (!entry) continue;   // already finished -> no marker, doesn't consume budget
+    const afford = budget >= entry.cost;
+    const short = Math.max(0, Math.round((entry.cost - budget) * 100) / 100);
+    marks[entry.t + ":" + entry.i] = {
+      color: afford ? "#ffffff" : shardPctColor(budget, entry.cost),
+      title: afford
+        ? `Affordable now (${fmt(entry.cost)} to finish, ${fmt(budget)} available)`
+        : `${fmt(short)} more than available currency (${fmt(entry.cost)} to finish, ${fmt(budget)} available)`,
+    };
+    if (!afford) break;     // leftover exhausted here; stop marking further rows
+    budget = Math.round((budget - entry.cost) * 100) / 100;
   }
-  // gradient red->yellow->green below 100%; white once fully affordable (>= cost)
-  const focusColor = focus ? (es.currency >= focus.cost ? "#ffffff" : shardPctColor(es.currency, focus.cost)) : "";
-  const focusTitle = focus ? `${fmt(Math.max(0, Math.round((focus.cost - es.currency) * 100) / 100))} more than current currency (${fmt(focus.cost)} to finish, have ${fmt(es.currency)})` : "";
-  const focusMark = (table, i) => (focus && focus.table === table && focus.idx === i)
-    ? ` cell-mark mark-dyn" style="--mark:${focusColor}" title="${focusTitle}` : "";
+  const focusMark = (table, i) => {
+    const m = marks[table + ":" + i];
+    return m ? ` cell-mark mark-dyn" style="--mark:${m.color}" title="${m.title}` : "";
+  };
 
   root.innerHTML = `
     <div class="grid">
