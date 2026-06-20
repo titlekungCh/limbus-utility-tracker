@@ -639,7 +639,8 @@ function renderEventShop() {
     const ri = es.rewards.findIndex((x) => x.name === nm);
     if (ri >= 0 && es.rewards[ri].due > 0) { focus = { table: "rewards", idx: ri, cost: es.rewards[ri].due }; break; }
   }
-  const focusColor = focus ? shardPctColor(es.currency, focus.cost) : "";
+  // gradient red->yellow->green below 100%; white once fully affordable (>= cost)
+  const focusColor = focus ? (es.currency >= focus.cost ? "#ffffff" : shardPctColor(es.currency, focus.cost)) : "";
   const focusTitle = focus ? `${fmt(Math.max(0, Math.round((focus.cost - es.currency) * 100) / 100))} more than current currency (${fmt(focus.cost)} to finish, have ${fmt(es.currency)})` : "";
   const focusMark = (table, i) => (focus && focus.table === table && focus.idx === i)
     ? ` cell-mark mark-dyn" style="--mark:${focusColor}" title="${focusTitle}` : "";
