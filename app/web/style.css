@@ -180,12 +180,16 @@ table.editlist tr.owned:hover td { background: #28391b; }
   border: 1px solid var(--line); background: var(--cell); color: var(--muted); }
 .ut-toggle.on { background: #2c3a26; color: #bfe0a8; border-color: var(--green); }
 /* low-shard cue that reads on any sinner-coloured cell: a ringed red corner dot */
-td.shard-low-cell { position: relative; }
-td.shard-low-cell::after {
+/* corner status marker (top-right dot) for a cell or value, colour by tier */
+.cell-mark { position: relative; }
+.cell-mark::after {
   content: ""; position: absolute; top: 2px; right: 2px; width: 7px; height: 7px;
-  border-radius: 50%; background: #ff2d2d; box-shadow: 0 0 0 1.5px #000, 0 0 3px #ff2d2d;
-  pointer-events: none;
+  border-radius: 50%; pointer-events: none;
 }
+.cell-mark.mark-red::after    { background: #ff2d2d; box-shadow: 0 0 0 1.5px #000, 0 0 3px #ff2d2d; }
+.cell-mark.mark-orange::after { background: #ff9a2d; box-shadow: 0 0 0 1.5px #000, 0 0 3px #ff9a2d; }
+.cell-mark.mark-yellow::after { background: #ffe23d; box-shadow: 0 0 0 1.5px #000, 0 0 3px #ffe23d; }
+.cell-mark.mark-green::after  { background: #3dff6a; box-shadow: 0 0 0 1.5px #000, 0 0 3px #3dff6a; }
 /* level-up marker next to a forecast value that reaches next-level XP */
 .lvlup { color: var(--gold); font-weight: 700; font-size: 11px; }
 /* rental MD has no fixed keyword: cycle all 7 status icons (~300ms each) */

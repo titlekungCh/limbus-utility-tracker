@@ -261,6 +261,12 @@ function renderDashboard() {
   // Total Rolls (Lunacy sheet F2:F4): 1300 lunacy / 10 ext tickets / 1 deca = one 10-roll chunk each.
   const rolls10 = (Math.floor(free / 1300) + Math.floor(s.lunacy.extTickets / 10) + s.lunacy.decaTickets) * 10; // F3
   const rollsTotal = rolls10 + Math.floor((free % 1300) / 130) + (s.lunacy.extTickets % 10);                    // F2 = F3 + F4
+  // Roll markers: green if 10-roll count clears 200 (else Total Rolls clears 200);
+  // otherwise orange if the 10-roll count clears 180.
+  let roll10Mark = "", rollTotalMark = "";
+  if (rolls10 > 200) roll10Mark = "cell-mark mark-green";
+  else if (rollsTotal > 200) rollTotalMark = "cell-mark mark-green";
+  else if (rolls10 > 180) roll10Mark = "cell-mark mark-orange";
   const pct = Math.max(0, Math.min(100, (s.manager.currentXP / s.manager.nextLevelXP) * 100));
   const t = s.inventory.tickets;
   // does the next manager level grant +1 max enkephalin? (sheet K9)
@@ -282,7 +288,7 @@ function renderDashboard() {
     return fillColor(INVENTORY_FILL[path.replace("inventory.", "")]);
   };
   // colored read-only row (e.g. derived Free Lunacy)
-  const srow = (label, val, big, color, ico) => { const st = color ? `background:${color.fill};color:${color.font};` : ""; return `<div class="k" style="${st}">${ico ? icoTag(ico, color ? lightenHex(color.fill) : null) : ""}${esc(label)}</div><div class="v${big ? " big" : ""}" style="${st}">${esc(fmt(val))}</div>`; };
+  const srow = (label, val, big, color, ico, vcls) => { const st = color ? `background:${color.fill};color:${color.font};` : ""; return `<div class="k" style="${st}">${ico ? icoTag(ico, color ? lightenHex(color.fill) : null) : ""}${esc(label)}</div><div class="v${big ? " big" : ""}${vcls ? " " + vcls : ""}" style="${st}">${esc(fmt(val))}</div>`; };
   const checks = (arr, labels) => arr.map((on, i) => `<span class="pill ${on ? "on" : "off"}">${esc(labels[i])}</span>`).join("");
 
   $("#dashboard").innerHTML = `
@@ -322,8 +328,8 @@ function renderDashboard() {
           ${srow("Free Lunacy", free, false, fillColor(LUNACY_FILL.lunacy), RESOURCE_ICON.lunacy)}
           ${erow("Extraction Tickets", "lunacy.extTickets", s.lunacy.extTickets, false, fillColor(LUNACY_FILL.ticket), RESOURCE_ICON.extraction)}
           ${erow("Deca Tickets", "lunacy.decaTickets", s.lunacy.decaTickets, false, fillColor(LUNACY_FILL.ticket), RESOURCE_ICON.deca)}
-          ${srow("Rolls (10-roll)", rolls10)}
-          ${srow("Total Rolls", rollsTotal, true)}
+          ${srow("Rolls (10-roll)", rolls10, false, null, null, roll10Mark)}
+          ${srow("Total Rolls", rollsTotal, true, null, null, rollTotalMark)}
         </div></div>
       </div>
 
@@ -364,7 +370,9 @@ function renderDashboard() {
             <tbody><tr><td style="white-space:nowrap">${icoTag(RESOURCE_ICON.egoshard)}Shards</td>${SINNER_ORDER.map((n) => {
               const i = state.sinners.findIndex((x) => x.name === n);
               const sh = state.sinners[i]?.shards ?? 0;
-              return `<td class="num${sh < 50 ? " shard-low-cell" : ""}" title="${sh < 50 ? "Low shards (<50)" : ""}"><input type="number" class="kv-num" data-path="sinners.${i}.shards" value="${sh}" style="${styleAttr(sinnerColor(n))}"/></td>`;
+              const mk = sh < 50 ? "mark-red" : sh < 150 ? "mark-orange" : sh < 300 ? "mark-yellow" : "";
+              const mkTitle = mk === "mark-red" ? "Very low shards (<50)" : mk === "mark-orange" ? "Low shards (<150)" : mk === "mark-yellow" ? "Shards under 300" : "";
+              return `<td class="num${mk ? " cell-mark " + mk : ""}" title="${mkTitle}"><input type="number" class="kv-num" data-path="sinners.${i}.shards" value="${sh}" style="${styleAttr(sinnerColor(n))}"/></td>`;
             }).join("")}</tr></tbody>
           </table>
         </div>
