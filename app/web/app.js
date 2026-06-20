@@ -994,8 +994,9 @@ function wireListFilterClose() {
 function renderEditableList(viewId, arrayName, columns, searchKeys, makeBlank) {
   const root = $("#" + viewId);
   const colByKey = Object.fromEntries(columns.map((c) => [c.key, c]));
-  // filterable tag columns (keyword / extra keyword); each gets a Set of picks
-  const filterCols = columns.filter((c) => c.type === "tags" && (c.key === "keyword" || c.key === "extraKeyword"));
+  // filterable columns (marked with `filter: true`); each gets a Set of picks.
+  // tags use AND-contains semantics; select/num use "value is one of the picks".
+  const filterCols = columns.filter((c) => c.filter);
   const fstate = listFilters[viewId] || (listFilters[viewId] = {});
   filterCols.forEach((c) => { if (!fstate[c.key]) fstate[c.key] = new Set(); });
 
@@ -1022,6 +1023,23 @@ function renderEditableList(viewId, arrayName, columns, searchKeys, makeBlank) {
     const extras = [...set].filter((t) => !order || !order.includes(t))
       .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
     return order ? [...order, ...extras] : extras;
+  };
+  // A row's filter value for a non-tags column (num: blank counts as 0).
+  const filterVal = (col, it) => (col.type === "num" ? String(Number(it[col.key]) || 0) : String(it[col.key] ?? ""));
+  // Distinct option values offered by a filterable column.
+  const filterOpts = (col) => {
+    if (col.type === "tags") {
+      const present = new Set();
+      state[arrayName].forEach((it) => splitTags(it[col.key]).forEach((t) => present.add(t)));
+      return distinctTags(col.key, col.optOrder).filter((t) => present.has(t));
+    }
+    const vals = new Set();
+    state[arrayName].forEach((it) => vals.add(filterVal(col, it)));
+    const arr = [...vals].filter((v) => v !== "");
+    if (col.type === "num") arr.sort((a, b) => Number(a) - Number(b));
+    else if (col.options) arr.sort((a, b) => col.options.indexOf(a) - col.options.indexOf(b));
+    else arr.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+    return arr;
   };
 
   const chipHtml = (tc, t) => { const c = tc && tc(t); return c ? `<span class="chip" style="background:${c.fill};color:${c.font}">${esc(t)}</span>` : `<span class="chip plain">${esc(t)}</span>`; };
@@ -1092,10 +1110,15 @@ function renderEditableList(viewId, arrayName, columns, searchKeys, makeBlank) {
     const ownedOnly = $("#" + viewId + "-owned").checked;
     const rows = arr.map((it, idx) => ({ it, idx })).filter(({ it }) => {
       if (ownedOnly && !it.acquired) return false;
-      // keyword / extra-keyword filters: row must contain ALL picked tags
+      // active filters: tags must contain ALL picks; select/num value must be one of the picks
       for (const key in fstate) {
         const set = fstate[key];
-        if (set.size) { const tags = splitTags(it[key]); for (const t of set) if (!tags.includes(t)) return false; }
+        if (!set.size) continue;
+        const col = colByKey[key];
+        if (col.type === "tags") {
+          const tags = splitTags(it[key]);
+          for (const t of set) if (!tags.includes(t)) return false;
+        } else if (!set.has(filterVal(col, it))) return false;
       }
       if (!q) return true;
       return searchKeys.some((k) => String(it[k] ?? "").toLowerCase().includes(q));
@@ -1178,12 +1201,10 @@ function renderEditableList(viewId, arrayName, columns, searchKeys, makeBlank) {
   const buildFilters = () => {
     const host = $("#" + viewId + "-filters"); if (!host) return;
     host.innerHTML = filterCols.map((col) => {
-      const present = new Set();
-      state[arrayName].forEach((it) => splitTags(it[col.key]).forEach((t) => present.add(t)));
-      const opts = distinctTags(col.key, col.optOrder).filter((t) => present.has(t));
+      const opts = filterOpts(col);
       const set = fstate[col.key];
       const optHtml = opts.length
-        ? opts.map((t) => `<label class="ms-opt"><input type="checkbox" data-ftag="${esc(t)}" ${set.has(t) ? "checked" : ""}/> ${optIcon(col.iconCat, t) || ""}${esc(t)}</label>`).join("")
+        ? opts.map((t) => `<label class="ms-opt"><input type="checkbox" data-ftag="${esc(t)}" ${set.has(t) ? "checked" : ""}/> ${col.iconCat ? optDeco(col.iconCat, t) : ""}${esc(t)}</label>`).join("")
         : '<div class="hint">none in list</div>';
       return `<details class="list-filter" data-fkey="${col.key}"><summary>${esc(col.label)}${fbadge(set.size)}</summary>
         <div class="filter-panel">${opts.length > 10 ? '<input type="text" class="ms-search" placeholder="search…"/>' : ""}${optHtml}
@@ -1232,15 +1253,15 @@ function renderEditableList(viewId, arrayName, columns, searchKeys, makeBlank) {
 function renderIDs() {
   renderEditableList("ids", "ids", [
     { label: "ID Name", key: "name", type: "text", color: (v, it) => sinnerColor(it.sinner) },
-    { label: "Sinner", key: "sinner", type: "select", options: SINNER_ORDER, color: (v) => sinnerColor(v), iconCat: "sinner" },
-    { label: "Tier", key: "tier", type: "select", options: ["★", "★★", "★★★"], color: (v) => tierColor(v), iconCat: "tier" },
+    { label: "Sinner", key: "sinner", type: "select", options: SINNER_ORDER, color: (v) => sinnerColor(v), iconCat: "sinner", filter: true },
+    { label: "Tier", key: "tier", type: "select", options: ["★", "★★", "★★★"], color: (v) => tierColor(v), iconCat: "tier", filter: true },
     { label: "Season", key: "season", type: "tags", tagColor: seasonTagColor, iconCat: "season" },
-    { label: "Keyword", key: "keyword", type: "tags", tagColor: keywordTagColor, optOrder: KEYWORD_ORDER, iconCat: "keyword" },
-    { label: "Extra Keyword", key: "extraKeyword", type: "tags", iconCat: "keyword", optOrder: extraKeywordNames() },
+    { label: "Keyword", key: "keyword", type: "tags", tagColor: keywordTagColor, optOrder: KEYWORD_ORDER, iconCat: "keyword", filter: true },
+    { label: "Extra Keyword", key: "extraKeyword", type: "tags", iconCat: "keyword", optOrder: extraKeywordNames(), filter: true },
     { label: "Owned", key: "acquired", type: "check" },
     { label: "Lv", key: "level", type: "num", color: (v) => levelColor(v) },
     { label: "LvExt", key: "levelExtra", type: "num" },
-    { label: "UT", key: "uptie", type: "num", color: (v) => scaleColor(v) },
+    { label: "UT", key: "uptie", type: "num", color: (v) => scaleColor(v), filter: true },
     { label: "Released", key: "release", type: "date" },
     { label: "IID", key: "internalId", type: "num" },
   ], ["name", "sinner", "keyword", "extraKeyword", "season"],
@@ -1249,14 +1270,14 @@ function renderIDs() {
 function renderEGOs() {
   renderEditableList("egos", "egos", [
     { label: "EGO Name", key: "name", type: "text", color: (v, it) => sinnerColor(it.sinner) },
-    { label: "Sinner", key: "sinner", type: "select", options: SINNER_ORDER, color: (v) => sinnerColor(v), iconCat: "sinner" },
+    { label: "Sinner", key: "sinner", type: "select", options: SINNER_ORDER, color: (v) => sinnerColor(v), iconCat: "sinner", filter: true },
     { label: "Sin", key: "sin", type: "select", options: SIN_ORDER, color: (v) => sinColor(v), iconCat: "sin" },
-    { label: "Grade", key: "tier", type: "select", options: ["ZAYIN", "TETH", "HE", "WAW", "ALEPH"], color: (v) => shardTypeColor(v), iconCat: "grade" },
+    { label: "Grade", key: "tier", type: "select", options: ["ZAYIN", "TETH", "HE", "WAW", "ALEPH"], color: (v) => shardTypeColor(v), iconCat: "grade", filter: true },
     { label: "Season", key: "season", type: "tags", tagColor: seasonTagColor, iconCat: "season" },
-    { label: "Keyword", key: "keyword", type: "tags", tagColor: keywordTagColor, optOrder: KEYWORD_ORDER, iconCat: "keyword" },
-    { label: "Extra Keyword", key: "extraKeyword", type: "tags", iconCat: "keyword", optOrder: extraKeywordNames() },
+    { label: "Keyword", key: "keyword", type: "tags", tagColor: keywordTagColor, optOrder: KEYWORD_ORDER, iconCat: "keyword", filter: true },
+    { label: "Extra Keyword", key: "extraKeyword", type: "tags", iconCat: "keyword", optOrder: extraKeywordNames(), filter: true },
     { label: "Owned", key: "acquired", type: "check" },
-    { label: "TS", key: "threadspin", type: "num", color: (v) => scaleColor(v) },
+    { label: "TS", key: "threadspin", type: "num", color: (v) => scaleColor(v), filter: true },
     { label: "Released", key: "release", type: "date" },
     { label: "IID", key: "internalId", type: "num" },
     { label: "TS5", key: "ts5", type: "check" },
