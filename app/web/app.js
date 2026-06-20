@@ -1,6 +1,6 @@
 import { ACTIONS, run, recompute } from "./logic.js";
 import {
-  UPTIE, THREADSPIN, SPINCHAIN, UPTIE_LEVEL, TS_STEP_LEVEL, LUNACY_ACTIONS, TICKET_ACTIONS, GACHA_TIERS,
+  UPTIE, THREADSPIN, SPINCHAIN, SHARD_DELTA, UPTIE_LEVEL, TS_STEP_LEVEL, LUNACY_ACTIONS, TICKET_ACTIONS, GACHA_TIERS,
   SINNER_ORDER, SINNER_COLORS, LEVEL_FILL, LEVEL_FILL_DEFAULT, SCALE_STOPS,
   SHARD_TYPE_FILL, GACHA_TIER_FILL, DAY_FILL,
   EVENT_ITEM_FILL, EVENT_REWARD_FILL, SIN_ORDER, SIN_FILL,
@@ -864,7 +864,10 @@ function renderActions() {
     // show only the TS steps that still advance the EGO ("from 1" only at TS1)
     ["TS2", "TS3", "TS3_1", "TS4"].filter((step) => step === "TS3_1" ? tsCur === 1 : tsCur < TS_STEP_LEVEL[step]).forEach((step) => {
       const bn = btn("", () => act((s) => ACTIONS.threadspin(s, grade, step)));
-      bn.innerHTML = `${esc(step.replace("_1", " (from 1)"))} (${icoTag(RESOURCE_ICON.thread)}${Math.abs(THREADSPIN[grade][step])})`;
+      const g = THREADSPIN[grade];
+      // TS4 also costs that sinner's EGO shards (SHARD_DELTA[grade]) — show it too
+      const shardCost = (step === "TS4" && g.shard) ? ` +${sinnerShardIco(state.egos[state.uptie.egoIdx]?.sinner)}${Math.abs(SHARD_DELTA[g.shard] || 0)}` : "";
+      bn.innerHTML = `${esc(step.replace("_1", " (from 1)"))} (${icoTag(RESOURCE_ICON.thread)}${Math.abs(g[step])})${shardCost}`;
       rr.append(bn);
     });
     const ts5Btn = (method) => {
