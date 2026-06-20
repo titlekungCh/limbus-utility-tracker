@@ -40,6 +40,18 @@ function shardAddDirect(s, sinnerName, amount) {
   if (i < 0) return;
   s.sinners[i].shards = round2(s.sinners[i].shards + amount);
 }
+// Buy out a shop item by name: deduct (remaining*cost) event currency, add the
+// gained resource (perUnit per remaining unit) to inventory, mark fully bought.
+function buyEventItem(s, name, perUnit, add) {
+  const it = s.event.items.find((x) => x.name === name);
+  if (!it) return;
+  const remaining = Math.max(0, round2(it.total - it.bought));
+  if (remaining <= 0) { note(`${name}: already bought`); return; }
+  s.event.currency = round2(s.event.currency - remaining * it.cost);
+  if (perUnit && add) add(s, round2(perUnit * remaining));
+  it.bought = it.total;
+  note(`${name}: bought ${remaining} (-${round2(remaining * it.cost)} currency)`);
+}
 
 // ---------- manager level / XP curve ----------
 function nextXPForLevel(s, level) {
@@ -267,7 +279,19 @@ export const ACTIONS = {
     note(`${grade} ${step}: ${g[step]} threads`);
   },
 
-  // (Intervallo event shop is handled by the editable Event Shop tab, not here.)
+  // --- For Completing Intervallo Shop (ported from Code.gs) ---
+  // Buys out a shop item: adds its resource to inventory, deducts the currency,
+  // and marks it fully bought. perUnit = resource gained per shop unit.
+  intvStart:        (s) => { s.event.items.forEach((it) => { it.bought = 0; }); s.event.rewards.forEach((r) => { r.claimed = false; }); note("Intervallo start: shop reset"); },
+  intvIV:           (s) => buyEventItem(s, "IV Ticket", 1, (s2, n) => tA(s2, "IV", n)),
+  intvIII:          (s) => buyEventItem(s, "III Ticket", 1, (s2, n) => tA(s2, "III", n)),
+  intvBothTickets:  (s) => { ACTIONS.intvIV(s); ACTIONS.intvIII(s); },
+  intvThreads:      (s) => buyEventItem(s, "Threads", 5, (s2, n) => threadAdd(s2, n)),
+  intvCrates:       (s) => buyEventItem(s, "Crates", 5, (s2, n) => crateAdd(s2, n)),
+  intvRandomCrates: (s) => buyEventItem(s, "Random Crates", 0, null),
+  intvEnkeBox:      (s) => buyEventItem(s, "Enkephalin Box", 0, null),
+  intvExtraction:   (s) => buyEventItem(s, "Extraction Ticket", 1, (s2, n) => { s2.lunacy.extTickets = round2((s2.lunacy.extTickets || 0) + n); }),
+  intvTheRest:      (s) => { s.event.rewards.forEach((r) => { r.claimed = true; }); note("Intervallo: all rewards claimed"); },
 
   // --- Full daily schedule (Daily Paid Pull + Monthly Free, then Daily Lux) ---
   fullCourse: (s) => { pLCH(s, -13); fLCH(s, 91); ACTIONS.addDailyXP(s); note("Full daily schedule done"); },

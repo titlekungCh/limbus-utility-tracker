@@ -629,6 +629,21 @@ function renderEventShop() {
   const es = eventShop(state);
   const e = state.event;
 
+  // Currency-to-finish marker: one row at a time, the highest-priority item/reward
+  // that still needs currency. Colour = how affordable it is now (red->yellow->green).
+  const EVENT_PRIORITY = ["ID/EGO Reward", "Extraction Ticket", "Enkephalin Box", "Random Crates", "Crates", "Threads", "III Ticket", "IV Ticket", "Announcer", "Banner Effect", "Ticket Effect", "Banner", "Ticket"];
+  let focus = null;
+  for (const nm of EVENT_PRIORITY) {
+    const ii = es.items.findIndex((x) => x.name === nm);
+    if (ii >= 0) { if (es.items[ii].toFinish > 0) { focus = { table: "items", idx: ii, cost: es.items[ii].toFinish }; break; } continue; }
+    const ri = es.rewards.findIndex((x) => x.name === nm);
+    if (ri >= 0 && es.rewards[ri].due > 0) { focus = { table: "rewards", idx: ri, cost: es.rewards[ri].due }; break; }
+  }
+  const focusColor = focus ? shardPctColor(es.currency, focus.cost) : "";
+  const focusTitle = focus ? `${fmt(Math.max(0, round2(focus.cost - es.currency)))} more than current currency (${fmt(focus.cost)} to finish, have ${fmt(es.currency)})` : "";
+  const focusMark = (table, i) => (focus && focus.table === table && focus.idx === i)
+    ? ` cell-mark mark-dyn" style="--mark:${focusColor}" title="${focusTitle}` : "";
+
   root.innerHTML = `
     <div class="grid">
       <div class="card">
@@ -645,6 +660,27 @@ function renderEventShop() {
         </div>
       </div>
 
+      <div class="card">
+        <h2>Complete Intervallo Shop <span class="count">(buy-out: adds resource, spends currency)</span></h2>
+        <div class="body">
+          <div class="btnrow">
+            <button class="act" data-ev="intvStart" title="New event: reset all Bought to 0 and unclaim all rewards">Intervallo Start</button>
+            <button class="act" data-ev="intvTheRest" title="Mark every one-time reward claimed">The Rest</button>
+          </div>
+          <div class="subhead">Buy out an item</div>
+          <div class="btnrow">
+            <button class="act" data-ev="intvBothTickets">Both Tickets</button>
+            <button class="act" data-ev="intvIV">IV Tickets</button>
+            <button class="act" data-ev="intvIII">III Tickets</button>
+            <button class="act" data-ev="intvThreads">Threads</button>
+            <button class="act" data-ev="intvCrates">Crates</button>
+            <button class="act" data-ev="intvRandomCrates">Random Crates</button>
+            <button class="act" data-ev="intvEnkeBox">Enkephalin Box</button>
+            <button class="act" data-ev="intvExtraction">Extraction Tickets</button>
+          </div>
+        </div>
+      </div>
+
       <div class="card" style="grid-column: 1 / -1;">
         <h2>Shop Items <span class="count">(enter Cost/Total per event; Bought as you buy)</span></h2>
         <div class="body" style="padding:0;">
@@ -657,7 +693,7 @@ function renderEventShop() {
                 <td class="num"><input type="number" class="qty" data-t="items" data-i="${i}" data-f="total" value="${fmt(it.total)}"/></td>
                 <td class="num"><input type="number" class="qty" data-t="items" data-i="${i}" data-f="bought" value="${fmt(it.bought)}"/></td>
                 <td class="num">${fmt(it.remaining)}</td>
-                <td class="num ${it.toFinish > 0 ? "shard-low" : "shard-ok"}">${fmt(it.toFinish)}</td>
+                <td class="num ${it.toFinish > 0 ? "shard-low" : "shard-ok"}${focusMark("items", i)}">${fmt(it.toFinish)}</td>
               </tr>`).join("")}</tbody>
           </table>
         </div>
@@ -675,7 +711,7 @@ function renderEventShop() {
                   ? `${fmt(r.cost)} <span class="count">(by type)</span>`
                   : `<input type="number" class="qty" data-t="rewards" data-i="${i}" data-f="cost" value="${fmt(r.cost)}"/>`}</td>
                 <td style="text-align:center"><input type="checkbox" data-t="rewards" data-i="${i}" data-f="claimed" ${r.claimed ? "checked" : ""}/></td>
-                <td class="num ${r.due > 0 ? "shard-low" : "shard-ok"}">${fmt(r.due)}</td>
+                <td class="num ${r.due > 0 ? "shard-low" : "shard-ok"}${focusMark("rewards", i)}">${fmt(r.due)}</td>
               </tr>`).join("")}</tbody>
           </table>
         </div>
@@ -684,6 +720,10 @@ function renderEventShop() {
 
   $("#ev-rtype").addEventListener("change", (ev) => { state.event.rewardType = ev.target.value; renderEventShop(); autosave(); });
   $("#ev-currency").addEventListener("change", (ev) => setSelection("event.currency", Number(ev.target.value) || 0));
+  root.querySelectorAll("button[data-ev]").forEach((b) => b.addEventListener("click", () => {
+    act(ACTIONS[b.dataset.ev]);   // runs + recomputes + autosaves + re-renders dashboard/inventory
+    renderEventShop();            // refresh this page (currency, bought, markers)
+  }));
   root.querySelectorAll("input[data-t]").forEach((node) => {
     node.addEventListener("change", (ev) => {
       const t = ev.target.dataset.t, i = +ev.target.dataset.i, f = ev.target.dataset.f;
