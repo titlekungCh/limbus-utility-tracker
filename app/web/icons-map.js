@@ -21,7 +21,7 @@ export const OPTION_ICONS = {
     "Charge": "icons/keyword/charge.webp",
     "Clash Power Down": "icons/keyword/clashPowerDown.webp",
     "Clash Power Up": "icons/keyword/clashPowerUp.webp",
-    "Clashable Counter": "icons/keyword/clashableGuard.webp",
+    "Clashable Counter": "icons/keyword/clashableCounter.webp",
     "Clashable Guard": "icons/keyword/clashableGuard.webp",
     "Crit DMG Up": "icons/keyword/damageCriticalHit.webp",
     "Curse": "icons/keyword/curse.webp",
