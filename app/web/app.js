@@ -1193,6 +1193,10 @@ function renderEditableList(viewId, arrayName, columns, searchKeys, makeBlank) {
     const arr = state[arrayName];
     const q = $("#" + viewId + "-search").value.trim().toLowerCase();
     const ownedOnly = $("#" + viewId + "-owned").checked;
+    // space-separated terms: plain term must match (AND), "-term" must NOT match.
+    const terms = q.split(/\s+/).filter(Boolean);
+    const pos = terms.filter((t) => !t.startsWith("-"));
+    const neg = terms.filter((t) => t.startsWith("-") && t.length > 1).map((t) => t.slice(1));
     const rows = arr.map((it, idx) => ({ it, idx })).filter(({ it }) => {
       if (ownedOnly && !it.acquired) return false;
       // active filters: tags must contain ALL picks; select/num value must be one of the picks
@@ -1205,8 +1209,10 @@ function renderEditableList(viewId, arrayName, columns, searchKeys, makeBlank) {
           for (const t of set) if (!tags.includes(t)) return false;
         } else if (!set.has(filterVal(col, it))) return false;
       }
-      if (!q) return true;
-      return searchKeys.some((k) => String(it[k] ?? "").toLowerCase().includes(q));
+      const hasTerm = (term) => searchKeys.some((k) => String(it[k] ?? "").toLowerCase().includes(term));
+      for (const t of neg) if (hasTerm(t)) return false;   // exclude rows containing a -term
+      for (const t of pos) if (!hasTerm(t)) return false;  // require each plain term
+      return true;
     });
     // sort by release date, then internal id (blanks last)
     rows.sort((a, b) => {
