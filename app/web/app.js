@@ -56,6 +56,17 @@ const sinnerIco = (name) => icoTag(OPTION_ICONS.sinner[name], SINNER_COLORS[name
 const sinnerShardIco = (name) => icoTag(SINNER_SHARD_ICON[name] || RESOURCE_ICON.egoshard);
 // progress colour 0%->red, 50%->yellow, 100%->green (owned vs needed shard marker)
 const shardPctColor = (owned, needed) => `hsl(${Math.round(120 * (needed > 0 ? Math.max(0, Math.min(1, owned / needed)) : 1))}, 90%, 52%)`;
+// event-shop affordability curve: red(0%)->orange(50%)->yellow(65%)->lime(85%)->green(100%)
+const eventPctColor = (have, cost) => {
+  const p = cost > 0 ? Math.max(0, Math.min(1, have / cost)) : 1;
+  const stops = [[0, 0], [0.5, 30], [0.65, 60], [0.85, 90], [1, 120]];
+  let hue = 120;
+  for (let k = 1; k < stops.length; k++) {
+    const [p0, h0] = stops[k - 1], [p1, h1] = stops[k];
+    if (p <= p1) { hue = h0 + (h1 - h0) * (p - p0) / (p1 - p0); break; }
+  }
+  return `hsl(${Math.round(hue)}, 90%, 52%)`;
+};
 // sinner acronym -> sinner name (e.g. "HL" -> "Hong Lu"); built from state.sinners
 let _acroName = null;
 const acroNameMap = () => {
@@ -645,7 +656,7 @@ function renderEventShop() {
     const afford = budget >= entry.cost;
     const short = Math.max(0, Math.round((entry.cost - budget) * 100) / 100);
     marks[entry.t + ":" + entry.i] = {
-      color: afford ? "#ffffff" : shardPctColor(budget, entry.cost),
+      color: afford ? "#ffffff" : eventPctColor(budget, entry.cost),
       title: afford
         ? `Affordable now (${fmt(entry.cost)} to finish, ${fmt(budget)} available)`
         : `${fmt(short)} more than available currency (${fmt(entry.cost)} to finish, ${fmt(budget)} available)`,
