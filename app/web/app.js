@@ -644,7 +644,7 @@ function renderEventShop() {
   // currency on each fully-affordable row (marked white) and cascading the leftover
   // to the next; the first row the leftover can't fully cover gets the gradient
   // colour (red->yellow->green), and the rest stay unmarked.
-  const EVENT_PRIORITY = ["ID/EGO Reward", "Extraction Ticket", "Enkephalin Box", "Random Crates", "Crates", "Threads", "III Ticket", "IV Ticket", "Announcer", "Banner Effect", "Ticket Effect", "Banner", "Ticket"];
+  const EVENT_PRIORITY = ["ID/EGO Reward", "Extraction Ticket", "Enkephalin Box", "Random Crates", "Crates", "Threads", "III Ticket", "IV Ticket", "Announcer", "Ticket Effect", "Banner Effect", "Ticket", "Banner"];
   const marks = {};   // "items:0" / "rewards:1" -> { color, title }
   let budget = es.currency;
   for (const nm of EVENT_PRIORITY) {
