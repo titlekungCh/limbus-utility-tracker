@@ -1,12 +1,12 @@
 import { ACTIONS, run, recompute } from "./logic.js";
 import {
-  UPTIE, THREADSPIN, SPINCHAIN, SHARD_DELTA, UPTIE_LEVEL, TS_STEP_LEVEL, LUNACY_ACTIONS, TICKET_ACTIONS, GACHA_TIERS,
+  UPTIE, THREADSPIN, SPINCHAIN, SHARD_DELTA, UPTIE_LEVEL, TS_STEP_LEVEL, LUNACY_ACTIONS, TICKET_ACTIONS, GACHA_TIERS, PULL,
   SINNER_ORDER, SINNER_COLORS, LEVEL_FILL, LEVEL_FILL_DEFAULT, SCALE_STOPS,
   SHARD_TYPE_FILL, GACHA_TIER_FILL, DAY_FILL,
   EVENT_ITEM_FILL, EVENT_REWARD_FILL, SIN_ORDER, SIN_FILL,
   STATUS_ORDER, STATUS_FILL, FACTION_COLORS, SCALE_MAX5, SEASON_FILL, TIER_FILL,
   SEASON_NUMBER_FILL, KEYWORD_FILL, KEYWORD_ORDER, DAYS, INVENTORY_FILL, LUNACY_FILL,
-  DAILY_LEFT_FILL, WEEKLY_LEFT_FILL, RESOURCE_ICON, SINNER_SHARD_ICON, EXTRA_KEYWORD_ALL,
+  DAILY_LEFT_FILL, WEEKLY_LEFT_FILL, RESOURCE_ICON, SINNER_SHARD_ICON, EVENT_ITEM_ICON, EXTRA_KEYWORD_ALL,
 } from "./constants.js";
 import { OPTION_ICONS, GRADE_GLYPH } from "./icons-map.js";
 
@@ -323,7 +323,7 @@ function renderDashboard() {
       <div class="card">
         <h2>Inventory</h2>
         <div class="body"><div class="kv">
-          ${erow("Crates", "inventory.crate", s.inventory.crate, true, invColor("inventory.crate"))}
+          ${erow("Crates", "inventory.crate", s.inventory.crate, true, invColor("inventory.crate"), RESOURCE_ICON.crate)}
           ${erow("Limbus Pass Lv", "inventory.pass", fmtPass(s.inventory.pass), false, invColor("inventory.pass"))}
           ${erow("Threads", "inventory.threads", s.inventory.threads, false, invColor("inventory.threads"), RESOURCE_ICON.thread)}
           ${erow("IV Ticket", "inventory.tickets.IV", t.IV, false, invColor("inventory.tickets.IV"), RESOURCE_ICON.IV)}
@@ -497,8 +497,8 @@ function renderForecast() {
                 <td class="num">${fmt(p.shardNeeded)}</td>
                 <td class="num${p.enabled ? " cell-mark mark-dyn" : ""}"${p.enabled ? ` style="--mark:${shardPctColor(p.shardsOwned, p.shardNeeded)}" title="${fmt(p.shardsOwned)} / ${fmt(p.shardNeeded)} needed (${Math.round((p.shardNeeded > 0 ? Math.min(1, p.shardsOwned / p.shardNeeded) : 1) * 100)}%)"` : ""}>${fmt(p.shardsOwned)}</td>
                 <td class="num ${p.shardShort > 0 ? "shard-low" : "shard-ok"}">${fmt(p.shardShort)}</td>
-                <td class="num">${fmt(p.crateNeeded)}</td>
-                <td class="num">${fmt(p.threadNeeded)}</td>
+                <td class="num">${fmt(p.crateNeeded)}${icoTag(RESOURCE_ICON.crate)}</td>
+                <td class="num">${fmt(p.threadNeeded)}${icoTag(RESOURCE_ICON.thread)}</td>
                 <td>${(() => {
                   const m = p.targetMode || "text";
                   const modeSel = `<select data-i="${p.index}" data-f="targetMode">${[["text", "Text"], ["one", "1 ID/EGO"], ["two", "2 ID/EGO"]].map(([v, l]) => `<option value="${v}"${v === m ? " selected" : ""}>${l}</option>`).join("")}</select>`;
@@ -694,14 +694,14 @@ function renderEventShop() {
           </div>
           <div class="subhead">Buy out an item</div>
           <div class="btnrow">
-            <button class="act" data-ev="intvBothTickets">Both Tickets</button>
-            <button class="act" data-ev="intvIV">IV Tickets</button>
-            <button class="act" data-ev="intvIII">III Tickets</button>
-            <button class="act" data-ev="intvThreads">Threads</button>
-            <button class="act" data-ev="intvCrates">Crates</button>
-            <button class="act" data-ev="intvRandomCrates">Random Crates</button>
-            <button class="act" data-ev="intvEnkeBox">Enkephalin Box</button>
-            <button class="act" data-ev="intvExtraction">Extraction Tickets</button>
+            <button class="act" data-ev="intvBothTickets" title="Both Tickets (III + IV)">${icoTag(RESOURCE_ICON.III)}${icoTag(RESOURCE_ICON.IV)}</button>
+            <button class="act" data-ev="intvIV" title="IV Tickets">${icoTag(RESOURCE_ICON.IV)}</button>
+            <button class="act" data-ev="intvIII" title="III Tickets">${icoTag(RESOURCE_ICON.III)}</button>
+            <button class="act" data-ev="intvThreads" title="Threads">${icoTag(RESOURCE_ICON.thread)}</button>
+            <button class="act" data-ev="intvCrates" title="Crates">${icoTag(RESOURCE_ICON.crate)}</button>
+            <button class="act" data-ev="intvRandomCrates" title="Random Crates">${icoTag(RESOURCE_ICON.randomCrate)}</button>
+            <button class="act" data-ev="intvEnkeBox" title="Enkephalin Box">${icoTag(RESOURCE_ICON.enkephalin)}</button>
+            <button class="act" data-ev="intvExtraction" title="Extraction Tickets">${icoTag(RESOURCE_ICON.extraction)}</button>
           </div>
         </div>
       </div>
@@ -713,7 +713,7 @@ function renderEventShop() {
             <thead><tr><th>Item</th><th class="num">Cost/Unit</th><th class="num">Total</th><th class="num">Bought</th><th class="num">Remaining</th><th class="num">Currency to Finish</th></tr></thead>
             <tbody>${es.items.map((it, i) => `
               <tr>
-                <td style="${styleAttr(fillColor(EVENT_ITEM_FILL[it.name]))}">${esc(it.name)}</td>
+                <td style="${styleAttr(fillColor(EVENT_ITEM_FILL[it.name]))}">${icoTag(EVENT_ITEM_ICON[it.name])}${esc(it.name)}</td>
                 <td class="num"><input type="number" class="qty" data-t="items" data-i="${i}" data-f="cost" value="${fmt(it.cost)}"/></td>
                 <td class="num"><input type="number" class="qty" data-t="items" data-i="${i}" data-f="total" value="${fmt(it.total)}"/></td>
                 <td class="num"><input type="number" class="qty" data-t="items" data-i="${i}" data-f="bought" value="${fmt(it.bought)}"/></td>
@@ -879,22 +879,31 @@ function renderActions() {
     b.appendChild(blk);
   });
 
-  // Extractions / Lunacy
+  // Extractions / Lunacy (each button tagged with the lunacy icon)
   b = panel("Extractions (Lunacy)");
   r = row(b);
-  Object.keys(LUNACY_ACTIONS).forEach((k) => r.append(btn(LUNACY_ACTIONS[k].label, () => act((s) => ACTIONS.lunacy(s, k)))));
+  Object.keys(LUNACY_ACTIONS).forEach((k) => { const bn = btn(LUNACY_ACTIONS[k].label, () => act((s) => ACTIONS.lunacy(s, k))); bn.innerHTML = `${icoTag(RESOURCE_ICON.lunacy)}${esc(LUNACY_ACTIONS[k].label)}`; r.append(bn); });
   const cpl = el(`<div class="field"><label>Custom</label><input type="number" class="qty" id="cpl" placeholder="paid"/></div>`);
   b.appendChild(cpl);
   r = row(b);
-  r.append(btn("Add Paid Lunacy", () => act((s) => ACTIONS.customPaidLunacy(s, $("#cpl").value))));
+  const aplBtn = btn("Add Paid Lunacy", () => act((s) => ACTIONS.customPaidLunacy(s, $("#cpl").value)));
+  aplBtn.innerHTML = `${icoTag(RESOURCE_ICON.lunacy)}Add Paid Lunacy`;
+  r.append(aplBtn);
 
-  // Pulls
+  // Pulls — tag each with the resource the pull would currently consume
   b = panel("Pulls");
   r = row(b);
-  r.append(
-    btn("Single Pull", () => act(ACTIONS.pull1Pull)),
-    btn("10-Pull", () => act(ACTIONS.pull10Pulls), "primary"),
-  );
+  const free = state.lunacy.total - state.lunacy.paid;
+  const singleIco = state.lunacy.extTickets >= PULL.single.ext ? RESOURCE_ICON.extraction
+    : free >= PULL.single.lunacy ? RESOURCE_ICON.lunacy : null;
+  const decaIco = state.lunacy.decaTickets >= PULL.deca.deca ? RESOURCE_ICON.deca
+    : state.lunacy.extTickets >= PULL.deca.ext ? RESOURCE_ICON.extraction
+    : free >= PULL.deca.lunacy ? RESOURCE_ICON.lunacy : null;
+  const singlePull = btn("Single Pull", () => act(ACTIONS.pull1Pull));
+  if (singleIco) singlePull.innerHTML = `Single Pull ${icoTag(singleIco)}`;
+  const tenPull = btn("10-Pull", () => act(ACTIONS.pull10Pulls), "primary");
+  if (decaIco) tenPull.innerHTML = `10-Pull ${icoTag(decaIco)}`;
+  r.append(singlePull, tenPull);
   const pc = el(`<div class="field"><label>Custom</label><input type="number" class="qty" id="pc" placeholder="# pulls"/></div>`);
   b.appendChild(pc);
   r = row(b);

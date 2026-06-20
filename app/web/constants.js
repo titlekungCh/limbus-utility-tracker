@@ -224,6 +224,19 @@ export const RESOURCE_ICON = {
   II: "icons/resource/ticket-2.webp",
   III: "icons/resource/ticket-3.webp",
   IV: "icons/resource/ticket-4.webp",
+  crate: "icons/resource/crate.webp",
+  randomCrate: "icons/resource/random-crate.webp",
+  enkephalin: "icons/resource/enkephalin.webp",
+};
+// Event-shop item name -> resource icon (shown before the item name + on buy-out buttons).
+export const EVENT_ITEM_ICON = {
+  "IV Ticket": "icons/resource/ticket-4.webp",
+  "III Ticket": "icons/resource/ticket-3.webp",
+  "Threads": "icons/resource/thread.webp",
+  "Crates": "icons/resource/crate.webp",
+  "Random Crates": "icons/resource/random-crate.webp",
+  "Enkephalin Box": "icons/resource/enkephalin.webp",
+  "Extraction Ticket": "icons/resource/extraction.webp",
 };
 // Per-sinner shard icons (used for uptie/threadspin where the shard belongs to a
 // specific sinner) — keyed by sinner name; falls back to RESOURCE_ICON.egoshard.
