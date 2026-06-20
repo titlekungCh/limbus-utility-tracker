@@ -120,6 +120,9 @@ const extraKeywordNames = () =>
 // icon shown before a dropdown option (not part of its text); "" when none maps
 const optIcon = (cat, val) => (cat === "sinner" ? sinnerIco(val)
   : cat === "keyword" ? icoTag(keywordIcon(val))
+  // numeric seasons resolve by convention (icons/season/s-N.webp) so a newly
+  // scraped season icon shows up without editing the map (see scrape_season_icons.py)
+  : cat === "season" ? icoTag((OPTION_ICONS.season && OPTION_ICONS.season[val]) || (/^\d+$/.test(val) ? `icons/season/s-${val}.webp` : ""))
   : icoTag(cat && OPTION_ICONS[cat] && OPTION_ICONS[cat][val]));
 // decoration before an option: image icon, or (for grade) the Hebrew glyph
 const optDeco = (cat, val) => (cat === "grade"
