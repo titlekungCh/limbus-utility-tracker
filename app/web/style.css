@@ -167,6 +167,8 @@ table.editlist tr.owned:hover td { background: #28391b; }
 .shard-ok { color: #bfe0a8; }
 /* Shard Planning: keep the data columns compact; let Target take the slack */
 #planTable th, #planTable td { white-space: nowrap; }
+/* Sinner name in the mono value font so it matches the numeric columns' size */
+#planTable td:first-child { font-family: var(--mono); }
 #planTable th:last-child, #planTable td:last-child { width: 100%; }
 #planTable td select[data-f="type"] { min-width: 0; }
 /* chooser on the left, picker(s) fill the rest — all on one line */
