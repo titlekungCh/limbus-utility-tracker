@@ -17,7 +17,7 @@ function currentPatchISO() {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 import {
-  managerForecast, resourceForecast, shardPlanRows, idLeveling, SHARD_TYPES,
+  managerForecast, resourceForecast, shardPlanRows, idLeveling, applyIdLeveling, SHARD_TYPES,
   eventShop, REWARD_TYPES, egoThreadspin, rentalWeekFlag,
 } from "./projections.js";
 
@@ -530,7 +530,8 @@ function renderIdLeveling() {
         `<select id="idlevel-name" style="${selSt}">${state.ids.map((x, i) => [x, i]).filter(([x]) => x.acquired).map(([x, i]) => `<option value="${i}"${i === idLevelSel.idx ? " selected" : ""}${optStyle(sinnerColor(x.sinner))} data-sinner="${esc(x.sinner)}">[${esc(x.name)}] ${esc(x.sinner)}</option>`).join("")}</select>`,
         "sinner", selId ? `[${selId.name}] ${selId.sinner}` : "", selId ? sinnerColor(selId.sinner) : null, selId ? optIcon("sinner", selId.sinner) : "")}</div>
     <div class="field"><label>Target Lv</label>
-      <input type="number" id="idlevel-target" class="qty" min="1" max="100" value="${idLevelSel.target}" style="${tgtSt}"/></div>
+      <input type="number" id="idlevel-target" class="qty" min="1" max="100" value="${idLevelSel.target}" style="${tgtSt}"/>
+      <button class="act primary" id="idlevel-apply"${res && res.xpNeeded > 0 && res.affordable ? "" : " disabled"} title="${res && res.xpNeeded <= 0 ? "Already at/above target" : res && !res.affordable ? "Not enough EXP tickets" : "Spend the tickets below and level this ID (stops ~1 Tier I short, no XP wasted)"}">Use Tickets</button></div>
     <div class="kv" style="margin-top:6px;">
       <div class="k" style="${lvlSt}">Current Level</div><div class="v" style="${lvlSt}">${res ? fmt(res.current) : "—"}</div>
       <div class="k">Level Extra XP</div><div class="v">${res ? fmt(res.levelExtra) : "—"}</div>
@@ -540,6 +541,14 @@ function renderIdLeveling() {
     <div class="kv">${ticketRows}</div>`;
   $("#idlevel-name").addEventListener("change", (e) => { idLevelSel.idx = +e.target.value; renderIdLeveling(); });
   $("#idlevel-target").addEventListener("change", (e) => { idLevelSel.target = Number(e.target.value) || 1; renderIdLeveling(); });
+  const applyBtn = $("#idlevel-apply");
+  if (applyBtn) applyBtn.addEventListener("click", () => {
+    const r = applyIdLeveling(state, idLevelSel.idx, idLevelSel.target);
+    if (!r) return;
+    renderDashboard();   // refresh calculator + Inventory ticket counts
+    renderIDs();         // reflect the new level / level-extra on the IDs page
+    autosave();
+  });
 }
 
 function renderEgoThreadspin() {

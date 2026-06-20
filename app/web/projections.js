@@ -135,6 +135,19 @@ export function totalXPAt(s, level) {
   const c = s.constants.idLevelCurve.find((r) => r.level === Math.round(level));
   return c ? c.totalXP : null;
 }
+// EXP-ticket XP values (Inventory M11:M14): IV=3000, III=1000, II=200, I=50.
+function ticketXpMap(s) {
+  return Array.isArray(s.constants.tickets)
+    ? Object.fromEntries(s.constants.tickets.map((t) => [t.tier, t.xp]))
+    : s.constants.ticketXP;
+}
+// Highest curve level whose cumulative totalXP is <= xp, plus the partial XP past it.
+export function levelForTotalXP(s, xp) {
+  const curve = s.constants.idLevelCurve;
+  let best = curve[0];
+  for (const r of curve) { if (r.totalXP <= xp) best = r; else break; }
+  return { level: best.level, extra: round2(xp - best.totalXP) };
+}
 export function idLeveling(s, idx, target) {
   const id = s.ids[idx];
   if (!id) return null;
@@ -144,10 +157,10 @@ export function idLeveling(s, idx, target) {
   // XP needed = totalXP(target) - totalXP(current) - current "level extra" XP (N9).
   const xpNeeded = Math.max(0, round2(atTarget - atCur - (id.levelExtra || 0)));
 
-  // Greedy EXP-ticket breakdown (Inventory M11:M14): IV=3000, III=1000, II=200, I=50.
-  const xp = Array.isArray(s.constants.tickets)
-    ? Object.fromEntries(s.constants.tickets.map((t) => [t.tier, t.xp]))
-    : s.constants.ticketXP;
+  // Greedy EXP-ticket breakdown, flooring each tier so the tickets never overshoot
+  // the target: after applying them you are < one Tier I ticket (50 XP) short, so
+  // no ticket XP is ever wasted (the `leftover` is filled by normal play).
+  const xp = ticketXpMap(s);
   let rem = xpNeeded;
   const need = {};
   for (const tier of ["IV", "III", "II", "I"]) {
@@ -156,8 +169,32 @@ export function idLeveling(s, idx, target) {
   }
   const owned = s.inventory.tickets;
   const left = { IV: owned.IV - need.IV, III: owned.III - need.III, II: owned.II - need.II, I: owned.I - need.I };
+  const affordable = left.IV >= 0 && left.III >= 0 && left.II >= 0 && left.I >= 0;
 
-  return { name: id.name, sinner: id.sinner, current, target, atCur, atTarget, levelExtra: id.levelExtra || 0, xpNeeded, need, left, leftover: rem };
+  return { name: id.name, sinner: id.sinner, current, target, atCur, atTarget, levelExtra: id.levelExtra || 0, xpNeeded, need, left, affordable, leftover: rem };
+}
+
+// Spend the EXP tickets from `idLeveling` on the chosen ID: subtract them from the
+// inventory and raise the ID's level / level-extra XP. Capped at owned tickets so
+// inventory never goes negative. Returns a summary, or null if nothing to do.
+export function applyIdLeveling(s, idx, target) {
+  const res = idLeveling(s, idx, target);
+  if (!res || res.xpNeeded <= 0) return null;
+  const id = s.ids[idx];
+  const xp = ticketXpMap(s);
+  const owned = s.inventory.tickets;
+  const used = {};
+  let appliedXP = 0;
+  for (const tier of ["IV", "III", "II", "I"]) {
+    used[tier] = Math.min(res.need[tier], owned[tier] || 0);
+    appliedXP += used[tier] * xp[tier];
+    owned[tier] = (owned[tier] || 0) - used[tier];
+  }
+  const newTotal = res.atCur + (id.levelExtra || 0) + appliedXP;
+  const { level, extra } = levelForTotalXP(s, newTotal);
+  id.level = level;
+  id.levelExtra = extra;
+  return { name: id.name, used, appliedXP, fromLevel: res.current, newLevel: level, newExtra: extra, target };
 }
 
 export const SHARD_TYPES = (s) => s.constants.shardTable.map((t) => t.type);
