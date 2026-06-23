@@ -1579,7 +1579,7 @@ function renderIFSS7() {
         <tbody>${statusCounts.map(([s, idn, egn]) => `<tr><td style="${styleAttr(statusColor(s))}">${esc(s)}</td><td class="num">${idn}</td><td class="num">${egn}</td></tr>`).join("")}</tbody></table>
       </div></div>
       <div class="card"><h2>Status Combo Legend <span class="count">(possible 2-status looks)</span></h2><div class="body" style="padding:0;">
-        <table class="sheet"><tbody>${(st.legend || []).map((row) => `<tr>${row.map((c) => `<td>${statusChips(c)}</td>`).join("")}</tr>`).join("")}</tbody></table>
+        <table class="sheet"><tbody>${(st.legend || []).map((row) => `<tr>${row.map((c) => `<td>${statusIconChips(c)}</td>`).join("")}</tr>`).join("")}</tbody></table>
       </div></div>
     </div>`;
 
