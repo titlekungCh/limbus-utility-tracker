@@ -1520,6 +1520,35 @@ function renderIFSS7() {
     return `<div class="k" style="${cs}">${esc(k)}</div><div class="v" style="${cs}">${esc(v)}</div>`;
   }).join("");
   const st = S.stats || {};
+
+  // computed stats (live; ported from the sheet's COUNTIF logic). IDs = actual[0..2]
+  // / keyword[0..2]; EGO = actual[3] / keyword[3]. Legend stays sheet reference data.
+  const actualIDs = S.above.flatMap((r) => (r.actual || []).slice(0, 3));
+  const actualEGO = S.above.map((r) => (r.actual || [])[3]);
+  const actualAll = S.above.flatMap((r) => r.actual || []);
+  const kwIDs = S.above.flatMap((r) => (r.keyword || []).slice(0, 3));
+  const kwEGO = S.above.map((r) => (r.keyword || [])[3]);
+  const cSub = (vals, sub) => vals.reduce((n, v) => n + (String(v ?? "").includes(sub) ? 1 : 0), 0);
+  const cNon = (vals) => vals.reduce((n, v) => n + (String(v ?? "").trim() ? 1 : 0), 0);
+  const cRe = (vals, re) => vals.reduce((n, v) => n + (re.test(String(v ?? "")) ? 1 : 0), 0);
+  const cEnds = (vals, suf) => vals.reduce((n, v) => n + (String(v ?? "").endsWith(suf) ? 1 : 0), 0);
+  const fingers = ["Thumb", "Index", "Middle", "Ring", "Pinky"];
+  const fingerRe = /Thumb|Index|Middle|Ring|Pinky/;
+  const actFinger = fingers.map((fn) => [fn, cSub(actualIDs, fn)]);
+  actFinger.push(["Walpurgisnaughts", cSub(actualAll, " Walp")]);
+  actFinger.push(["Intervallos & Bokgaks", cSub(actualAll, " Intv") + cEnds(actualAll, " Bkgk")]);
+  const totals = [
+    ["Non-Finger IDs", cNon(actualIDs) - cRe(actualIDs, fingerRe)],
+    ["Non-BP EGOs", cNon(actualEGO) - cSub(actualEGO, " BP")],
+    ["House of Spiders", cRe(actualIDs, /Father|Apprentice|App|Araya/)],
+    ["Total IDs", cNon(actualIDs)],
+    ["Total EGOs", cNon(actualEGO)],
+    ["No Faction Stuff", cNon(actualAll) - cRe(actualAll, /Thumb|Index|Middle|Ring|Pinky| Walp| Intv| Bkgk| BP/)],
+    ["Standard Fare", cSub(actualAll, " SF")],
+  ];
+  const statuses = ["Burn", "Bleed", "Tremor", "Rupture", "Sinking", "Poise", "Charge"];
+  const statusCounts = statuses.map((s) => [s, cSub(kwIDs, s), cSub(kwEGO, s)]);
+
   const picker = `<div class="field"><label>Season</label><select id="ifss-season" class="kv-select">${keys.map((k) => `<option value="${k}"${k === ifssSel ? " selected" : ""}>IF SS${k}</option>`).join("")}</select></div>`;
 
   root.innerHTML = `
@@ -1530,13 +1559,13 @@ function renderIFSS7() {
         <th>KW ID#1</th><th>KW ID#2</th><th>KW ID#3</th><th>KW EGO</th>
       </tr></thead><tbody id="ifss7-main">${mainRows}</tbody></table>
     </div>
-    <h2 class="section-title">Stats <span class="count">(from the sheet)</span></h2>
+    <h2 class="section-title">Stats <span class="count">(computed; legend from sheet)</span></h2>
     <div class="grid">
-      <div class="card"><h2>Actual Fingers / Source</h2><div class="body"><div class="kv">${kv2(st.actFinger, facLabel)}</div></div></div>
-      <div class="card"><h2>Totals</h2><div class="body"><div class="kv">${kv2(st.totals, facLabel)}</div></div></div>
+      <div class="card"><h2>Actual Fingers / Source</h2><div class="body"><div class="kv">${kv2(actFinger, facLabel)}</div></div></div>
+      <div class="card"><h2>Totals</h2><div class="body"><div class="kv">${kv2(totals, facLabel)}</div></div></div>
       <div class="card"><h2>Status Counts</h2><div class="body" style="padding:0;">
-        <table class="sheet"><thead><tr><th>Status</th><th>Count</th></tr></thead>
-        <tbody>${(st.statusCounts || []).map(([s, cnt]) => `<tr><td style="${styleAttr(statusColor(s))}">${esc(s)}</td><td>${esc(cnt)}</td></tr>`).join("")}</tbody></table>
+        <table class="sheet"><thead><tr><th>Status</th><th class="num">IDs</th><th class="num">EGOs</th></tr></thead>
+        <tbody>${statusCounts.map(([s, idn, egn]) => `<tr><td style="${styleAttr(statusColor(s))}">${esc(s)}</td><td class="num">${idn}</td><td class="num">${egn}</td></tr>`).join("")}</tbody></table>
       </div></div>
       <div class="card"><h2>Status Combo Legend <span class="count">(possible 2-status looks)</span></h2><div class="body" style="padding:0;">
         <table class="sheet"><tbody>${(st.legend || []).map((row) => `<tr>${row.map((c) => `<td>${statusChips(c)}</td>`).join("")}</tr>`).join("")}</tbody></table>
