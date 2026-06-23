@@ -230,9 +230,27 @@ async function fetchIconTo(url, name) {
 }
 
 // Run a logic action, then refresh + autosave.
+// snapshot of the diagnostically-relevant tracked values (for the action log)
+const logSnap = (s) => ({
+  pass: s.inventory.pass, crate: s.inventory.crate, threads: s.inventory.threads,
+  xp: s.manager.currentXP, lvl: s.manager.level,
+  lunTotal: s.lunacy.total, lunPaid: s.lunacy.paid, ext: s.lunacy.extTickets, deca: s.lunacy.decaTickets,
+});
+// record one Quick-Button press: what it logged + the deltas it produced
+function logAction(s, lines, before) {
+  const a = s.actionLog || (s.actionLog = []);
+  const after = logSnap(s), delta = {};
+  for (const k in after) { const d = Math.round((after[k] - before[k]) * 100) / 100; if (d) delta[k] = d; }
+  const now = new Date();
+  const hhmm = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+  a.push({ day: s.currentDay, time: hhmm, date: now.toISOString().slice(0, 10), notes: lines, delta });
+  if (a.length > 300) a.splice(0, a.length - 300); // keep the last 300
+}
 function act(fn) {
+  const before = logSnap(state);
   const lines = run(state, fn);
   recompute(state);
+  logAction(state, lines, before);
   renderDashboard();
   renderActions();   // sinner/tier selectors & values may have changed
   renderIDs();       // uptie/threadspin actions can change an ID/EGO's UT/TS level
@@ -988,6 +1006,18 @@ function renderActions() {
   r.append(
     btn("New Season Start", () => act(ACTIONS.newSeason)),
   );
+
+  // Action Log (diagnostic): every Quick Button press with its tracked deltas
+  b = panel("Action Log");
+  b.appendChild(btn("Clear log", () => { state.actionLog = []; renderActions(); autosave(); }, "undo"));
+  const log = state.actionLog || [];
+  const dlab = { pass: "pass", crate: "crate", threads: "thr", xp: "xp", lvl: "lvl", lunTotal: "lun", lunPaid: "paid", ext: "ext", deca: "deca" };
+  const fmtDelta = (d) => Object.keys(d || {}).map((k) => `<span class="dlt ${d[k] > 0 ? "up" : "dn"}">${d[k] > 0 ? "+" : ""}${d[k]} ${dlab[k] || k}</span>`).join(" ");
+  const logBox = el(`<div class="actionlog"></div>`);
+  logBox.innerHTML = log.length
+    ? log.slice().reverse().map((e) => `<div class="logrow"><span class="logwhen">${esc(e.day || "")} ${esc(e.time || "")}</span> ${fmtDelta(e.delta) || '<span class="dlt">(no change)</span>'} <span class="lognote">${esc((e.notes || []).join("; "))}</span></div>`).join("")
+    : `<div class="hint">No actions logged yet — press a Quick Button. Each entry shows the day, the value changes, and what happened.</div>`;
+  b.appendChild(logBox);
 }
 
 // ---------- colour helpers (from xlsx conditional formatting) ----------

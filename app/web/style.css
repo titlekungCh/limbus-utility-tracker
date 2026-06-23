@@ -243,6 +243,14 @@ button.act.primary:hover { background: var(--crimson-bright); }
 button.act.undo { color: var(--muted); }
 button.act.undo:hover { border-color: var(--crimson); color: var(--crimson-bright); }
 .subhead { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-top: 4px; }
+/* diagnostic action log */
+.actionlog { max-height: 260px; overflow-y: auto; display: flex; flex-direction: column; gap: 3px; margin-top: 6px; }
+.logrow { font: 11px var(--mono); padding: 3px 5px; background: var(--cell); border: 1px solid var(--line); border-radius: 4px; display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline; }
+.logwhen { color: var(--gold); white-space: nowrap; }
+.logrow .dlt { white-space: nowrap; }
+.logrow .dlt.up { color: #8fdc6e; }
+.logrow .dlt.dn { color: var(--crimson-bright); }
+.lognote { color: var(--muted); flex: 1 1 100%; }
 .tk-adj { display: inline-flex; gap: 2px; margin-left: 6px; vertical-align: middle; }
 .tk-step {
   font: 11px var(--mono); line-height: 1; padding: 1px 5px; cursor: pointer;
