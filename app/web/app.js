@@ -1503,7 +1503,22 @@ function renderIFSS7() {
     (row.actual || []).map((val, c) => ac(r, c, val)).join("") +
     (row.keyword || []).map((val, c) => kw(r, c, val)).join("") + `</tr>`).join("");
 
-  const kv2 = (rows) => (rows || []).map(([k, v]) => `<div class="k">${esc(k)}</div><div class="v">${esc(v)}</div>`).join("");
+  // faction colour for a stats label. Aggregate labels map to their faction tag
+  // ("Walpurgisnaughts"->Walp, "Intervallos & Bokgaks"->Intv); otherwise a
+  // trimmed-substring match (covers the finger labels Thumb..Pinky).
+  const STAT_FAC = { "Walpurgisnaughts": "Walp", "Intervallos & Bokgaks": "Intv" };
+  const facLabel = (label) => {
+    const t = String(label ?? ""), alias = STAT_FAC[t];
+    for (const f of fac) {
+      const m = (f.match || "").trim();
+      if (m && (alias ? m === alias : t.includes(m))) return { fill: f.fill, font: f.font };
+    }
+    return null;
+  };
+  const kv2 = (rows, colorFn) => (rows || []).map(([k, v]) => {
+    const cs = colorFn ? styleAttr(colorFn(k)) : "";
+    return `<div class="k" style="${cs}">${esc(k)}</div><div class="v" style="${cs}">${esc(v)}</div>`;
+  }).join("");
   const st = S.stats || {};
   const picker = `<div class="field"><label>Season</label><select id="ifss-season" class="kv-select">${keys.map((k) => `<option value="${k}"${k === ifssSel ? " selected" : ""}>IF SS${k}</option>`).join("")}</select></div>`;
 
@@ -1517,9 +1532,8 @@ function renderIFSS7() {
     </div>
     <h2 class="section-title">Stats <span class="count">(from the sheet)</span></h2>
     <div class="grid">
-      <div class="card"><h2>Predicted Fingers</h2><div class="body"><div class="kv">${kv2(st.predFinger)}</div></div></div>
-      <div class="card"><h2>Actual Fingers / Source</h2><div class="body"><div class="kv">${kv2(st.actFinger)}</div></div></div>
-      <div class="card"><h2>Totals</h2><div class="body"><div class="kv">${kv2(st.totals)}</div></div></div>
+      <div class="card"><h2>Actual Fingers / Source</h2><div class="body"><div class="kv">${kv2(st.actFinger, facLabel)}</div></div></div>
+      <div class="card"><h2>Totals</h2><div class="body"><div class="kv">${kv2(st.totals, facLabel)}</div></div></div>
       <div class="card"><h2>Status Counts</h2><div class="body" style="padding:0;">
         <table class="sheet"><thead><tr><th>Status</th><th>Count</th></tr></thead>
         <tbody>${(st.statusCounts || []).map(([s, cnt]) => `<tr><td style="${styleAttr(statusColor(s))}">${esc(s)}</td><td>${esc(cnt)}</td></tr>`).join("")}</tbody></table>
