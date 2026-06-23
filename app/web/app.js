@@ -1572,7 +1572,7 @@ function renderIFSS7() {
     </div>
     <h2 class="section-title">Stats <span class="count">(computed; legend from sheet)</span></h2>
     <div class="grid">
-      <div class="card"><h2>Actual Fingers / Source</h2><div class="body"><div class="kv">${kv2(actFinger, facLabel)}</div></div></div>
+      <div class="card"><h2>Factions / Source</h2><div class="body"><div class="kv">${kv2(actFinger, facLabel)}</div></div></div>
       <div class="card"><h2>Totals</h2><div class="body"><div class="kv">${kv2(totals, facLabel)}</div></div></div>
       <div class="card"><h2>Status Counts</h2><div class="body" style="padding:0;">
         <table class="sheet"><thead><tr><th>Status</th><th class="num">IDs</th><th class="num">EGOs</th></tr></thead>
