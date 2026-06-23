@@ -35,6 +35,7 @@ during normal use, and re-seeding overwrites it.)
 |------|---------|
 | `app/server.py`      | Local HTTP server + `GET/POST /api/state`; `POST /api/fetch-icon` |
 | `app/import_xlsx.py` | One-time importer: xlsx → `data.json` |
+| `app/import_ifss.py` | Merge each `IF SS<N> Sheet` into `data.json` (per-season pages) |
 | `app/scrape_season_icons.py` | Standalone tool: fetch new season / Walpurgis icons |
 | `app/data.json`      | The live state the app reads & writes (a `.bak` is kept on save) |
 | `app/web/constants.js` | All costs/values ported from `Code.gs` + colour palettes + icon paths |
@@ -47,7 +48,7 @@ during normal use, and re-seeding overwrites it.)
 ## UI
 
 Tabs: **Dashboard, Quick Buttons, Event Shop, IDs, EGOs, Bokgak Teams,
-IF SS7, MD Teams, Data.**
+IF SS, MD Teams, Data.**
 
 - **Dashboard** — editable Manager XP, Inventory, **Lunacy & Pulls** (incl.
   derived **Rolls (10-roll)** and **Total Rolls**), Mirror Dungeon status
@@ -65,6 +66,8 @@ IF SS7, MD Teams, Data.**
   Daily, Manager XP (+undos), Sinner Gacha Result (per-tier 12-sinner grids),
   Extractions/Lunacy, Pulls (each tagged with the resource it would consume),
   Tickets, Uptying, Thread Spinning (TS4 shows its EGO-shard cost), Season.
+  A diagnostic **Action Log** at the bottom records each press with its day and
+  the pass/crate/XP/etc. deltas.
 - **Event Shop** — the Intervallo planner: editable shop items (cost / total /
   bought → remaining + currency-to-finish, icon-labelled), one-time rewards
   (cost / claimed) with the ID/EGO cost following the icon-labelled Reward
@@ -81,10 +84,13 @@ IF SS7, MD Teams, Data.**
   get a green tint; everything is colour-coded from the sheet's formatting.
 - **Bokgak Teams** / **MD Teams** — editable free-form grids (add/delete rows &
   columns); cells tinted by the sinner acronym they contain.
-- **IF SS7** — structured view: editable prediction / actual-result / keyword
-  table (ID cells faction-coloured, keyword cells status-coloured), computed
-  read-only stat cards (the sheet's COUNTIF formulas), the status-combo legend,
-  and the registered-teams sub-grid.
+- **IF SS** — one page per season with a **season picker** (`state.ifss`, fed by
+  `import_ifss.py` from each `IF SS<N> Sheet`). Editable Actual + Keyword table
+  (F1:P13; prediction columns dropped): Actual cells faction-coloured from the
+  **sheet's conditional formatting** (extracted per season), keyword cells shown
+  as **status icons on coloured chips**. Stat cards (Factions/Source, Totals,
+  Status Counts) recompute **live** from the table; the Status Combo Legend is
+  sheet reference data. (MD Teams still reads the old full IF SS7 grid.)
 - **Data** — edit `state.constants` (curves, scalars, shard table with colour
   pickers, ticket XP) and manage the shared **Extra Keyword** list
   (add / rename / set icon via fetch / remove). Computed fields are read-only.
