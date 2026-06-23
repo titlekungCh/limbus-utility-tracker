@@ -1472,94 +1472,84 @@ function renderEditableGrid(viewId, arrayName) {
 }
 
 // ---------- IF SS7 (structured: prediction/actual/keyword + computed stats) ----------
-// Row indices in state.ifss7: 0 header, 1-12 sinners, 13 blank, 14-20 stats,
-// 21 blank, 22+ team list. Columns: 0 A | 1 B 2 C 3 D | 6 G 7 H 8 I 9 J | 12 M 13 N 14 O 15 P.
+// IF SS pages, one per season (state.ifss = { "7": {...}, "8": {...} }). Each
+// season: above = Actual (F sinner, G:J) + Keyword (M:P) rows (editable); stats =
+// the sheet's pre-computed cards (read-only); faction = colours from the sheet's
+// conditional formatting. A picker switches season. (MD Teams still uses ifss7.)
+let ifssSel = null; // selected season key (per-session; defaults to the latest)
 function renderIFSS7() {
   const root = $("#ifss7");
   if (!root) return;
-  const g = state.ifss7;
-  const data = g.slice(1, 13);
-  const txt = (row, c) => String(row[c] ?? "");
-  const cSub = (cols, sub) => data.reduce((a, row) => a + cols.reduce((b, c) => b + (txt(row, c).includes(sub) ? 1 : 0), 0), 0);
-  const cNon = (cols) => data.reduce((a, row) => a + cols.reduce((b, c) => b + (txt(row, c).trim() ? 1 : 0), 0), 0);
-  const cRe = (cols, re) => data.reduce((a, row) => a + cols.reduce((b, c) => b + (re.test(txt(row, c)) ? 1 : 0), 0), 0);
-  // ends-with (sheet's COUNTIF "* Bkgk" has no trailing *, so "...Bkgk2" doesn't match)
-  const cEnds = (cols, suf) => data.reduce((a, row) => a + cols.reduce((b, c) => b + (txt(row, c).endsWith(suf) ? 1 : 0), 0), 0);
-  const fingers = ["Thumb", "Index", "Middle", "Ring", "Pinky"];
-  const fingerRe = /Thumb|Index|Middle|Ring|Pinky/;
-
-  const predFinger = fingers.map((fn) => [fn, cSub([1, 2], fn)]);
-  const actFinger = fingers.map((fn) => [fn, cSub([6, 7, 8], fn)]);
-  actFinger.push(["Walpurgisnaughts", cSub([6, 7, 8, 9], " Walp")]);
-  actFinger.push(["Intervallos & Bokgaks", cSub([6, 7, 8, 9], " Intv") + cEnds([6, 7, 8, 9], " Bkgk")]);
-  const stats = [
-    ["Non-Finger IDs", cNon([6, 7, 8]) - cRe([6, 7, 8], fingerRe)],
-    ["Non-BP EGOs", cNon([9]) - cSub([9], " BP")],
-    ["House of Spiders", cRe([6, 7, 8], /Father|Apprentice|App|Araya/)],
-    ["Total IDs", cNon([6, 7, 8])],
-    ["Total EGOs", cNon([9])],
-    ["No Faction Stuff", cNon([6, 7, 8, 9]) - cRe([6, 7, 8, 9], /Thumb|Index|Middle|Ring|Pinky| Walp| Intv| Bkgk| BP/)],
-    ["Standard Fare", cSub([6, 7, 8, 9], " SF")],
-  ];
-  const statuses = ["Burn", "Bleed", "Tremor", "Rupture", "Sinking", "Poise", "Charge"];
-  const statusCounts = statuses.map((s) => [s, cSub([12, 13, 14], s), cSub([15], s)]);
-
-  const ec = (r, c, fn) => `<td><input type="text" data-r="${r}" data-c="${c}" value="${esc(g[r][c] ?? "")}" style="${styleAttr(fn(g[r][c]))}"/></td>`;
-  // keyword cell: coloured per status word (click to edit)
-  const kw = (r, c) => `<td class="kw" data-r="${r}" data-c="${c}">${statusChips(g[r][c])}</td>`;
-  const mainRows = [];
-  for (let r = 1; r <= 12; r++) {
-    mainRows.push(`<tr><td style="${styleAttr(sinnerColor(g[r][0]))}">${esc(g[r][0] ?? "")}</td>` +
-      ec(r, 1, factionColor) + ec(r, 2, factionColor) + ec(r, 3, factionColor) +
-      ec(r, 6, factionColor) + ec(r, 7, factionColor) + ec(r, 8, factionColor) + ec(r, 9, factionColor) +
-      kw(r, 12) + kw(r, 13) + kw(r, 14) + kw(r, 15) + `</tr>`);
+  const all = state.ifss || {};
+  const keys = Object.keys(all).sort((a, b) => Number(a) - Number(b));
+  if (!keys.length) {
+    root.innerHTML = `<div class="hint" style="padding:16px">No IF SS data yet. Run <code>python app/import_ifss.py</code> to import the IF SS season sheet(s) from the spreadsheet.</div>`;
+    return;
   }
-  const kv2 = (rows) => rows.map(([k, v]) => `<div class="k">${esc(k)}</div><div class="v">${esc(v)}</div>`).join("");
-  const legendRows = [];
-  for (let r = 14; r <= 20 && r < g.length; r++)
-    legendRows.push(`<tr>${[13, 14, 15].map((c) => `<td>${statusChips(g[r][c])}</td>`).join("")}</tr>`);
+  if (ifssSel == null || !all[ifssSel]) ifssSel = keys[keys.length - 1]; // latest
+  const S = all[ifssSel];
+  const fac = S.faction || [];
+  // faction colour from this season's conditional formatting, else the constants palette
+  const facColor = (val) => {
+    const t = String(val ?? "");
+    for (const f of fac) if (f.match && t.includes(f.match)) return { fill: f.fill, font: f.font };
+    return factionColor(val);
+  };
+  // editable Actual cell (faction-coloured); keyword cell = status chips (click to edit)
+  const ac = (r, c, val) => `<td><input type="text" data-r="${r}" data-c="${c}" value="${esc(val ?? "")}" style="${styleAttr(facColor(val))}"/></td>`;
+  const kw = (r, c, val) => `<td class="kw" data-r="${r}" data-c="${c}">${statusChips(val)}</td>`;
+  const mainRows = S.above.map((row, r) =>
+    `<tr><td style="${styleAttr(sinnerColor(row.sinner))}">${esc(row.sinner ?? "")}</td>` +
+    (row.actual || []).map((val, c) => ac(r, c, val)).join("") +
+    (row.keyword || []).map((val, c) => kw(r, c, val)).join("") + `</tr>`).join("");
+
+  const kv2 = (rows) => (rows || []).map(([k, v]) => `<div class="k">${esc(k)}</div><div class="v">${esc(v)}</div>`).join("");
+  const st = S.stats || {};
+  const picker = `<div class="field"><label>Season</label><select id="ifss-season" class="kv-select">${keys.map((k) => `<option value="${k}"${k === ifssSel ? " selected" : ""}>IF SS${k}</option>`).join("")}</select></div>`;
 
   root.innerHTML = `
-    <div class="table-wrap ifss7-scroll" style="margin-bottom:14px;">
+    ${picker}
+    <div class="table-wrap ifss7-scroll" style="margin:8px 0 14px;">
       <table class="sheet"><thead><tr>
-        <th>Sinner</th><th>Pred ID#1</th><th>Pred ID#2</th><th>Pred EGO</th>
-        <th>Actual ID#1</th><th>Actual ID#2</th><th>Actual ID#3</th><th>Actual EGO</th>
+        <th>Sinner</th><th>Actual ID#1</th><th>Actual ID#2</th><th>Actual ID#3</th><th>Actual EGO</th>
         <th>KW ID#1</th><th>KW ID#2</th><th>KW ID#3</th><th>KW EGO</th>
-      </tr></thead><tbody id="ifss7-main">${mainRows.join("")}</tbody></table>
+      </tr></thead><tbody id="ifss7-main">${mainRows}</tbody></table>
     </div>
-    <h2 class="section-title">Stats <span class="count">(computed)</span></h2>
+    <h2 class="section-title">Stats <span class="count">(from the sheet)</span></h2>
     <div class="grid">
-      <div class="card"><h2>Predicted Fingers</h2><div class="body"><div class="kv">${kv2(predFinger)}</div></div></div>
-      <div class="card"><h2>Actual Fingers / Source</h2><div class="body"><div class="kv">${kv2(actFinger)}</div></div></div>
-      <div class="card"><h2>Totals</h2><div class="body"><div class="kv">${kv2(stats)}</div></div></div>
+      <div class="card"><h2>Predicted Fingers</h2><div class="body"><div class="kv">${kv2(st.predFinger)}</div></div></div>
+      <div class="card"><h2>Actual Fingers / Source</h2><div class="body"><div class="kv">${kv2(st.actFinger)}</div></div></div>
+      <div class="card"><h2>Totals</h2><div class="body"><div class="kv">${kv2(st.totals)}</div></div></div>
       <div class="card"><h2>Status Counts</h2><div class="body" style="padding:0;">
-        <table class="sheet"><thead><tr><th>Status</th><th class="num">IDs</th><th class="num">EGOs</th></tr></thead>
-        <tbody>${statusCounts.map(([s, idn, egn]) => `<tr><td style="${styleAttr(statusColor(s))}">${esc(s)}</td><td class="num">${idn}</td><td class="num">${egn}</td></tr>`).join("")}</tbody></table>
+        <table class="sheet"><thead><tr><th>Status</th><th>Count</th></tr></thead>
+        <tbody>${(st.statusCounts || []).map(([s, cnt]) => `<tr><td style="${styleAttr(statusColor(s))}">${esc(s)}</td><td>${esc(cnt)}</td></tr>`).join("")}</tbody></table>
       </div></div>
       <div class="card"><h2>Status Combo Legend <span class="count">(possible 2-status looks)</span></h2><div class="body" style="padding:0;">
-        <table class="sheet"><tbody>${legendRows.join("")}</tbody></table>
+        <table class="sheet"><tbody>${(st.legend || []).map((row) => `<tr>${row.map((c) => `<td>${statusChips(c)}</td>`).join("")}</tr>`).join("")}</tbody></table>
       </div></div>
     </div>`;
 
-  // main block edits -> re-render so computed stats update
+  $("#ifss-season").addEventListener("change", (e) => { ifssSel = e.target.value; renderIFSS7(); });
+
   const main = $("#ifss7-main");
+  // Actual cell edits -> recolour that cell (stats are sheet snapshots, not recomputed)
   main.addEventListener("change", (e) => {
     const t = e.target;
-    if (t.dataset.r == null) return;   // faction inputs only (kw-edit has no data-r)
-    g[+t.dataset.r][+t.dataset.c] = t.value;
+    if (t.dataset.r == null || !t.matches("input[type=text]")) return;
+    S.above[+t.dataset.r].actual[+t.dataset.c] = t.value;
     renderIFSS7();
     autosave();
   });
-  // keyword cells: click to edit, save on blur/Enter (re-render to recolour + update counts)
+  // keyword cells: click to edit, save on blur/Enter (re-render to recolour)
   main.addEventListener("click", (e) => {
     const cell = e.target.closest("td.kw");
     if (!cell || cell.querySelector("input")) return;
     const r = +cell.dataset.r, c = +cell.dataset.c;
-    cell.innerHTML = `<input type="text" class="kw-edit" value="${esc(g[r][c] ?? "")}"/>`;
+    cell.innerHTML = `<input type="text" class="kw-edit" value="${esc(S.above[r].keyword[c] ?? "")}"/>`;
     const inp = cell.querySelector("input");
     inp.focus();
     inp.select();
-    inp.addEventListener("blur", () => { g[r][c] = inp.value; renderIFSS7(); autosave(); });
+    inp.addEventListener("blur", () => { S.above[r].keyword[c] = inp.value; renderIFSS7(); autosave(); });
     inp.addEventListener("keydown", (ev) => { if (ev.key === "Enter") { ev.preventDefault(); inp.blur(); } });
   });
 }

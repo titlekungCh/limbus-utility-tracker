@@ -6,6 +6,7 @@ After seeding, the app reads/writes app/data.json and the xlsx is no longer need
 """
 import json
 import os
+import re
 from datetime import datetime, date
 
 import openpyxl
@@ -33,6 +34,74 @@ def num(v, default=0):
         return clean(v) if isinstance(v, (int, float)) else (float(v) if v not in (None, "") else default)
     except (TypeError, ValueError):
         return default
+
+
+def _hex(color):
+    """openpyxl Color -> #RRGGBB (drops the alpha byte), or None."""
+    rgb = getattr(color, "rgb", None) if color is not None else None
+    return "#" + rgb[-6:] if isinstance(rgb, str) and len(rgb) in (6, 8) else None
+
+
+def ifss_faction_colors(ws):
+    """Faction colours from the sheet's conditional formatting on the Actual block
+    (the NOT(ISERROR(SEARCH(("X"),...))) rules over G2:J13). Returns a list of
+    {match, fill, font} in rule order (order = match priority). Picks up any new
+    faction/source a future season introduces."""
+    out = []
+    for rng in ws.conditional_formatting:
+        if "G2:J13" not in str(rng.sqref):
+            continue
+        for rule in ws.conditional_formatting[rng]:
+            f = rule.formula[0] if rule.formula else ""
+            m = re.search(r'SEARCH\(\("([^"]+)"\)', f)
+            if not m or not rule.dxf or not rule.dxf.fill:
+                continue
+            fill = _hex(rule.dxf.fill.bgColor)
+            font = _hex(rule.dxf.font.color) if (rule.dxf.font and rule.dxf.font.color) else None
+            if fill:
+                out.append({"match": m.group(1), "fill": fill, "font": font or "#202124"})
+        break
+    return out
+
+
+def extract_ifss(wb):
+    """Every 'IF SS<N> Sheet' -> structured page data, keyed by season number.
+    above = Actual (F sinner, G:J) + Keyword (M:P), rows 2-13 (editable).
+    stats = the sheet's pre-computed cards (read-only): predicted fingers A15:B19,
+    actual fingers F15:G21, totals H15:I21, status counts L15:M21, combo legend
+    N15:P21. faction = colours from the sheet's conditional formatting."""
+    seasons = {}
+    for name in wb.sheetnames:
+        m = re.match(r"^IF SS(\d+) Sheet$", name)
+        if not m:
+            continue
+        ws = wb[name]
+
+        def v(coord):
+            return clean(ws[coord].value)
+
+        above = [{
+            "sinner": v(f"F{r}"),
+            "actual": [v(f"G{r}"), v(f"H{r}"), v(f"I{r}"), v(f"J{r}")],
+            "keyword": [v(f"M{r}"), v(f"N{r}"), v(f"O{r}"), v(f"P{r}")],
+        } for r in range(2, 14)]
+
+        def rows(r0, r1, cols):
+            return [[v(f"{c}{r}") for c in cols] for r in range(r0, r1 + 1)]
+
+        seasons[m.group(1)] = {
+            "season": int(m.group(1)),
+            "above": above,
+            "stats": {
+                "predFinger": rows(15, 19, ["A", "B"]),
+                "actFinger": rows(15, 21, ["F", "G"]),
+                "totals": rows(15, 21, ["H", "I"]),
+                "statusCounts": rows(15, 21, ["L", "M"]),
+                "legend": rows(15, 21, ["N", "O", "P"]),
+            },
+            "faction": ifss_faction_colors(ws),
+        }
+    return seasons
 
 
 def main():
@@ -278,7 +347,8 @@ def main():
     state["ids"] = ids
     state["egos"] = egos
     state["teams"] = teams
-    state["ifss7"] = ifss7
+    state["ifss7"] = ifss7                # full grid (MD Teams page reads rows 22+)
+    state["ifss"] = extract_ifss(wb)      # per-season structured IF SS pages
 
     with open(OUT, "w", encoding="utf-8") as f:
         json.dump(state, f, ensure_ascii=False, indent=2)
