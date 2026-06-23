@@ -1087,13 +1087,24 @@ function factionColor(text) {
 function mdPill(on, status) {
   return `<span class="mdpill ${on ? "" : "done"}">${statusChips(status)}</span>`;
 }
-// IF SS7 keyword cells hold space-separated statuses; colour EACH word (by text)
+// IF SS keyword cells hold space-separated statuses; colour EACH word (by text)
 function statusChips(text) {
   if (text == null || text === "") return "";
   return String(text).split(/\s+/).filter(Boolean).map((w) => {
     const c = fillColor(STATUS_FILL[w]);
     return c ? `<span class="chip" style="background:${c.fill};color:${c.font}">${esc(w)}</span>`
       : `<span class="chip plain">${esc(w)}</span>`;
+  }).join(" ");
+}
+// same, but each status shows its keyword icon (kept on its coloured chip);
+// falls back to the word when a status has no icon
+function statusIconChips(text) {
+  if (text == null || text === "") return "";
+  return String(text).split(/\s+/).filter(Boolean).map((w) => {
+    const c = fillColor(STATUS_FILL[w]);
+    const inner = optIcon("keyword", w) || esc(w);
+    return c ? `<span class="chip" style="background:${c.fill};color:${c.font}">${inner}</span>`
+      : `<span class="chip plain">${inner}</span>`;
   }).join(" ");
 }
 
@@ -1497,7 +1508,7 @@ function renderIFSS7() {
   };
   // editable Actual cell (faction-coloured); keyword cell = status chips (click to edit)
   const ac = (r, c, val) => `<td><input type="text" data-r="${r}" data-c="${c}" value="${esc(val ?? "")}" style="${styleAttr(facColor(val))}"/></td>`;
-  const kw = (r, c, val) => `<td class="kw" data-r="${r}" data-c="${c}">${statusChips(val)}</td>`;
+  const kw = (r, c, val) => `<td class="kw" data-r="${r}" data-c="${c}">${statusIconChips(val)}</td>`;
   const mainRows = S.above.map((row, r) =>
     `<tr><td style="${styleAttr(sinnerColor(row.sinner))}">${esc(row.sinner ?? "")}</td>` +
     (row.actual || []).map((val, c) => ac(r, c, val)).join("") +
