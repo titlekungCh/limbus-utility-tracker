@@ -277,6 +277,10 @@ input[data-key="levelExtra"]::-webkit-outer-spin-button, input[data-key="levelEx
 input[data-key="level"]::-webkit-outer-spin-button, input[data-key="level"]::-webkit-inner-spin-button,
 input[data-key="threadspin"]::-webkit-outer-spin-button, input[data-key="threadspin"]::-webkit-inner-spin-button,
 input[data-key="uptie"]::-webkit-outer-spin-button, input[data-key="uptie"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+/* Dashboard Inventory + Lunacy & Pulls number cells: no spinner arrows */
+input.kv-num[data-path^="inventory."], input.kv-num[data-path^="lunacy."] { -moz-appearance: textfield; appearance: textfield; }
+input.kv-num[data-path^="inventory."]::-webkit-outer-spin-button, input.kv-num[data-path^="inventory."]::-webkit-inner-spin-button,
+input.kv-num[data-path^="lunacy."]::-webkit-outer-spin-button, input.kv-num[data-path^="lunacy."]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 /* "Lv" header is tiny, so the column shrinks until 2-digit levels clip; widen a touch. */
 table.editlist td input[data-key="level"] { min-width: 34px; }
 table.sheet td input[type=text]:focus, table.sheet td input[type=number]:focus, table.sheet td input[type=date]:focus, table.sheet td select:focus {
