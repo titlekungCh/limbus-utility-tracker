@@ -1,4 +1,4 @@
-import { ACTIONS, run, recompute } from "./logic.js";
+import { ACTIONS, run, recompute, maybeWeeklyReset } from "./logic.js";
 import {
   UPTIE, THREADSPIN, SPINCHAIN, SHARD_DELTA, UPTIE_LEVEL, TS_STEP_LEVEL, LUNACY_ACTIONS, TICKET_ACTIONS, GACHA_TIERS, PULL,
   SINNER_ORDER, SINNER_COLORS, LEVEL_FILL, LEVEL_FILL_DEFAULT, SCALE_STOPS,
@@ -1867,6 +1867,7 @@ function migrateConstants(s) {
   state.currentDay = DAYS[new Date().getDay()];
   state.lunacy.currentDate = currentPatchISO();
   state.md.rentalWeek = rentalWeekFlag(state.lunacy.currentDate); // derived from the rental anchor, not stored/toggled
+  const weekReset = maybeWeeklyReset(state); // reset MDs once per patch-week (deterministic, not tied to daily lux)
   migrateConstants(state);
   recompute(state);
   $("#dashboard").addEventListener("change", dashboardEdit); // once; #dashboard persists across re-renders
@@ -1879,5 +1880,5 @@ function migrateConstants(s) {
   renderEditableGrid("teams", "teams");
   renderIFSS7();
   renderMDTeams();
-  markSaved();
+  if (weekReset) autosave(); else markSaved(); // persist weekResetFor (and any boundary reset)
 })();

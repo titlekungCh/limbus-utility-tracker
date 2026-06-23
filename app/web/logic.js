@@ -90,16 +90,31 @@ function updateCurrentDate(s) {
 }
 
 // ---------- MD checkbox helpers ----------
-function mdCheckAll(s, t) {
-  if (t === 1) {
-    s.md.hard = [true, true, true];
-    s.md.normal = [true, true, true];
-    s.md.schedule = s.md.schedule.map(() => false);
-  } else if (t === -1) {
-    s.md.hard = [false, false, false];
-    s.md.normal = [false, false, false];
-    s.md.schedule = s.md.schedule.map(() => true);
-  }
+// Weekly MD reset — fired deterministically once per patch-week (see
+// maybeWeeklyReset) rather than on the Wednesday daily-lux click, so the hard-MD
+// slots (1st/2nd/3rd = 7.5/8/9.5 pass, 21/24/27 crate) are always consumed in
+// order within a real week regardless of when daily lux is pressed.
+function weeklyMDReset(s) {
+  s.md.hard = [true, true, true];
+  s.md.normal = [true, true, true];
+  if (Array.isArray(s.md.schedule)) s.md.schedule = s.md.schedule.map(() => false);
+}
+// most recent Thursday (incl. today), local, as YYYY-MM-DD — the patch-week key
+function patchWeekISO() {
+  const d = new Date();
+  d.setDate(d.getDate() - ((d.getDay() - 4 + 7) % 7));
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+// Reset MDs once when the patch-week changes. The first run after this lands
+// adopts the current week silently (no reset — preserves in-progress checks).
+// Returns true if it changed state (so the caller can persist it).
+export function maybeWeeklyReset(s) {
+  const wk = patchWeekISO();
+  if (s.md.weekResetFor === wk) return false;
+  const first = s.md.weekResetFor == null;
+  s.md.weekResetFor = wk;
+  if (!first) weeklyMDReset(s);
+  return true;
 }
 function normalCheck(s, t) {
   const n = s.md.normal;
@@ -134,7 +149,7 @@ function wLPXP(s, t) {
     case "Sun":   weeklyModule(s, "onlyDaily", 3, 1, 0, 0, x); break;
     case "Mon":   weeklyModule(s, "full", 2, 0, 1.4, 6, x); break;
     case "Tue":   weeklyModule(s, "onlyDaily", 1, 0, 0, 0, x); break;
-    case "Wed":   mdCheckAll(s, x); weeklyModule(s, "dailyWeekly", 7, 5, 0, 0, x); s.weekTilSeasonEnd += -1 * x; break;
+    case "Wed":   weeklyModule(s, "dailyWeekly", 7, 5, 0, 0, x); s.weekTilSeasonEnd += -1 * x; break;
   }
 }
 
@@ -199,7 +214,7 @@ export const ACTIONS = {
   undowNormal:  (s) => { manXPAdd(s, -100); chkManLvlUp(s, "uwnormal"); },
 
   // --- Day updates ---
-  cmenuDayUpdate: (s) => { updateWeekDay(s); updateCurrentDate(s); note(`Day -> ${s.currentDay}`); },
+  cmenuDayUpdate: (s) => { updateWeekDay(s); updateCurrentDate(s); maybeWeeklyReset(s); note(`Day -> ${s.currentDay}`); },
   newSeason: (s) => { s.weekTilSeasonEnd = 24; note("New season: 24 weeks to season end"); },
 
   // --- Lunacy / tickets (generic, driven by constants) ---
