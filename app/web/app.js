@@ -292,6 +292,10 @@ function setSelection(path, value) {
 function renderDashboard() {
   const s = state;
   const free = s.lunacy.total - s.lunacy.paid;
+  // is today's daily lux marked done? (stamped by the daily-lux button or the toggle)
+  const _t = new Date();
+  const todayISO = `${_t.getFullYear()}-${String(_t.getMonth() + 1).padStart(2, "0")}-${String(_t.getDate()).padStart(2, "0")}`;
+  const dailyDoneToday = s.lastDailyDate === todayISO;
   // Total Rolls (Lunacy sheet F2:F4): 1300 lunacy / 10 ext tickets / 1 deca = one 10-roll chunk each.
   const rolls10 = (Math.floor(free / 1300) + Math.floor(s.lunacy.extTickets / 10) + s.lunacy.decaTickets) * 10; // F3
   const rollsTotal = rolls10 + Math.floor((free % 1300) / 130) + (s.lunacy.extTickets % 10);                    // F2 = F3 + F4
@@ -389,6 +393,7 @@ function renderDashboard() {
         <div class="body">
           <div class="kv">
             <div class="k">Current Day</div><div class="v"><span class="tag" style="${styleAttr(dayColor(s.currentDay))}">${esc(s.currentDay)}</span></div>
+            <div class="k">Today's Daily</div><div class="v"><button class="act ${dailyDoneToday ? "" : "undo"}" id="st-daily-done" title="Click to toggle whether today's daily lux is done">${dailyDoneToday ? "✓ Done" : "Not done"}</button></div>
             <div class="k">Current Patch</div><div class="v">${esc(s.lunacy.currentDate)}</div>
             <div class="k">Rental Week</div><div class="v">${s.md.rentalWeek === 0 ? "Yes" : "No"}</div>
             <div class="k">Event Currency</div><div class="v"><input type="number" class="qty" id="st-currency" value="${fmt(s.event.currency)}"/></div>
@@ -418,6 +423,12 @@ function renderDashboard() {
 
   const cur = $("#st-currency");
   if (cur) cur.addEventListener("change", (ev) => setSelection("event.currency", Number(ev.target.value) || 0));
+  const dailyDoneBtn = $("#st-daily-done");
+  if (dailyDoneBtn) dailyDoneBtn.addEventListener("click", () => {
+    state.lastDailyDate = dailyDoneToday ? null : todayISO; // toggle today's daily done/not-done
+    renderDashboard();   // refresh this + the forecast day badges
+    autosave();
+  });
   const addBtn = $("#st-currency-addbtn");
   if (addBtn) {
     const doAdd = () => { const n = Number($("#st-currency-add").value) || 0; if (n) setSelection("event.currency", (state.event.currency || 0) + n); };
