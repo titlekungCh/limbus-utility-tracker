@@ -456,10 +456,15 @@ function renderForecast() {
   const kv = (rows) => rows.map(([k, v, big]) => `<div class="k">${esc(k)}</div><div class="v${big ? " big" : ""}">${esc(fmt(v))}</div>`).join("");
   // level-up marker: shown next to any forecast value that reaches next-level XP
   const lvlGlyph = (on) => (on ? ` <span class="lvlup" title="reaches next level">▲</span>` : "");
-  // weekday each "After N Daily" run lands on (run 1 = today); Thursday = patch day
+  // weekday each "After N Daily" run lands on. Run 1 is the NEXT daily: today if
+  // today's daily isn't done yet, else tomorrow (lastDailyDate stamped on a daily
+  // lux). Thursday = patch day.
   const todayIdx = DAYS.indexOf(s.currentDay);
+  const _td = new Date();
+  const todayISO = `${_td.getFullYear()}-${String(_td.getMonth() + 1).padStart(2, "0")}-${String(_td.getDate()).padStart(2, "0")}`;
+  const dailyOffset = s.lastDailyDate === todayISO ? 1 : 0; // today's daily already done -> start from tomorrow
   const dayGlyph = (n) => {
-    const di = todayIdx < 0 ? -1 : (todayIdx + n - 1) % 7;
+    const di = todayIdx < 0 ? -1 : (todayIdx + dailyOffset + n - 1) % 7;
     if (di < 0) return "";
     const patch = di === DAYS.indexOf("Thurs");
     return `<span class="mdtype ${patch ? "patch" : "day"}" title="${esc(DAYS[di])}${patch ? " — patch day" : ""}">${esc(DAYS[di].slice(0, 2))}</span> `;

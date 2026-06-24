@@ -12,6 +12,8 @@ function note(msg) { LOG.push(msg); }
 
 // ---------- primitives (mirror Code.gs helpers) ----------
 const round2 = (n) => Math.round(n * 100) / 100;
+// local YYYY-MM-DD for "today" (used to mark when the day's daily lux was done)
+function todayISO() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; }
 
 function freeLunacy(s) { return s.lunacy.total - s.lunacy.paid; }
 function fLCH(s, a) { s.lunacy.total = round2(s.lunacy.total + a); }          // free lunacy change
@@ -202,12 +204,12 @@ function chkManLvlUp(s, type) {
 // ============================================================
 export const ACTIONS = {
   // --- Manager XP runs ---
-  addDailyXP: (s) => { manXPAdd(s, s.constants.dailyManagerXP); chkManLvlUp(s, "dailyXP"); },
+  addDailyXP: (s) => { manXPAdd(s, s.constants.dailyManagerXP); chkManLvlUp(s, "dailyXP"); s.lastDailyDate = todayISO(); },
   addNMDXP:   (s) => { manXPAdd(s, 100); chkManLvlUp(s, "normalMDXP"); },
   addWBMDXP:  (s) => { manXPAdd(s, 120); chkManLvlUp(s, "weeklyMDXP"); },
   add3HMD:    (s) => { manXPAdd(s, 360); chkManLvlUp(s, "3hmd"); },
   addwNormal: (s) => { manXPAdd(s, 100); chkManLvlUp(s, "wnormal"); },
-  undoDailyXP:  (s) => { manXPAdd(s, -s.constants.dailyManagerXP); chkManLvlUp(s, "undoDaily"); },
+  undoDailyXP:  (s) => { manXPAdd(s, -s.constants.dailyManagerXP); chkManLvlUp(s, "undoDaily"); s.lastDailyDate = null; },
   undoNMDXP:    (s) => { manXPAdd(s, -100); chkManLvlUp(s, "undoNormal"); },
   undoWBMDXP:   (s) => { manXPAdd(s, -120); chkManLvlUp(s, "undoWeekly"); },
   undo3HMD:     (s) => { manXPAdd(s, -360); chkManLvlUp(s, "u3hmd"); },
