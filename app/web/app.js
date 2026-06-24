@@ -456,6 +456,14 @@ function renderForecast() {
   const kv = (rows) => rows.map(([k, v, big]) => `<div class="k">${esc(k)}</div><div class="v${big ? " big" : ""}">${esc(fmt(v))}</div>`).join("");
   // level-up marker: shown next to any forecast value that reaches next-level XP
   const lvlGlyph = (on) => (on ? ` <span class="lvlup" title="reaches next level">▲</span>` : "");
+  // weekday each "After N Daily" run lands on (run 1 = today); Thursday = patch day
+  const todayIdx = DAYS.indexOf(s.currentDay);
+  const dayGlyph = (n) => {
+    const di = todayIdx < 0 ? -1 : (todayIdx + n - 1) % 7;
+    if (di < 0) return "";
+    const patch = di === DAYS.indexOf("Thurs");
+    return `<span class="mdtype ${patch ? "patch" : "day"}" title="${esc(DAYS[di])}${patch ? " — patch day" : ""}">${esc(DAYS[di].slice(0, 2))}</span> `;
+  };
 
   $("#forecast").innerHTML = `
     <div class="grid">
@@ -463,11 +471,11 @@ function renderForecast() {
         <h2>Manager XP Forecast</h2>
         <div class="body" style="padding:0;">
           <table class="sheet">
-            <thead><tr><th>Run</th><th style="white-space:nowrap">After N Daily</th><th style="white-space:nowrap">after MD</th></tr></thead>
-            <tbody>${mf.rows.map((r) => `<tr><td style="white-space:nowrap">${r.n} Daily</td><td class="num">${fmt(r.afterDaily)}${lvlGlyph(r.dailyLevels)}</td><td class="num"><span class="mdtype ${r.mdHard ? "h" : "n"}" title="${r.mdHard ? "Hard MD (+120)" : "Normal/Rental MD (+100)"}">${r.mdHard ? "H" : "N"}</span> ${fmt(r.afterMD)} <span class="count">(+${r.cumMD})</span>${lvlGlyph(r.mdLevels)}</td></tr>`).join("")}</tbody>
+            <thead><tr><th>N</th><th style="white-space:nowrap">After N Daily</th><th style="white-space:nowrap">after N MD</th></tr></thead>
+            <tbody>${mf.rows.map((r) => `<tr><td class="num">${r.n}</td><td class="num">${dayGlyph(r.n)}${fmt(r.afterDaily)}${lvlGlyph(r.dailyLevels)}</td><td class="num"><span class="mdtype ${r.mdHard ? "h" : "n"}" title="${r.mdHard ? "Hard MD (+120)" : "Normal/Rental MD (+100)"}">${r.mdHard ? "H" : "N"}</span> ${fmt(r.afterMD)} <span class="count">(+${r.cumMD})</span>${lvlGlyph(r.mdLevels)}</td></tr>`).join("")}</tbody>
           </table>
         </div>
-        <div class="body"><div class="kv">${kv([["Next Level XP", mf.nextLevelXP], ["Next Lvl Enkephalin", mf.enk]])}</div></div>
+        <div class="body"><div class="kv">${kv([["Current XP", s.manager.currentXP], ["Next Level XP", mf.nextLevelXP], ["Next Lvl Enkephalin", mf.enk]])}</div></div>
       </div>
 
       <div class="card">

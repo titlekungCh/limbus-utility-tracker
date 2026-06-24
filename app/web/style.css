@@ -220,6 +220,8 @@ table.editlist tr.owned:hover td { background: #28391b; }
   border-radius: 3px; padding: 0 3px; }
 .mdtype.h { background: #5a1a1a; color: #ffb3b3; }
 .mdtype.n { background: #1a2a5a; color: #b3c6ff; }
+.mdtype.day { background: #2a2a2a; color: #b8b8b8; }
+.mdtype.patch { background: #4a3a12; color: var(--gold); }
 
 /* ---------- actions ---------- */
 .panels { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; align-items: start; }
