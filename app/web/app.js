@@ -391,7 +391,7 @@ function renderDashboard() {
       <div class="card">
         <h2>Status</h2>
         <div class="body">
-          <div class="kv">
+          <div class="kv kv-status">
             <div class="k">Current Day</div><div class="v"><span class="tag" style="${styleAttr(dayColor(s.currentDay))}">${esc(s.currentDay)}</span></div>
             <div class="k">Today's Daily</div><div class="v"><button class="act ${dailyDoneToday ? "" : "undo"}" id="st-daily-done" title="Click to toggle whether today's daily lux is done">${dailyDoneToday ? "✓ Done" : "Not done"}</button></div>
             <div class="k">Current Patch</div><div class="v">${esc(s.lunacy.currentDate)}</div>

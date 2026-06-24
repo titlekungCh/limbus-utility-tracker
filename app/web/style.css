@@ -93,6 +93,8 @@ table.sheet tr.disabled td select { color: var(--muted); }
   background: var(--cell); padding: 6px 9px; border: 1px solid var(--line);
 }
 .kv .k { color: var(--muted); }
+/* Status card: vertically centre the label column (rows vary in height) */
+.kv-status .k { display: flex; align-items: center; }
 .kv .v { font-family: var(--mono); text-align: right; color: var(--text); }
 .add-currency { display: inline-flex; gap: 6px; align-items: center; }
 .add-currency .qty { width: 80px; }
