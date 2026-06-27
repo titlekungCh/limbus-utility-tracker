@@ -243,7 +243,7 @@ function logAction(s, lines, before) {
   for (const k in after) { const d = Math.round((after[k] - before[k]) * 100) / 100; if (d) delta[k] = d; }
   const now = new Date();
   const hhmm = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
-  a.push({ day: s.currentDay, time: hhmm, date: now.toISOString().slice(0, 10), notes: lines, delta });
+  a.push({ day: s.currentDay, time: hhmm, date: now.toISOString().slice(0, 10), notes: lines, delta, pass: after.pass, crate: after.crate });
   if (a.length > 300) a.splice(0, a.length - 300); // keep the last 300
 }
 function act(fn) {
@@ -1039,7 +1039,7 @@ function renderActions() {
   const fmtDelta = (d) => Object.keys(d || {}).map((k) => `<span class="dlt ${d[k] > 0 ? "up" : "dn"}">${d[k] > 0 ? "+" : ""}${d[k]} ${dlab[k] || k}</span>`).join(" ");
   const logBox = el(`<div class="actionlog"></div>`);
   logBox.innerHTML = log.length
-    ? log.slice().reverse().map((e) => `<div class="logrow"><span class="logwhen">${esc(e.day || "")} ${esc(e.time || "")}</span> ${fmtDelta(e.delta) || '<span class="dlt">(no change)</span>'} <span class="lognote">${esc((e.notes || []).join("; "))}</span></div>`).join("")
+    ? log.slice().reverse().map((e) => `<div class="logrow"><span class="logwhen">${esc(e.day || "")} ${esc(e.time || "")}</span> ${fmtDelta(e.delta) || '<span class="dlt">(no change)</span>'}${e.pass != null ? ` <span class="logtot">= ${fmt(e.pass)} pass / ${fmt(e.crate)} crate</span>` : ""} <span class="lognote">${esc((e.notes || []).join("; "))}</span></div>`).join("")
     : `<div class="hint">No actions logged yet — press a Quick Button. Each entry shows the day, the value changes, and what happened.</div>`;
   b.appendChild(logBox);
 }

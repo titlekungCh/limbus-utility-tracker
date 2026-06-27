@@ -254,6 +254,7 @@ button.act.undo:hover { border-color: var(--crimson); color: var(--crimson-brigh
 .logrow .dlt { white-space: nowrap; }
 .logrow .dlt.up { color: #8fdc6e; }
 .logrow .dlt.dn { color: var(--crimson-bright); }
+.logtot { color: var(--gold); white-space: nowrap; }
 .lognote { color: var(--muted); flex: 1 1 100%; }
 .tk-adj { display: inline-flex; gap: 2px; margin-left: 6px; vertical-align: middle; }
 .tk-step {
