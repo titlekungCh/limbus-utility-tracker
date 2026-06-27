@@ -145,8 +145,8 @@ function weeklyModule(s, t, d, w, l, c, n) {
 function wLPXP(s, t) {
   const x = t === "normal" ? 1 : t === "undo" ? -1 : 0;
   switch (s.currentDay) {
-    case "Thurs": updateCurrentDate(s); weeklyModule(s, "full", 6, 2, 2.2, 6, x); break;
-    case "Fri":   weeklyModule(s, "noCrate", 5, 1, 1.4, 6, x); break;
+    case "Thurs": updateCurrentDate(s); weeklyModule(s, "full", 6, 2, 1.1, 3, x); break;
+    case "Fri":   weeklyModule(s, "noCrate", 5, 1, 0.4, 0, x); break;
     case "Sat":   weeklyModule(s, "onlyDaily", 4, 1, 0, 0, x); break;
     case "Sun":   weeklyModule(s, "onlyDaily", 3, 1, 0, 0, x); break;
     case "Mon":   weeklyModule(s, "full", 2, 0, 1.4, 6, x); break;
