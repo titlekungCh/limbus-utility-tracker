@@ -315,7 +315,7 @@ function renderDashboard() {
   // editable number row (writes to a dotted state path on change); optional colour + icon
   const erow = (label, path, val, big, color, ico) => {
     const st = color ? `background:${color.fill};color:${color.font};` : "";
-    return `<div class="k" style="${st}">${ico ? icoTag(ico, color ? lightenHex(color.fill) : null) : ""}${esc(label)}</div><div class="v${big ? " big" : ""}"><input type="number" class="kv-num" data-path="${path}" value="${val ?? ""}" style="${st}"/></div>`;
+    return `<div class="k" style="${st}">${ico ? icoTag(ico, color ? lightenHex(color.fill) : null) : ""}${esc(label)}</div><div class="v${big ? " big" : ""}"><input type="number" step="any" class="kv-num" data-path="${path}" value="${val ?? ""}" style="${st}"/></div>`;
   };
   const invColor = (path) => {
     const m = /^inventory\.tickets\.(\w+)$/.exec(path);   // tickets get their editable colour from constants.tickets
