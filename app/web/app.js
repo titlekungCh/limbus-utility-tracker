@@ -1523,6 +1523,16 @@ function renderIFSS7() {
   }
   if (ifssSel == null || !all[ifssSel]) ifssSel = keys[keys.length - 1]; // latest
   const S = all[ifssSel];
+  // Column layout: 3 ID slots + 2 EGO slots for both Actual and Keyword. Older /
+  // freshly-imported rows carry a single EGO column (length 4); pad to the full
+  // set so the extra Actual EGO#2 / KW EGO#2 cells render and persist.
+  const ID_N = 3, EGO_N = 2, COL_N = ID_N + EGO_N;
+  S.above.forEach((row) => {
+    row.actual = row.actual || [];
+    row.keyword = row.keyword || [];
+    while (row.actual.length < COL_N) row.actual.push("");
+    while (row.keyword.length < COL_N) row.keyword.push("");
+  });
   const fac = S.faction || [];
   // faction colour from this season's conditional formatting, else the constants palette
   const facColor = (val) => {
@@ -1557,12 +1567,13 @@ function renderIFSS7() {
   const st = S.stats || {};
 
   // computed stats (live; ported from the sheet's COUNTIF logic). IDs = actual[0..2]
-  // / keyword[0..2]; EGO = actual[3] / keyword[3]. Legend stays sheet reference data.
-  const actualIDs = S.above.flatMap((r) => (r.actual || []).slice(0, 3));
-  const actualEGO = S.above.map((r) => (r.actual || [])[3]);
+  // / keyword[0..2]; EGO = actual[3..] / keyword[3..] (every EGO column counts the
+  // same way). Legend stays sheet reference data.
+  const actualIDs = S.above.flatMap((r) => (r.actual || []).slice(0, ID_N));
+  const actualEGO = S.above.flatMap((r) => (r.actual || []).slice(ID_N));
   const actualAll = S.above.flatMap((r) => r.actual || []);
-  const kwIDs = S.above.flatMap((r) => (r.keyword || []).slice(0, 3));
-  const kwEGO = S.above.map((r) => (r.keyword || [])[3]);
+  const kwIDs = S.above.flatMap((r) => (r.keyword || []).slice(0, ID_N));
+  const kwEGO = S.above.flatMap((r) => (r.keyword || []).slice(ID_N));
   const cSub = (vals, sub) => vals.reduce((n, v) => n + (String(v ?? "").includes(sub) ? 1 : 0), 0);
   const cNon = (vals) => vals.reduce((n, v) => n + (String(v ?? "").trim() ? 1 : 0), 0);
   const cRe = (vals, re) => vals.reduce((n, v) => n + (re.test(String(v ?? "")) ? 1 : 0), 0);
@@ -1590,8 +1601,8 @@ function renderIFSS7() {
     ${picker}
     <div class="table-wrap ifss7-scroll" style="margin:8px 0 14px;">
       <table class="sheet"><thead><tr>
-        <th>Sinner</th><th>Actual ID#1</th><th>Actual ID#2</th><th>Actual ID#3</th><th>Actual EGO</th>
-        <th>KW ID#1</th><th>KW ID#2</th><th>KW ID#3</th><th>KW EGO</th>
+        <th>Sinner</th><th>Actual ID#1</th><th>Actual ID#2</th><th>Actual ID#3</th><th>Actual EGO#1</th><th>Actual EGO#2</th>
+        <th>KW ID#1</th><th>KW ID#2</th><th>KW ID#3</th><th>KW EGO#1</th><th>KW EGO#2</th>
       </tr></thead><tbody id="ifss7-main">${mainRows}</tbody></table>
     </div>
     <h2 class="section-title">Stats <span class="count">(computed; legend from sheet)</span></h2>
