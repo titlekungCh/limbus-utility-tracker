@@ -10,6 +10,7 @@ import re
 from datetime import datetime, date
 
 import openpyxl
+from openpyxl.utils import range_boundaries
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -42,31 +43,57 @@ def _hex(color):
     return "#" + rgb[-6:] if isinstance(rgb, str) and len(rgb) in (6, 8) else None
 
 
+# Actual block = the G..K data columns, rows 2-13 (3 ID + up to 2 EGO columns).
+_ACTUAL_BLOCK = (7, 2, 11, 13)   # (min_col G, min_row, max_col K, max_row)
+
+
+def _overlaps_actual(sqref):
+    """True if any sub-range of a conditional-formatting sqref touches the Actual
+    block. Tolerates the block being G2:J13 (1 EGO col) or G2:K13 (2 EGO cols),
+    and rules openpyxl splits across several sqref groups (e.g. G2:J13 + K2:K13)."""
+    amin_c, amin_r, amax_c, amax_r = _ACTUAL_BLOCK
+    for tok in str(sqref).split():
+        try:
+            min_c, min_r, max_c, max_r = range_boundaries(tok)
+        except (ValueError, TypeError):
+            continue
+        if None in (min_c, min_r, max_c, max_r):
+            continue
+        if min_c <= amax_c and max_c >= amin_c and min_r <= amax_r and max_r >= amin_r:
+            return True
+    return False
+
+
 def ifss_faction_colors(ws):
-    """Faction colours from the sheet's conditional formatting on the Actual block
-    (the NOT(ISERROR(SEARCH(("X"),...))) rules over G2:J13). Returns a list of
-    {match, fill, font} in rule order (order = match priority). Picks up any new
-    faction/source a future season introduces."""
-    out = []
+    """Faction/source colours from the sheet's conditional formatting on the Actual
+    block (the NOT(ISERROR(SEARCH(("X"),...))) rules covering the G..K data columns,
+    rows 2-13). Returns a list of {match, fill, font} in discovery order (= match
+    priority), deduped by match. Picks up any new faction/source a future season
+    introduces, and tolerates 1-vs-2 EGO columns and openpyxl splitting the rules
+    across multiple sqref groups."""
+    out, seen = [], set()
     for rng in ws.conditional_formatting:
-        if "G2:J13" not in str(rng.sqref):
+        if not _overlaps_actual(rng.sqref):
             continue
         for rule in ws.conditional_formatting[rng]:
             f = rule.formula[0] if rule.formula else ""
             m = re.search(r'SEARCH\(\("([^"]+)"\)', f)
             if not m or not rule.dxf or not rule.dxf.fill:
                 continue
+            match = m.group(1)
+            if match in seen:
+                continue
             fill = _hex(rule.dxf.fill.bgColor)
             font = _hex(rule.dxf.font.color) if (rule.dxf.font and rule.dxf.font.color) else None
             if fill:
-                out.append({"match": m.group(1), "fill": fill, "font": font or "#202124"})
-        break
+                seen.add(match)
+                out.append({"match": match, "fill": fill, "font": font or "#202124"})
     return out
 
 
 def extract_ifss(wb):
     """Every 'IF SS<N> Sheet' -> structured page data, keyed by season number.
-    above = Actual (F sinner, G:J) + Keyword (M:P), rows 2-13 (editable).
+    above = Actual (F sinner, G:K = 3 ID + 2 EGO) + Keyword (M:Q), rows 2-13 (editable).
     stats = the sheet's pre-computed cards (read-only): predicted fingers A15:B19,
     actual fingers F15:G21, totals H15:I21, status counts L15:M21, combo legend
     N15:P21. faction = colours from the sheet's conditional formatting."""
@@ -82,8 +109,8 @@ def extract_ifss(wb):
 
         above = [{
             "sinner": v(f"F{r}"),
-            "actual": [v(f"G{r}"), v(f"H{r}"), v(f"I{r}"), v(f"J{r}")],
-            "keyword": [v(f"M{r}"), v(f"N{r}"), v(f"O{r}"), v(f"P{r}")],
+            "actual": [v(f"G{r}"), v(f"H{r}"), v(f"I{r}"), v(f"J{r}"), v(f"K{r}")],
+            "keyword": [v(f"M{r}"), v(f"N{r}"), v(f"O{r}"), v(f"P{r}"), v(f"Q{r}")],
         } for r in range(2, 14)]
 
         def rows(r0, r1, cols):
