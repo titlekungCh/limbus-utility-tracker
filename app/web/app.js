@@ -439,28 +439,41 @@ function renderDashboard() {
   renderForecast();
 }
 
+// Shard-plan Target picker: 5 single slot-kinds + every unordered pair (with
+// repetition). Kinds: free-text note; Shard ID/EGO = not-owned named (sheet
+// Extractible F13/F14 + Need-to-Shard F15/F16); Acq ID/EGO = acquired named.
+const TARGET_KINDS = [["text", "Text"], ["sid", "Shard ID"], ["sego", "Shard EGO"], ["aid", "Acq ID"], ["aego", "Acq EGO"]];
+const TARGET_MODES = (() => {
+  const out = TARGET_KINDS.map(([v, l]) => [v, l]);              // 5 singles
+  for (let i = 0; i < TARGET_KINDS.length; i++)
+    for (let j = i; j < TARGET_KINDS.length; j++)                // 15 pairs (i<=j: unordered + self)
+      out.push([`${TARGET_KINDS[i][0]}+${TARGET_KINDS[j][0]}`, `${TARGET_KINDS[i][1]} + ${TARGET_KINDS[j][1]}`]);
+  return out;
+})();
+
 // ---------- forecasts / projections ----------
 function renderForecast() {
   const s = state;
   const mf = managerForecast(s);
   const rf = resourceForecast(s);
   const plan = shardPlanRows(s);
-  // Shard-plan target list: the un-owned IDs + EGOs you'd shard toward (mirrors the
-  // sheet's Extraction + Need-to-Shard lists = everything not acquired).
-  const targetSeen = new Set(), targetList = [];
-  [...s.ids, ...s.egos].forEach((x) => {
-    if (x.acquired || !x.name) return;
-    const label = `[${x.name}] ${x.sinner}`;
-    if (!targetSeen.has(label)) { targetSeen.add(label); targetList.push({ label, sinner: x.sinner }); }
-  });
-  const targetSinner = (label) => (targetList.find((o) => o.label === label) || {}).sinner;
-  // colour-coded sinner-icon dropdown (like the calculator pickers); only the
-  // row's own sinner's un-owned IDs/EGOs are listed
-  const targetSelect = (idx, df, sel, sinnerName, ut) => {
+  // Shard-plan target picker (see TARGET_KINDS). Each dropdown lists only the row
+  // sinner's items from one of four lists; a slot can also be a free-text note.
+  const kindList = (kind, sinner) => {
+    switch (kind) {
+      case "sid":  return s.ids.filter((x) => x.name && !x.acquired && x.sinner === sinner);   // F14 + F16
+      case "sego": return s.egos.filter((x) => x.name && !x.acquired && x.sinner === sinner);  // F13 + F15
+      case "aid":  return s.ids.filter((x) => x.name && x.acquired && x.sinner === sinner);     // acquired IDs
+      case "aego": return s.egos.filter((x) => x.name && x.acquired && x.sinner === sinner);    // acquired EGOs
+      default:     return [];
+    }
+  };
+  // one colour-coded sinner-icon dropdown slot (like the calculator pickers) + its Uptie toggle
+  const slotSelect = (idx, df, sel, sinner, ut, list) => {
     const opts = `<option${!sel ? " selected" : ""}></option>`
-      + targetList.filter((o) => o.sinner === sinnerName).map((o) => `<option${o.label === sel ? " selected" : ""}${optStyle(sinnerColor(o.sinner))} data-sinner="${esc(o.sinner)}">${esc(o.label)}</option>`).join("");
-    const sn = targetSinner(sel);
-    const picker = cselHtml(`<select data-i="${idx}" data-f="${df}">${opts}</select>`, "sinner", sel || "", sn ? sinnerColor(sn) : null, sn ? optIcon("sinner", sn) : "");
+      + list.map((x) => { const label = `[${x.name}] ${x.sinner}`;
+          return `<option${label === sel ? " selected" : ""}${optStyle(sinnerColor(x.sinner))} data-sinner="${esc(x.sinner)}">${esc(label)}</option>`; }).join("");
+    const picker = cselHtml(`<select data-i="${idx}" data-f="${df}">${opts}</select>`, "sinner", sel || "", sinnerColor(sinner), optIcon("sinner", sinner));
     const toggle = `<button type="button" class="ut-toggle${ut ? " on" : ""}" data-i="${idx}" data-f="${df}UT" title="Uptie target / not">${ut ? "Uptie" : "No UT"}</button>`;
     return picker + toggle;
   };
@@ -545,12 +558,20 @@ function renderForecast() {
                 <td class="num">${fmt(p.crateNeeded)}${icoTag(RESOURCE_ICON.crate)}</td>
                 <td class="num">${fmt(p.threadNeeded)}${icoTag(RESOURCE_ICON.thread)}</td>
                 <td>${(() => {
-                  const m = p.targetMode || "text";
-                  const modeSel = `<select data-i="${p.index}" data-f="targetMode">${[["text", "Text"], ["one", "1 ID/EGO"], ["two", "2 ID/EGO"]].map(([v, l]) => `<option value="${v}"${v === m ? " selected" : ""}>${l}</option>`).join("")}</select>`;
-                  const body = m === "one" ? targetSelect(p.index, "targetA", p.targetA, p.sinner, p.targetAUT)
-                    : m === "two" ? targetSelect(p.index, "targetA", p.targetA, p.sinner, p.targetAUT) + targetSelect(p.index, "targetB", p.targetB, p.sinner, p.targetBUT)
-                    : `<input type="text" data-i="${p.index}" data-f="target" value="${esc(p.target)}"/>`;
-                  return `<div class="target-cell">${modeSel}${body}</div>`;
+                  let mode = p.targetMode || "text";
+                  if (mode === "one") mode = "text";              // migrate retired legacy modes,
+                  else if (mode === "two") mode = "text+text";    // keeping old labels as text notes
+                  const modeSel = `<select data-i="${p.index}" data-f="targetMode">${TARGET_MODES.map(([v, l]) => `<option value="${v}"${v === mode ? " selected" : ""}>${esc(l)}</option>`).join("")}</select>`;
+                  const F = ["targetA", "targetB"], UT = ["targetAUT", "targetBUT"];
+                  const slots = mode.split("+").map((kind, si) => {
+                    const df = F[si];
+                    if (kind === "text") {
+                      const val = p[df] || (si === 0 ? p.target : "") || "";
+                      return `<input type="text" data-i="${p.index}" data-f="${df}" value="${esc(val)}"/>`;
+                    }
+                    return slotSelect(p.index, df, p[df] || "", p.sinner, p[UT[si]], kindList(kind, p.sinner));
+                  }).join("");
+                  return `<div class="target-cell">${modeSel}${slots}</div>`;
                 })()}</td>
               </tr>`).join("")}</tbody>
           </table>
