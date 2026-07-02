@@ -442,7 +442,7 @@ function renderDashboard() {
 // Shard-plan Target picker: 5 single slot-kinds + every unordered pair (with
 // repetition). Kinds: free-text note; Shard ID/EGO = not-owned named (sheet
 // Extractible F13/F14 + Need-to-Shard F15/F16); Acq ID/EGO = acquired named.
-const TARGET_KINDS = [["text", "Text"], ["sid", "Shard ID"], ["sego", "Shard EGO"], ["aid", "Acq ID"], ["aego", "Acq EGO"]];
+const TARGET_KINDS = [["text", "Text"], ["sid", "S ID"], ["sego", "S EGO"], ["aid", "A ID"], ["aego", "A EGO"]];
 const TARGET_MODES = (() => {
   const out = TARGET_KINDS.map(([v, l]) => [v, l]);              // 5 singles
   for (let i = 0; i < TARGET_KINDS.length; i++)
