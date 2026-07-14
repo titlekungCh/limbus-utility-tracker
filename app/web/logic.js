@@ -266,11 +266,11 @@ export const ACTIONS = {
   // --- Uptie ---
   uptie: (s, key) => {
     const u = UPTIE[key];
+    const id = s.ids[s.uptie.idIdx];
     if (u.threads) threadAdd(s, u.threads);
     if (u.lunacy) fLCH(s, u.lunacy);
-    if (u.shard) changeShard(s, u.shard, s.uptie.sinner);
+    if (u.shard) changeShard(s, u.shard, id?.sinner);
     // also bump the selected ID's uptie level (IDs page)
-    const id = s.ids[s.uptie.idIdx];
     if (id && UPTIE_LEVEL[key] != null) { id.uptie = UPTIE_LEVEL[key]; note(`${id.name}: UT -> ${id.uptie}`); }
     note(`${u.label}: ${u.threads ? u.threads + " threads" : ""}${u.lunacy ? ", +" + u.lunacy + " lunacy" : ""}`);
   },
@@ -278,9 +278,9 @@ export const ACTIONS = {
   // --- TS5: craft spinchains from EGO shard (1:1) or thread (2:1) ---
   threadspinTS5: (s, grade, method) => {
     const cost = SPINCHAIN[grade] || 0;
-    if (method === "thread") threadAdd(s, -cost * SPINCHAIN_PER_THREAD);
-    else shardAddDirect(s, s.uptie.sinner, -cost);          // 1 spinchain = 1 EGO shard
     const ego = s.egos[s.uptie.egoIdx];
+    if (method === "thread") threadAdd(s, -cost * SPINCHAIN_PER_THREAD);
+    else shardAddDirect(s, ego?.sinner, -cost);          // 1 spinchain = 1 EGO shard
     if (ego) { ego.threadspin = 5; note(`${ego.name}: TS -> 5`); }
     note(`${grade} TS5: ${cost} spinchain (${method === "thread" ? cost * SPINCHAIN_PER_THREAD + " threads" : cost + " shards"})`);
   },
@@ -288,10 +288,10 @@ export const ACTIONS = {
   // --- Thread spinning ---
   threadspin: (s, grade, step) => {
     const g = THREADSPIN[grade];
-    threadAdd(s, g[step]);
-    if (step === "TS4") changeShard(s, g.shard, s.uptie.sinner);
-    // also set the selected EGO's TS level (EGOs page)
     const ego = s.egos[s.uptie.egoIdx];
+    threadAdd(s, g[step]);
+    if (step === "TS4") changeShard(s, g.shard, ego?.sinner);
+    // also set the selected EGO's TS level (EGOs page)
     if (ego && TS_STEP_LEVEL[step] != null) { ego.threadspin = TS_STEP_LEVEL[step]; note(`${ego.name}: TS -> ${ego.threadspin}`); }
     note(`${grade} ${step}: ${g[step]} threads`);
   },
