@@ -146,13 +146,18 @@ const TICKET_ORDER = ["IV", "III", "II", "I"];
 // Shift one EXP ticket of `tier` in the planned breakdown without changing the
 // total XP covered: lowering a tier (dir<0) refills the gap with the tiers below
 // it; raising a tier (dir>0) pulls that XP back out of the lower tiers. Returns a
-// new counts object, or null if the move isn't possible (no lower tier / nothing
-// to give back). All ticket XP values are exact multiples of the smaller ones, so
-// the greedy refill always lands exactly.
+// new counts object, or null if the move isn't possible (nothing to give back).
+// All ticket XP values are exact multiples of the smaller ones, so the greedy
+// refill always lands exactly. Tier I has nothing below it: it is a free +/-1
+// override (0..owned) that changes the total XP covered, e.g. when short on Tier I.
 export function adjustTicketUse(s, counts, tier, dir) {
   const xp = ticketXpMap(s);
   const lower = TICKET_ORDER.slice(TICKET_ORDER.indexOf(tier) + 1);
-  if (!lower.length) return null;                       // Tier I: nothing below
+  if (!lower.length) {
+    const cur = counts[tier] || 0;
+    if (dir < 0 ? cur <= 0 : cur >= ((s.inventory.tickets[tier]) || 0)) return null;
+    return { ...counts, [tier]: cur + (dir < 0 ? -1 : 1) };
+  }
   const lowerXP = lower.reduce((a, t) => a + (counts[t] || 0) * xp[t], 0);
   const next = { ...counts };
   if (dir < 0) {

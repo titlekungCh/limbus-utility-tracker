@@ -17,7 +17,7 @@ function currentPatchISO() {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 import {
-  managerForecast, resourceForecast, shardPlanRows, idLeveling, applyIdLeveling, adjustTicketUse, ticketXpMap, SHARD_TYPES,
+  managerForecast, resourceForecast, shardPlanRows, idLeveling, applyIdLeveling, adjustTicketUse, ticketXpMap, levelForTotalXP, SHARD_TYPES,
   eventShop, REWARD_TYPES, egoThreadspin, rentalWeekFlag,
 } from "./projections.js";
 
@@ -522,8 +522,9 @@ function renderForecast() {
 
       <div class="card">
         <h2>Pass Level Forecast</h2>
-        <div class="body"><div class="kv">${kv([
-          ["Current Pass Level", rf.pass.current],
+        <div class="body"><div class="kv">
+          <div class="k">Current Pass Level</div><div class="v"><input type="number" step="any" class="kv-num" data-path="inventory.pass" value="${rf.pass.current ?? ""}"/></div>
+          ${kv([
           ["Will Gain (to season end)", rf.pass.willGain, true],
           ["Final Pass Level", rf.pass.final],
           ["This Week Projection", rf.pass.thisWeek],
@@ -630,10 +631,21 @@ function renderIdLeveling() {
     const st = styleAttr(fillColor(INVENTORY_FILL["tickets." + tier]));
     const left = (owned[tier] || 0) - (counts[tier] || 0);
     const lowerXP = (tier === "I") ? 0 : ["IV", "III", "II", "I"].slice(["IV", "III", "II", "I"].indexOf(tier) + 1).reduce((a, t) => a + (counts[t] || 0) * tx[t], 0);
-    const adj = (tier === "I") ? "" :
-      `<span class="tk-adj"><button class="tk-step" data-tier="${tier}" data-dir="-1"${(counts[tier] || 0) <= 0 ? " disabled" : ""} title="Use one fewer Ticket ${tier} — lower tiers fill in">&lt;</button><button class="tk-step" data-tier="${tier}" data-dir="1"${lowerXP < tx[tier] ? " disabled" : ""} title="Use one more Ticket ${tier} — pulled back from lower tiers">&gt;</button></span>`;
+    const adj = (tier === "I")
+      ? `<span class="tk-adj"><button class="tk-step" data-tier="I" data-dir="-1"${(counts.I || 0) <= 0 ? " disabled" : ""} title="Use one fewer Ticket I — result level drops (use when short on Ticket I)">&lt;</button><button class="tk-step" data-tier="I" data-dir="1"${(counts.I || 0) >= (owned.I || 0) ? " disabled" : ""} title="Use one more Ticket I (up to owned)">&gt;</button></span>`
+      : `<span class="tk-adj"><button class="tk-step" data-tier="${tier}" data-dir="-1"${(counts[tier] || 0) <= 0 ? " disabled" : ""} title="Use one fewer Ticket ${tier} — lower tiers fill in">&lt;</button><button class="tk-step" data-tier="${tier}" data-dir="1"${lowerXP < tx[tier] ? " disabled" : ""} title="Use one more Ticket ${tier} — pulled back from lower tiers">&gt;</button></span>`;
     return `<div class="k" style="${st}">${icoTag(RESOURCE_ICON[tier])}Ticket ${tier}${adj}</div><div class="v" style="${st}">${fmt(counts[tier] || 0)} <span class="count${left < 0 ? " shard-low" : ""}">(${fmt(left)} left)</span></div>`;
   }).join("") : "";
+  // level the ID actually lands on with the planned tickets (differs from Target if Ticket I is lowered)
+  let resultRows = "";
+  if (res && counts) {
+    const covered = ["IV", "III", "II", "I"].reduce((a, t) => a + (counts[t] || 0) * tx[t], 0);
+    const fin = levelForTotalXP(state, res.atCur + res.levelExtra + covered);
+    const short = Math.max(0, res.xpNeeded - covered);
+    const finSt = styleAttr(levelColor(fin.level));
+    resultRows = `<div class="k">Tickets XP</div><div class="v">${fmt(covered)}</div>
+      <div class="k" style="${finSt}">Result Level</div><div class="v big" style="${finSt}">${fmt(fin.level)} <span class="count">(+${fmt(fin.extra)} XP${short > 0 ? `, ${fmt(short)} short of target` : ""})</span></div>`;
+  }
   body.innerHTML = `
     <div class="field"><label>ID</label>
       ${cselHtml(
@@ -648,7 +660,7 @@ function renderIdLeveling() {
       <div class="k">XP Needed</div><div class="v big">${res ? fmt(res.xpNeeded) : "—"}</div>
     </div>
     <div class="subhead">EXP Tickets needed</div>
-    <div class="kv">${ticketRows}</div>`;
+    <div class="kv">${ticketRows}${resultRows}</div>`;
   $("#idlevel-name").addEventListener("change", (e) => { idLevelSel.idx = +e.target.value; renderIdLeveling(); });
   $("#idlevel-target").addEventListener("change", (e) => { idLevelSel.target = Number(e.target.value) || 1; renderIdLeveling(); });
   body.querySelectorAll(".tk-step").forEach((b) => b.addEventListener("click", () => {
