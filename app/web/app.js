@@ -22,7 +22,7 @@ import {
 } from "./projections.js";
 
 // persists across dashboard re-renders (idx into state.ids / state.egos)
-let idLevelSel = { idx: null, target: 60 };
+let idLevelSel = { idx: null, target: 65 };
 let egoTSel = { idx: null, target: 4 };
 
 let state = null;
