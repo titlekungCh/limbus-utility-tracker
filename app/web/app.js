@@ -643,8 +643,12 @@ function renderIdLeveling() {
     const fin = levelForTotalXP(state, res.atCur + res.levelExtra + covered);
     const short = Math.max(0, res.xpNeeded - covered);
     const finSt = styleAttr(levelColor(fin.level));
-    resultRows = `<div class="k">Tickets XP</div><div class="v">${fmt(covered)}</div>
-      <div class="k" style="${finSt}">Result Level</div><div class="v big" style="${finSt}">${fmt(fin.level)} <span class="count">(+${fmt(fin.extra)} XP${short > 0 ? `, ${fmt(short)} short of target` : ""})</span></div>`;
+    resultRows = `<div class="kv" style="margin-top:6px;">
+      <div class="k">Tickets XP</div><div class="v">${fmt(covered)}</div>
+      <div class="k" style="${finSt}">Result Level</div><div class="v big" style="${finSt}">${fmt(fin.level)}</div>
+      <div class="k">Level Extra XP After</div><div class="v">${fmt(fin.extra)}</div>
+      ${short > 0 ? `<div class="k">XP Short of Target</div><div class="v shard-low">${fmt(short)}</div>` : ""}
+    </div>`;
   }
   body.innerHTML = `
     <div class="field"><label>ID</label>
@@ -660,7 +664,7 @@ function renderIdLeveling() {
       <div class="k">XP Needed</div><div class="v big">${res ? fmt(res.xpNeeded) : "—"}</div>
     </div>
     <div class="subhead">EXP Tickets needed</div>
-    <div class="kv">${ticketRows}${resultRows}</div>`;
+    <div class="kv">${ticketRows}</div>${resultRows}`;
   $("#idlevel-name").addEventListener("change", (e) => { idLevelSel.idx = +e.target.value; renderIdLeveling(); });
   $("#idlevel-target").addEventListener("change", (e) => { idLevelSel.target = Number(e.target.value) || 1; renderIdLeveling(); });
   body.querySelectorAll(".tk-step").forEach((b) => b.addEventListener("click", () => {
