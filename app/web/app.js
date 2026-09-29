@@ -108,11 +108,15 @@ const refreshAcell = (input) => {
 // Keyword icons resolve through the user-managed list (state.extraKeywords)
 // first, then the built-in OPTION_ICONS map. The list also drives the Extra
 // Keyword option set (managed on the Data page).
-const keywordIcon = (val) => {
+// An icon field may hold several comma-separated paths/URLs (alternate icons);
+// `pick` selects one (per-ID/EGO choice, see kwIcons), defaulting to the first.
+const splitIcons = (s) => String(s || "").split(",").map((x) => x.trim()).filter(Boolean);
+const keywordIcons = (val) => {
   const ek = (state && state.extraKeywords) || [];
   const hit = ek.find((k) => k && k.name === val && k.icon);
-  return hit ? hit.icon : (OPTION_ICONS.keyword || {})[val] || "";
+  return hit ? splitIcons(hit.icon) : splitIcons((OPTION_ICONS.keyword || {})[val]);
 };
+const keywordIcon = (val, pick) => { const a = keywordIcons(val); return a[pick] || a[0] || ""; };
 const extraKeywordNames = () =>
   (state && state.extraKeywords && state.extraKeywords.length
     ? state.extraKeywords.map((k) => k && k.name).filter(Boolean)
@@ -1174,6 +1178,7 @@ function statusIconChips(text) {
 // memory only — intentionally NOT saved to state, so they reset on refresh.
 const listFilters = {};
 let listFilterWired = false;
+let kwiWired = false; // right-click keyword-icon picker: document close handlers attached once
 function wireListFilterClose() {
   if (listFilterWired) return;
   listFilterWired = true;
@@ -1233,10 +1238,12 @@ function renderEditableList(viewId, arrayName, columns, searchKeys, makeBlank) {
   };
 
   const chipHtml = (tc, t) => { const c = tc && tc(t); return c ? `<span class="chip" style="background:${c.fill};color:${c.font}">${esc(t)}</span>` : `<span class="chip plain">${esc(t)}</span>`; };
-  const tagSummary = (col, tags) => {
+  // a row's chosen icon for a keyword (right-click picker), else the first one
+  const kwIco = (item, t) => icoTag(keywordIcon(t, item && item.kwIcons && item.kwIcons[t]));
+  const tagSummary = (col, tags, item) => {
     if (col.cellColor) return `<span class="tag" style="${styleAttr(col.cellColor(tags))}">${tags.length ? esc(tags.join(", ")) : "—"}</span>`;
     // Keyword / Extra Keyword: icon-only summary (icon if one exists, else the name)
-    if (col.iconCat === "keyword") return tags.length ? tags.map((t) => optIcon("keyword", t) || esc(t)).join(" ") : "—";
+    if (col.iconCat === "keyword") return tags.length ? tags.map((t) => kwIco(item, t) || esc(t)).join(" ") : "—";
     if (col.tagColor) return tags.length ? tags.map((t) => optIcon(col.iconCat, t) + chipHtml(col.tagColor, t)).join(" ") : "—";
     if (col.iconCat) return tags.length ? tags.map((t) => optIcon(col.iconCat, t) || esc(t)).join(" ") : "—";
     return tags.length ? esc(tags.join(", ")) : "—";
@@ -1275,7 +1282,7 @@ function renderEditableList(viewId, arrayName, columns, searchKeys, makeBlank) {
       const tags = splitTags(v);
       // panel options are filled lazily on first open (see fillPanel) so we
       // don't bake every row's full option list into the DOM up-front.
-      return `<td class="season-cell"><details class="ms"><summary>${tagSummary(col, tags)}</summary>
+      return `<td class="season-cell" data-idx="${idx}" data-key="${col.key}"><details class="ms"><summary>${tagSummary(col, tags, item)}</summary>
         <div class="ms-panel" data-idx="${idx}" data-key="${col.key}"></div></details></td>`;
     }
     if (col.type === "date")
@@ -1370,7 +1377,7 @@ function renderEditableList(viewId, arrayName, columns, searchKeys, makeBlank) {
       const added = [...checked].filter((t) => !prev.includes(t));
       const tags = [...kept, ...added];
       item[key] = tags.join(", ");
-      panel.parentElement.querySelector("summary").innerHTML = tagSummary(colByKey[key], tags);
+      panel.parentElement.querySelector("summary").innerHTML = tagSummary(colByKey[key], tags, item);
       autosave();
       return;
     }
@@ -1392,6 +1399,43 @@ function renderEditableList(viewId, arrayName, columns, searchKeys, makeBlank) {
     draw();
     autosave();
   });
+  // ----- right-click a Keyword / Extra Keyword cell: pick which icon each of
+  // its keywords shows (only keywords with alternate icons are listed) -----
+  const closeKwi = () => document.querySelectorAll(".kwi-panel").forEach((p) => p.remove());
+  const kwiRows = (item, key) => {
+    const rows = splitTags(item[key]).map((t) => ({ t, icons: keywordIcons(t) })).filter((r) => r.icons.length > 1);
+    if (!rows.length) return `<div class="hint">No alternate icons for these keywords</div>`;
+    const cur = item.kwIcons || {};
+    return rows.map(({ t, icons }) => `<div class="ms-opt kwi-row">${icons.map((p, j) =>
+      `<button type="button" class="kwi-ico${(cur[t] || 0) === j ? " on" : ""}" data-kw="${esc(t)}" data-j="${j}" title="${esc(t)}">${icoTag(p)}</button>`).join("")}</div>`).join("");
+  };
+  body.addEventListener("contextmenu", (e) => {
+    const td = e.target.closest("td.season-cell");
+    const col = td && colByKey[td.dataset.key];
+    if (!col || col.iconCat !== "keyword") return;
+    e.preventDefault();
+    closeKwi();
+    const d = td.querySelector("details.ms"); if (d) d.open = false;
+    const item = state[arrayName][+td.dataset.idx]; if (!item) return;
+    td.insertAdjacentHTML("beforeend", `<div class="ms-panel kwi-panel">${kwiRows(item, col.key)}</div>`);
+  });
+  body.addEventListener("click", (e) => {
+    const b = e.target.closest(".kwi-ico"); if (!b) return;
+    const td = b.closest("td.season-cell");
+    const item = state[arrayName][+td.dataset.idx]; if (!item) return;
+    item.kwIcons = { ...(item.kwIcons || {}), [b.dataset.kw]: +b.dataset.j };
+    if (!+b.dataset.j) delete item.kwIcons[b.dataset.kw];   // first icon is the default: don't store it
+    if (!Object.keys(item.kwIcons).length) delete item.kwIcons;
+    td.querySelector("summary").innerHTML = tagSummary(colByKey[td.dataset.key], splitTags(item[td.dataset.key]), item);
+    td.querySelector(".kwi-panel").innerHTML = kwiRows(item, td.dataset.key);
+    autosave();
+  });
+  if (!kwiWired) {
+    kwiWired = true;
+    // (a picked icon re-renders the panel, detaching the click target — not an outside click)
+    document.addEventListener("click", (e) => { if (e.target.isConnected && !e.target.closest(".kwi-panel")) closeKwi(); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeKwi(); });
+  }
   // live filter for searchable tag dropdowns (e.g. Extra Keyword)
   body.addEventListener("input", (e) => {
     if (!e.target.classList.contains("ms-search")) return;
@@ -1742,10 +1786,10 @@ function renderData() {
   // server downloads into icons/keyword/). Drives the IDs/EGOs pickers.
   const ekwRows = () => state.extraKeywords.map((k, i) =>
     `<tr data-i="${i}">
-      <td style="text-align:center;width:34px">${k.icon ? icoTag(k.icon) : '<span class="hint">—</span>'}</td>
+      <td style="text-align:center;min-width:34px;white-space:nowrap">${k.icon ? splitIcons(k.icon).map((p) => icoTag(p)).join("") : '<span class="hint">—</span>'}</td>
       <td><input class="ekw-name" data-i="${i}" value="${esc(k.name ?? "")}"/></td>
-      <td><input class="ekw-icon" data-i="${i}" value="${esc(k.icon ?? "")}" placeholder="icons/keyword/… or https://…" style="width:100%"/></td>
-      <td style="text-align:center"><button class="act ekw-fetch" data-i="${i}" title="download the icon at that URL for offline use">⤓</button></td>
+      <td><input class="ekw-icon" data-i="${i}" value="${esc(k.icon ?? "")}" placeholder="icons/keyword/… or https://… (comma-separate for alternates)" style="width:100%"/></td>
+      <td style="text-align:center"><button class="act ekw-fetch" data-i="${i}" title="download the icon URL(s) for offline use">⤓</button></td>
       <td style="text-align:center"><button class="reset ekw-del" data-i="${i}" title="remove keyword">✕</button></td>
     </tr>`).join("");
   const isScalar = (v) => v === null || ["number", "string", "boolean"].includes(typeof v);
@@ -1820,7 +1864,7 @@ function renderData() {
       </div>
       <div class="field" style="margin-top:8px;">
         <input type="text" id="ekw-newname" placeholder="new keyword" style="min-width:160px"/>
-        <input type="text" id="ekw-newurl" placeholder="icon URL or path (optional)" style="min-width:240px"/>
+        <input type="text" id="ekw-newurl" placeholder="icon URL(s) or path(s), comma-separated (optional)" style="min-width:240px"/>
         <button class="act primary" id="ekw-add">+ Add keyword</button>
         <span class="count" id="ekw-count">${state.extraKeywords.length} keywords</span>
       </div>
@@ -1877,6 +1921,20 @@ function renderData() {
 
   // ----- Extra Keyword manager -----
   // Refresh just the keyword table + the IDs/EGOs pickers (which read the list).
+  // Download every http(s) entry of a comma-separated icon list (alternates get
+  // "-2", "-3"… file names); local paths and failed URLs are kept as-is.
+  const isUrl = (p) => /^https?:\/\//i.test(p);
+  const fetchIconList = async (src, name) => {
+    const out = [], failed = [];
+    const list = splitIcons(src);
+    for (let j = 0; j < list.length; j++) {
+      const p = list[j];
+      if (!isUrl(p)) { out.push(p); continue; }
+      try { out.push(await fetchIconTo(p, j ? `${name} ${j + 1}` : name)); }
+      catch (err) { out.push(p); failed.push(err.message); }
+    }
+    return { icon: out.join(", "), failed };
+  };
   const redrawEkw = () => {
     const tb = $("#ekw-body"); if (tb) tb.innerHTML = ekwRows();
     const cnt = $("#ekw-count"); if (cnt) cnt.textContent = `${state.extraKeywords.length} keywords`;
@@ -1893,11 +1951,11 @@ function renderData() {
     const i = +btn.dataset.i; const k = state.extraKeywords[i]; if (!k) return;
     if (btn.classList.contains("ekw-del")) { state.extraKeywords.splice(i, 1); redrawEkw(); return; }
     if (btn.classList.contains("ekw-fetch")) {
-      const src = (k.icon || "").trim();
-      if (!/^https?:\/\//i.test(src)) { toast(["Put an http(s) image URL in the icon field first"]); return; }
+      if (!splitIcons(k.icon).some(isUrl)) { toast(["Put an http(s) image URL in the icon field first"]); return; }
       btn.disabled = true; btn.textContent = "…";
-      try { k.icon = await fetchIconTo(src, k.name); redrawEkw(); toast([`Saved icon for ${k.name}`]); }
-      catch (err) { toast([`Icon fetch failed: ${err.message}`]); btn.disabled = false; btn.textContent = "⤓"; }
+      const r = await fetchIconList(k.icon, k.name);
+      k.icon = r.icon; redrawEkw();
+      toast(r.failed.length ? r.failed.map((f) => `Icon fetch failed: ${f}`) : [`Saved icon(s) for ${k.name}`]);
     }
   });
   $("#ekw-add").addEventListener("click", async () => {
@@ -1906,9 +1964,11 @@ function renderData() {
     if (!name) { toast(["Enter a keyword name"]); return; }
     if (state.extraKeywords.some((k) => k.name === name)) { toast([`"${name}" already exists`]); return; }
     let icon = url;
-    if (/^https?:\/\//i.test(url)) {
-      try { icon = await fetchIconTo(url, name); }
-      catch (err) { toast([`Added "${name}", but icon fetch failed: ${err.message}`]); icon = ""; }
+    if (splitIcons(url).some(isUrl)) {
+      const r = await fetchIconList(url, name);
+      // drop URLs that failed to download so the keyword isn't left with a broken remote icon
+      icon = splitIcons(r.icon).filter((p) => !isUrl(p)).join(", ");
+      if (r.failed.length) toast([`Added "${name}", but some icon fetches failed:`, ...r.failed]);
     }
     state.extraKeywords.push({ name, icon });
     $("#ekw-newname").value = ""; $("#ekw-newurl").value = "";

@@ -82,6 +82,8 @@ IF SS, MD Teams, Data.**
   — blank UT/TS counts as 0. The text search matches the **name only** and
   supports `term` (AND), `-term` (exclude), and `"quoted phrases"`. Owned rows
   get a green tint; everything is colour-coded from the sheet's formatting.
+  **Right-click** a Keyword / Extra Keyword cell to pick which alternate icon
+  each of its keywords shows (stored per row in `kwIcons`).
 - **Bokgak Teams** / **MD Teams** — editable free-form grids (add/delete rows &
   columns); cells tinted by the sinner acronym they contain.
 - **IF SS** — one page per season with a **season picker** (`state.ifss`, fed by
@@ -93,7 +95,9 @@ IF SS, MD Teams, Data.**
   sheet reference data. (MD Teams still reads the old full IF SS7 grid.)
 - **Data** — edit `state.constants` (curves, scalars, shard table with colour
   pickers, ticket XP) and manage the shared **Extra Keyword** list
-  (add / rename / set icon via fetch / remove). Computed fields are read-only.
+  (add / rename / set icon via fetch / remove). The icon field takes a
+  **comma-separated list** of paths/URLs for alternate icons (fetch downloads
+  each as `name`, `name-2`, …). Computed fields are read-only.
 
 ## Icons
 

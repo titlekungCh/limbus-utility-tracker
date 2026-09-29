@@ -437,3 +437,11 @@ table.sheet td .acell:not(:focus-within) > input { color: transparent; }
   padding: 8px 12px; border-radius: 6px; font-size: 12px; font-family: var(--mono);
   box-shadow: 0 4px 12px #000a;
 }
+
+/* right-click keyword-icon picker (IDs / EGOs keyword cells) */
+.kwi-panel { min-width: 0; }
+.kwi-row { gap: 4px; }
+.kwi-ico { background: none; border: 1px solid transparent; border-radius: 4px; padding: 2px; cursor: pointer; line-height: 0; }
+.kwi-ico .opt-ico { width: 22px; height: 22px; margin: 0; }
+.kwi-ico:hover { border-color: var(--line); }
+.kwi-ico.on { border-color: var(--gold); background: #ffffff12; }
