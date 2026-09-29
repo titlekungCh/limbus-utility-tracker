@@ -13,9 +13,9 @@ const isRentalWeek = (wk) => (((wk % 2) + 2) % 2) === 1; // anchor week even -> 
 // Single source of truth for the stored md.rentalWeek flag (0 = rental week,
 // 1 = non-rental week — matches Code.gs / normalCheck), derived from the patch date.
 export const rentalWeekFlag = (iso) => (isRentalWeek(weeksFromAnchor(iso)) ? 0 : 1);
-// A week's MD types in run order: (Hard, Normal) x3, then a Rental (counts as
-// Normal) on rental weeks. "H" = Hard (+120 XP), "N"/"R" = +100 XP.
-const weekTypes = (rental) => (rental ? ["H", "N", "H", "N", "H", "N", "R"] : ["H", "N", "H", "N", "H", "N"]);
+// A week's MD types in run order: 3 Hard, then 3 Normal, then a Rental (counts
+// as Normal) on rental weeks. "H" = Hard (+120 XP), "N"/"R" = +100 XP.
+const weekTypes = (rental) => (rental ? ["H", "H", "H", "N", "N", "N", "R"] : ["H", "H", "H", "N", "N", "N"]);
 
 // The next `count` Mirror Dungeon runs (true = Hard), rolled up from the first
 // run not yet done this week (read off the Mirror Dungeon card) and continuing
@@ -25,7 +25,8 @@ export function mdSchedule(s, count = 7) {
   const w0 = weeksFromAnchor(s.lunacy && s.lunacy.currentDate);
   const rental0 = isRentalWeek(w0);
   const pending = []; // true = still to do (its pill on the MD card isn't struck)
-  for (let i = 0; i < 3; i++) { pending.push(!!(md.hard && md.hard[i])); pending.push(!!(md.normal && md.normal[i])); }
+  for (let i = 0; i < 3; i++) pending.push(!!(md.hard && md.hard[i]));
+  for (let i = 0; i < 3; i++) pending.push(!!(md.normal && md.normal[i]));
   if (rental0) pending.push(!!md.rental);
   let start = pending.findIndex((p) => p);
   if (start < 0) start = pending.length;            // all done -> start next week
