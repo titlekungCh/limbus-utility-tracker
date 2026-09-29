@@ -23,9 +23,18 @@ function threadAdd(s, t) { s.inventory.threads = round2(s.inventory.threads + t)
 function manXPAdd(s, xp) { s.manager.currentXP = round2(s.manager.currentXP + xp); }
 function tA(s, type, amount) { s.inventory.tickets[type] = round2((s.inventory.tickets[type] || 0) + amount); }
 
+// Decimal adds (weekly-pass bonus, hard MD .5s) grant crates for their whole
+// part only; when the decimals themselves carry the pass into a new level, that
+// level's 3 crates are granted here too (and taken back again on undo).
 function limPassAdd(s, level, noDecimal) {
-  s.inventory.pass = round2(s.inventory.pass + level);
-  if (noDecimal === 1) crateAdd(s, level * 3);
+  const old = s.inventory.pass;
+  s.inventory.pass = round2(old + level);
+  if (noDecimal === 1) { crateAdd(s, level * 3); return; }
+  const extra = (Math.floor(s.inventory.pass) - Math.floor(old)) - Math.trunc(level);
+  if (extra) {
+    crateAdd(s, extra * 3);
+    note(`Pass rollover ${old} -> ${s.inventory.pass}: ${extra > 0 ? "+" : ""}${extra} level from decimals (${extra > 0 ? "+" : ""}${extra * 3} crate)`);
+  }
 }
 
 function sinnerIndexByName(name) { return SINNER_ORDER.indexOf(name); }
