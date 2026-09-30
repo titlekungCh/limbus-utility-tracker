@@ -117,6 +117,20 @@ const keywordIcons = (val) => {
   return hit ? splitIcons(hit.icon) : splitIcons((OPTION_ICONS.keyword || {})[val]);
 };
 const keywordIcon = (val, pick) => { const a = keywordIcons(val); return a[pick] || a[0] || ""; };
+// display name of an icon = its file name without folder/extension/query
+const iconName = (p) => decodeURIComponent(String(p || "").split(/[?#]/)[0].split("/").pop().replace(/\.[^.]+$/, ""));
+// a row's picked icon indices for a keyword: array (legacy single number -> [n]; none -> [0])
+const kwPicks = (item, kw) => {
+  const v = item && item.kwIcons && item.kwIcons[kw];
+  return Array.isArray(v) && v.length ? v : typeof v === "number" ? [v] : [0];
+};
+// new pick set after clicking icon j: plain click = only j; shift = toggle j (never empty)
+const togglePick = (picks, j, multi) => {
+  if (!multi) return [j];
+  const set = new Set(picks);
+  if (set.has(j)) { if (set.size > 1) set.delete(j); } else set.add(j);
+  return [...set].sort((a, b) => a - b);
+};
 const extraKeywordNames = () =>
   (state && state.extraKeywords && state.extraKeywords.length
     ? state.extraKeywords.map((k) => k && k.name).filter(Boolean)
@@ -1238,8 +1252,12 @@ function renderEditableList(viewId, arrayName, columns, searchKeys, makeBlank) {
   };
 
   const chipHtml = (tc, t) => { const c = tc && tc(t); return c ? `<span class="chip" style="background:${c.fill};color:${c.font}">${esc(t)}</span>` : `<span class="chip plain">${esc(t)}</span>`; };
-  // a row's chosen icon for a keyword (right-click picker), else the first one
-  const kwIco = (item, t) => icoTag(keywordIcon(t, item && item.kwIcons && item.kwIcons[t]));
+  // a row's chosen icon(s) for a keyword (right-click picker), else the first one
+  const kwIco = (item, t) => {
+    const icons = keywordIcons(t);
+    const picked = kwPicks(item, t).map((j) => icons[j]).filter(Boolean);
+    return (picked.length ? picked : icons.slice(0, 1)).map((p) => icoTag(p)).join("");
+  };
   const tagSummary = (col, tags, item) => {
     if (col.cellColor) return `<span class="tag" style="${styleAttr(col.cellColor(tags))}">${tags.length ? esc(tags.join(", ")) : "—"}</span>`;
     // Keyword / Extra Keyword: icon-only summary (icon if one exists, else the name)
@@ -1405,16 +1423,17 @@ function renderEditableList(viewId, arrayName, columns, searchKeys, makeBlank) {
   const kwiRows = (item, key) => {
     const rows = splitTags(item[key]).map((t) => ({ t, icons: keywordIcons(t) })).filter((r) => r.icons.length > 1);
     if (!rows.length) return `<div class="hint">No alternate icons for these keywords</div>`;
-    const cur = item.kwIcons || {};
-    return rows.map(({ t, icons }) => `<div class="ms-opt kwi-row">${icons.map((p, j) =>
-      `<button type="button" class="kwi-ico${(cur[t] || 0) === j ? " on" : ""}" data-kw="${esc(t)}" data-j="${j}" title="${esc(t)}">${icoTag(p)}</button>`).join("")}</div>`).join("");
+    return rows.map(({ t, icons }) => { const picks = kwPicks(item, t); return `<div class="ms-opt kwi-row">${icons.map((p, j) =>
+      `<button type="button" class="kwi-ico${picks.includes(j) ? " on" : ""}" data-kw="${esc(t)}" data-j="${j}" title="${esc(iconName(p))}">${icoTag(p)}</button>`).join("")}</div>`; }).join("");
   };
   body.addEventListener("contextmenu", (e) => {
     const td = e.target.closest("td.season-cell");
     const col = td && colByKey[td.dataset.key];
     if (!col || col.iconCat !== "keyword") return;
     e.preventDefault();
+    const wasOpen = !!td.querySelector(".kwi-panel");
     closeKwi();
+    if (wasOpen) return;   // right-click again closes it
     const d = td.querySelector("details.ms"); if (d) d.open = false;
     const item = state[arrayName][+td.dataset.idx]; if (!item) return;
     td.insertAdjacentHTML("beforeend", `<div class="ms-panel kwi-panel">${kwiRows(item, col.key)}</div>`);
@@ -1423,8 +1442,10 @@ function renderEditableList(viewId, arrayName, columns, searchKeys, makeBlank) {
     const b = e.target.closest(".kwi-ico"); if (!b) return;
     const td = b.closest("td.season-cell");
     const item = state[arrayName][+td.dataset.idx]; if (!item) return;
-    item.kwIcons = { ...(item.kwIcons || {}), [b.dataset.kw]: +b.dataset.j };
-    if (!+b.dataset.j) delete item.kwIcons[b.dataset.kw];   // first icon is the default: don't store it
+    const kw = b.dataset.kw;
+    const picks = togglePick(kwPicks(item, kw), +b.dataset.j, e.shiftKey);
+    item.kwIcons = { ...(item.kwIcons || {}), [kw]: picks };
+    if (picks.length === 1 && picks[0] === 0) delete item.kwIcons[kw];   // first icon alone is the default: don't store it
     if (!Object.keys(item.kwIcons).length) delete item.kwIcons;
     td.querySelector("summary").innerHTML = tagSummary(colByKey[td.dataset.key], splitTags(item[td.dataset.key]), item);
     td.querySelector(".kwi-panel").innerHTML = kwiRows(item, td.dataset.key);
@@ -1786,7 +1807,7 @@ function renderData() {
   // server downloads into icons/keyword/). Drives the IDs/EGOs pickers.
   const ekwRows = () => state.extraKeywords.map((k, i) =>
     `<tr data-i="${i}">
-      <td style="text-align:center;min-width:34px;white-space:nowrap">${k.icon ? splitIcons(k.icon).map((p) => icoTag(p)).join("") : '<span class="hint">—</span>'}</td>
+      <td style="text-align:left;min-width:34px;max-width:84px">${k.icon ? splitIcons(k.icon).map((p) => icoTag(p)).join("") : '<span class="hint">—</span>'}</td>
       <td><input class="ekw-name" data-i="${i}" value="${esc(k.name ?? "")}"/></td>
       <td><input class="ekw-icon" data-i="${i}" value="${esc(k.icon ?? "")}" placeholder="icons/keyword/… or https://… (comma-separate for alternates)" style="width:100%"/></td>
       <td style="text-align:center"><button class="act ekw-fetch" data-i="${i}" title="download the icon URL(s) for offline use">⤓</button></td>

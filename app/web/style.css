@@ -441,7 +441,7 @@ table.sheet td .acell:not(:focus-within) > input { color: transparent; }
 /* right-click keyword-icon picker (IDs / EGOs keyword cells) */
 .kwi-panel { min-width: 0; }
 .kwi-row { gap: 4px; }
-.kwi-ico { background: none; border: 1px solid transparent; border-radius: 4px; padding: 2px; cursor: pointer; line-height: 0; }
+.kwi-ico { user-select: none; background: none; border: 1px solid transparent; border-radius: 4px; padding: 2px; cursor: pointer; line-height: 0; }
 .kwi-ico .opt-ico { width: 22px; height: 22px; margin: 0; }
 .kwi-ico:hover { border-color: var(--line); }
 .kwi-ico.on { border-color: var(--gold); background: #ffffff12; }

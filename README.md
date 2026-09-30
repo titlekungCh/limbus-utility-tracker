@@ -83,7 +83,8 @@ IF SS, MD Teams, Data.**
   supports `term` (AND), `-term` (exclude), and `"quoted phrases"`. Owned rows
   get a green tint; everything is colour-coded from the sheet's formatting.
   **Right-click** a Keyword / Extra Keyword cell to pick which alternate icon
-  each of its keywords shows (stored per row in `kwIcons`).
+  each of its keywords shows (Shift+click picks several; right-click again
+  closes; stored per row in `kwIcons` as index arrays).
 - **Bokgak Teams** / **MD Teams** — editable free-form grids (add/delete rows &
   columns); cells tinted by the sinner acronym they contain.
 - **IF SS** — one page per season with a **season picker** (`state.ifss`, fed by
