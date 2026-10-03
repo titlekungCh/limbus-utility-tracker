@@ -4,40 +4,42 @@
     "version": 1
   },
   "inventory": {
-    "crate": 59,
-    "pass": 87.4,
-    "threads": 1542,
+    "crate": 600,
+    "pass": 121.8,
+    "threads": 1483,
     "tickets": {
       "I": 0,
-      "II": 443,
-      "III": 667,
-      "IV": 387
+      "II": 451,
+      "III": 736,
+      "IV": 541
     }
   },
   "manager": {
     "level": 90,
-    "currentXP": 1981,
+    "currentXP": 3401,
     "nextLevelXP": 5068
   },
   "lunacy": {
-    "total": 37188,
-    "paid": 1112,
-    "extTickets": 28,
+    "total": 46613,
+    "paid": 5211,
+    "extTickets": 58,
     "decaTickets": 8,
-    "currentDate": "2026-09-24"
+    "currentDate": "2026-10-01",
+    "enkDate": "2026-10-03",
+    "enkCount": 2
   },
   "md": {
-    "dailyLeft": 1,
-    "weeklyLeft": 0,
-    "normalLeftTotal": 94,
+    "dailyLeft": 4,
+    "weeklyLeft": 1,
+    "normalLeftTotal": 93,
     "hard": [
       false,
       false,
       false
     ],
     "normal": [
-      false,
-      false,
+      true,
+      true,
       true
     ],
     "hardStatus": [
@@ -51,7 +53,7 @@
       "Charge"
     ],
     "rental": false,
-    "rentalWeek": 1,
+    "rentalWeek": 0,
     "schedule": [
       false,
       false,
@@ -60,23 +62,24 @@
       false,
       false
     ],
-    "weekResetFor": "2026-09-24"
+    "weekResetFor": "2026-10-01"
   },
-  "currentDay": "Tue",
-  "weekTilSeasonEnd": 31,
+  "currentDay": "Sat",
+  "weekTilSeasonEnd": 30,
   "uptie": {
-    "sinner": "Rodion",
-    "idIdx": 128,
-    "egoIdx": 110
+    "sinner": "Meursault",
+    "idIdx": 184,
+    "egoIdx": 112
   },
   "gacha": {
     "sinner": "Yi Sang",
     "tier": "1Star",
-    "gainIdIdx": 16,
-    "gainEgoIdx": 19,
+    "gainIdIdx": 182,
+    "gainEgoIdx": 74,
     "gainMode": "gacha",
-    "shardIdIdx": 45,
-    "shardEgoIdx": 12
+    "shardIdIdx": 189,
+    "shardEgoIdx": 12,
+    "consumePaid": true
   },
   "event": {
     "currency": 0,
@@ -2267,49 +2270,49 @@
     ],
     "shardTable": [
       {
-        "type": "EGO/3 Star",
+        "type": "1x 000/EGO",
         "shardNeeded": 400,
         "threadNeeded": 0,
         "color": "#FF9E00"
       },
       {
-        "type": "2 3 Star + UT4",
+        "type": "2x 000 2x UT4",
         "shardNeeded": 900,
         "threadNeeded": 500,
         "color": "#FFF243"
       },
       {
-        "type": "2 Star",
+        "type": "1x 00",
         "shardNeeded": 150,
         "threadNeeded": 0,
         "color": "#B10202"
       },
       {
-        "type": "000 UT4",
+        "type": "1x 000 UT4",
         "shardNeeded": 50,
         "threadNeeded": 150,
         "color": "#FFE5A0"
       },
       {
-        "type": "ZAYIN",
+        "type": "TS4 ZAYIN",
         "shardNeeded": 80,
         "threadNeeded": 110,
         "color": "#D4EDBC"
       },
       {
-        "type": "TETH",
+        "type": "TS4 TETH",
         "shardNeeded": 90,
         "threadNeeded": 130,
         "color": "#BFE1F6"
       },
       {
-        "type": "HE",
+        "type": "TS4 HE",
         "shardNeeded": 100,
         "threadNeeded": 150,
         "color": "#f3f3b4"
       },
       {
-        "type": "WAW",
+        "type": "TS4 WAW",
         "shardNeeded": 150,
         "threadNeeded": 170,
         "color": "#E6CFF2"
@@ -2321,25 +2324,25 @@
         "color": "#E8EAED"
       },
       {
-        "type": "3 Star UT",
+        "type": "1x 000 1x UT4",
         "shardNeeded": 450,
         "threadNeeded": 250,
         "color": "#FFE400"
       },
       {
-        "type": "00 UT4",
+        "type": "1x 00 UT4",
         "shardNeeded": 30,
         "threadNeeded": 100,
         "color": "#B10202"
       },
       {
-        "type": "2 3 Star",
+        "type": "2x 000/EGO",
         "shardNeeded": 800,
         "threadNeeded": 0,
         "color": "#FFF243"
       },
       {
-        "type": "1 3StarUT + 13Star",
+        "type": "2x 000 1x UT4",
         "shardNeeded": 850,
         "threadNeeded": 250,
         "color": "#fff539"
@@ -2879,73 +2882,73 @@
     {
       "name": "Yi Sang",
       "acronym": "YS",
-      "shards": 4,
+      "shards": 53,
       "cell": "J1"
     },
     {
       "name": "Faust",
       "acronym": "FT",
-      "shards": 10,
+      "shards": 30,
       "cell": "J2"
     },
     {
       "name": "Don Quixote",
       "acronym": "DQ",
-      "shards": 15,
+      "shards": 41,
       "cell": "J3"
     },
     {
       "name": "Ryoshu",
       "acronym": "RS",
-      "shards": 28,
+      "shards": 50,
       "cell": "J4"
     },
     {
       "name": "Meursault",
       "acronym": "MS",
-      "shards": 13,
+      "shards": 48,
       "cell": "J5"
     },
     {
       "name": "Hong Lu",
       "acronym": "HL",
-      "shards": 7,
+      "shards": 41,
       "cell": "J6"
     },
     {
       "name": "Heathcliff",
       "acronym": "HC",
-      "shards": 9,
+      "shards": 27,
       "cell": "J7"
     },
     {
       "name": "Ishmael",
       "acronym": "IS",
-      "shards": 13,
+      "shards": 37,
       "cell": "J8"
     },
     {
       "name": "Rodion",
       "acronym": "RD",
-      "shards": 60,
+      "shards": 44,
       "cell": "J9"
     },
     {
       "name": "Sinclair",
       "acronym": "SC",
-      "shards": 20,
+      "shards": 73,
       "cell": "J10"
     },
     {
       "name": "Outis",
       "acronym": "OT",
-      "shards": 15,
+      "shards": 36,
       "cell": "J11"
     },
     {
       "name": "Gregor",
       "acronym": "GG",
-      "shards": 16,
+      "shards": 31,
       "cell": "J12"
     }
   ],
@@ -2969,20 +2972,20 @@
       "targetBUT": true
     },
     {
-      "type": "None",
-      "enabled": false,
+      "type": "1x 000/EGO",
+      "enabled": true,
       "target": "Queen of Hatred Don Quixote",
-      "targetMode": "text",
-      "targetA": "[I'll Go fer Scissors. How 'Bout You?] Don Quixote",
+      "targetMode": "sid",
+      "targetA": "[Haute Couture::Brand Manager] Don Quixote",
       "targetAUT": false
     },
     {
-      "type": "EGO/3 Star",
+      "type": "1x 000/EGO",
       "enabled": true,
       "target": "Araya+UT",
       "targetMode": "sid",
       "targetA": "[Haute Couture::Le Noir Footwear Hall] Ryoshu",
-      "targetAUT": true
+      "targetAUT": false
     },
     {
       "type": "None",
@@ -3011,7 +3014,7 @@
       "targetB": "[Kurokumo Clan Wakashu] Heathcliff"
     },
     {
-      "type": "EGO/3 Star",
+      "type": "1x 000/EGO",
       "enabled": true,
       "target": "LCD Osir+UT / Kurokumo",
       "targetMode": "sid",
@@ -3020,14 +3023,14 @@
       "targetAUT": false
     },
     {
-      "type": "EGO/3 Star",
-      "enabled": true,
+      "type": "None",
+      "enabled": false,
       "target": "Into the Sunset / Thumb Mother+UT",
-      "targetMode": "sid",
+      "targetMode": "text",
       "targetA": "[Haute Couture::Alteration Shop] Rodion",
       "targetB": "[Into The Sunset] Rodion",
       "targetBUT": false,
-      "targetAUT": true
+      "targetAUT": false
     },
     {
       "type": "None",
@@ -4209,7 +4212,10 @@
       "acquired": true,
       "level": 60,
       "levelExtra": 0,
-      "uptie": 4
+      "uptie": 4,
+      "kwIcons": {
+        "Sin DMG/Power Up": 3
+      }
     },
     {
       "name": "The Middle Little Brother",
@@ -4224,7 +4230,10 @@
       "acquired": true,
       "level": 59,
       "levelExtra": 8832,
-      "uptie": 4
+      "uptie": 4,
+      "kwIcons": {
+        "Sin DMG/Power Up": 3
+      }
     },
     {
       "name": "The Pequod Harpooneer",
@@ -4524,7 +4533,10 @@
       "acquired": false,
       "level": null,
       "levelExtra": 0,
-      "uptie": null
+      "uptie": null,
+      "kwIcons": {
+        "Sin DMG/Power Up": 1
+      }
     },
     {
       "name": "Edgar Family Butler",
@@ -4743,13 +4755,19 @@
       "tierStars": 3,
       "season": "Walpurgisnaught, 4",
       "keyword": "Bleed, Charge",
-      "extraKeyword": "Haste, Bind, Attack Power Down",
+      "extraKeyword": "Haste, Bind, Attack Power Down, Unique Charge",
       "internalId": 113,
       "release": "2024-09-05",
       "acquired": false,
       "level": null,
       "levelExtra": 0,
-      "uptie": null
+      "uptie": null,
+      "kwIcons": {
+        "Unique Charge": [
+          6,
+          7
+        ]
+      }
     },
     {
       "name": "Lobotomy E.G.O::Solemn Lament",
@@ -5223,13 +5241,16 @@
       "tierStars": 3,
       "season": "Walpurgisnaught, 6",
       "keyword": "Rupture, Sinking, Charge",
-      "extraKeyword": "Unbreakable Coin, Clashable Guard",
+      "extraKeyword": "Unbreakable Coin, Clashable Guard, Unique Charge",
       "internalId": 145,
       "release": "2025-07-17",
       "acquired": true,
       "level": 1,
       "levelExtra": 0,
-      "uptie": 4
+      "uptie": 4,
+      "kwIcons": {
+        "Unique Charge": 3
+      }
     },
     {
       "name": "Lobotomy E.G.O:: The Sword Sharpened with Tears",
@@ -5238,7 +5259,7 @@
       "tierStars": 3,
       "season": "Walpurgisnaught, 6",
       "keyword": "Sinking, Charge",
-      "extraKeyword": "Clashable Guard, Unbreakable Coin, Protection, Clash Power Up, Damage Up, Power Up, Aggro, Clashable Counter",
+      "extraKeyword": "Clashable Guard, Unbreakable Coin, Protection, Clash Power Up, Damage Up, Power Up, Aggro, Clashable Counter, Unique Charge",
       "internalId": 146,
       "release": "2025-07-17",
       "acquired": true,
@@ -5274,7 +5295,10 @@
       "acquired": true,
       "level": 64,
       "levelExtra": 9632,
-      "uptie": 4
+      "uptie": 4,
+      "kwIcons": {
+        "Sin DMG/Power Up": 4
+      }
     },
     {
       "name": "Heishou Pack - You Branch Adept",
@@ -5289,7 +5313,13 @@
       "acquired": true,
       "level": 60,
       "levelExtra": 0,
-      "uptie": 4
+      "uptie": 4,
+      "kwIcons": {
+        "Sin DMG/Power Up": [
+          0,
+          4
+        ]
+      }
     },
     {
       "name": "Heishou Pack - Wu Branch Adept",
@@ -5613,13 +5643,16 @@
       "tierStars": 3,
       "season": "Season, 7",
       "keyword": "Bleed, Charge",
-      "extraKeyword": "Defense Level Down, Defense Level Up, Unbreakable Coin, Bind, Damage Down, Haste, Attack Type DMG/Power Up, Clashable Guard, Assist Defense, Clashable Counter",
+      "extraKeyword": "Defense Level Down, Defense Level Up, Unbreakable Coin, Bind, Damage Down, Haste, Attack Type DMG/Power Up, Clashable Guard, Assist Defense, Clashable Counter, Unique Charge",
       "internalId": 171,
       "release": "2026-03-19",
       "acquired": true,
       "level": 59,
       "levelExtra": 8924,
-      "uptie": 4
+      "uptie": 4,
+      "kwIcons": {
+        "Unique Charge": 1
+      }
     },
     {
       "name": "The House of Spiders: The Ring Nursefather",
@@ -5628,13 +5661,16 @@
       "tierStars": 3,
       "season": "Season, 7",
       "keyword": "Bleed, Charge",
-      "extraKeyword": "Defense Level Down, Defense Level Up, Unbreakable Coin, Bind, Haste, Damage Down, Attack Type DMG/Power Up, Offense Level Up, Assist Defense, Offense Level Down, Clashable Counter",
+      "extraKeyword": "Defense Level Down, Defense Level Up, Unbreakable Coin, Bind, Haste, Damage Down, Attack Type DMG/Power Up, Offense Level Up, Assist Defense, Offense Level Down, Clashable Counter, Unique Charge",
       "internalId": 172,
       "release": "2026-03-19",
       "acquired": true,
       "level": 60,
       "levelExtra": 0,
-      "uptie": 4
+      "uptie": 4,
+      "kwIcons": {
+        "Unique Charge": 1
+      }
     },
     {
       "name": "The Ring Fauvist Student",
@@ -5709,7 +5745,10 @@
       "acquired": true,
       "level": 59,
       "levelExtra": 8924,
-      "uptie": 4
+      "uptie": 4,
+      "kwIcons": {
+        "Sin DMG/Power Up": 3
+      }
     },
     {
       "name": "S Corp. Ch'unokkun",
@@ -5792,14 +5831,17 @@
       "tier": "★★★",
       "tierStars": 3,
       "season": "Season, 8",
-      "keyword": "Tremor, Charge",
-      "extraKeyword": "Tremor Burst, Unbreakable Coin, Aggro, Clashable Counter",
+      "keyword": "Charge, Tremor",
+      "extraKeyword": "Tremor Burst, Unbreakable Coin, Aggro, Clashable Counter, Unique Charge",
       "internalId": 187,
       "release": "2026-09-18",
       "acquired": false,
       "level": null,
       "levelExtra": 0,
-      "uptie": null
+      "uptie": null,
+      "kwIcons": {
+        "Unique Charge": 5
+      }
     },
     {
       "name": "Haute Couture::Boutique du Rouge",
@@ -5807,14 +5849,17 @@
       "tier": "★★★",
       "tierStars": 3,
       "season": "Season, 8",
-      "keyword": "Bleed, Charge",
-      "extraKeyword": "Sin Fragility, Unbreakable Coin, Aggro, Clashable Guard, Clashable Counter, Power Up, Damage Up",
+      "keyword": "Charge, Bleed",
+      "extraKeyword": "Sin Fragility, Unbreakable Coin, Aggro, Clashable Guard, Clashable Counter, Power Up, Damage Up, Unique Charge",
       "internalId": 186,
       "release": "2026-09-18",
       "acquired": false,
       "level": null,
       "levelExtra": 0,
-      "uptie": null
+      "uptie": null,
+      "kwIcons": {
+        "Unique Charge": 2
+      }
     },
     {
       "name": "Haute Couture::Alteration Shop",
@@ -5822,14 +5867,17 @@
       "tier": "★★★",
       "tierStars": 3,
       "season": "Season, 8",
-      "keyword": "Tremor, Charge",
-      "extraKeyword": "Duality, Offense Level Up, Attack Power Up, Tremor Burst, Sin Resist Down, Clashable Counter",
+      "keyword": "Charge, Tremor",
+      "extraKeyword": "Duality, Offense Level Up, Attack Power Up, Tremor Burst, Sin Resist Down, Clashable Counter, Unique Charge",
       "internalId": 188,
       "release": "2026-09-24",
-      "acquired": false,
-      "level": null,
+      "acquired": true,
+      "level": 1,
       "levelExtra": 0,
-      "uptie": null
+      "uptie": 4,
+      "kwIcons": {
+        "Unique Charge": 4
+      }
     },
     {
       "name": "Haute Couture::Brand Manager",
@@ -5837,14 +5885,17 @@
       "tier": "★★★",
       "tierStars": 3,
       "season": "Season, 8",
-      "keyword": "Tremor, Charge",
-      "extraKeyword": "Tremor Burst, Offense Level Up, Defense Level Up, Amplitude Conversion, Tremor - Conservation, Haste, Bind",
+      "keyword": "Charge, Tremor",
+      "extraKeyword": "Tremor Burst, Offense Level Up, Defense Level Up, Amplitude Conversion, Tremor - Conservation, Haste, Bind, Unique Charge",
       "internalId": 189,
       "release": "2026-10-01",
       "acquired": false,
       "level": null,
       "levelExtra": 0,
-      "uptie": null
+      "uptie": null,
+      "kwIcons": {
+        "Unique Charge": 5
+      }
     },
     {
       "name": "N Corp E.G.O:: Carvenous Wailings",
@@ -5852,8 +5903,8 @@
       "tier": "★★★",
       "tierStars": 3,
       "season": "Season, 8",
-      "keyword": "Tremor",
-      "extraKeyword": "Tremor - Reverb, Amplitude Conversion",
+      "keyword": "",
+      "extraKeyword": "",
       "internalId": 190,
       "release": "2026-10-08",
       "acquired": false,
@@ -5882,7 +5933,7 @@
       "tier": "★★★",
       "tierStars": 3,
       "season": "Season, 8",
-      "keyword": "Poise, Charge, Rupture",
+      "keyword": "",
       "extraKeyword": null,
       "internalId": 191,
       "release": "2026-10-08",
@@ -7428,7 +7479,12 @@
       "internalId": 45,
       "release": "2023-02-27",
       "acquired": true,
-      "threadspin": 3
+      "threadspin": 3,
+      "kwIcons": {
+        "Sin DMG/Power Up": [
+          5
+        ]
+      }
     },
     {
       "name": "Legerdemain",
@@ -7480,7 +7536,12 @@
       "internalId": 19,
       "release": "2023-04-06",
       "acquired": true,
-      "threadspin": 3
+      "threadspin": 3,
+      "kwIcons": {
+        "Sin DMG/Power Up": [
+          3
+        ]
+      }
     },
     {
       "name": "Lifetime Stew",
@@ -7599,7 +7660,12 @@
       "internalId": 16,
       "release": "2023-06-15",
       "acquired": true,
-      "threadspin": 3
+      "threadspin": 3,
+      "kwIcons": {
+        "Sin DMG/Power Up": [
+          2
+        ]
+      }
     },
     {
       "name": "AEDD",
@@ -7900,7 +7966,12 @@
       "internalId": 65,
       "release": "2024-04-11",
       "acquired": true,
-      "threadspin": 3
+      "threadspin": 3,
+      "kwIcons": {
+        "Sin DMG/Power Up": [
+          1
+        ]
+      }
     },
     {
       "name": "Electric Screaming",
@@ -7926,7 +7997,12 @@
       "internalId": 67,
       "release": "2024-04-11",
       "acquired": true,
-      "threadspin": 3
+      "threadspin": 3,
+      "kwIcons": {
+        "Sin DMG/Power Up": [
+          3
+        ]
+      }
     },
     {
       "name": "Sanguine Desire",
@@ -8069,7 +8145,12 @@
       "internalId": 78,
       "release": "2024-10-17",
       "acquired": false,
-      "threadspin": null
+      "threadspin": null,
+      "kwIcons": {
+        "Sin DMG/Power Up": [
+          4
+        ]
+      }
     },
     {
       "name": "Lasso",
@@ -8225,7 +8306,12 @@
       "internalId": 90,
       "release": "2025-02-20",
       "acquired": true,
-      "threadspin": 3
+      "threadspin": 3,
+      "kwIcons": {
+        "Sin DMG/Power Up": [
+          6
+        ]
+      }
     },
     {
       "name": "Indicant's Trial",
@@ -8277,7 +8363,12 @@
       "internalId": 94,
       "release": "2025-05-29",
       "acquired": true,
-      "threadspin": 4
+      "threadspin": 4,
+      "kwIcons": {
+        "Sin DMG/Power Up": [
+          4
+        ]
+      }
     },
     {
       "name": "Tears of the Tarnished Blood 【汚血泣淚】",
@@ -8299,11 +8390,14 @@
       "tier": "WAW",
       "season": "Walpurgisnaught, 6",
       "keyword": "Charge, Rupture, Sinking",
-      "extraKeyword": "Unbreakable Coin",
+      "extraKeyword": "Unbreakable Coin, Unique Charge",
       "internalId": 96,
       "release": "2025-07-17",
       "acquired": true,
-      "threadspin": 1
+      "threadspin": 1,
+      "kwIcons": {
+        "Unique Charge": 3
+      }
     },
     {
       "name": "Crushbound Past",
@@ -8329,7 +8423,12 @@
       "internalId": 98,
       "release": "2025-09-25",
       "acquired": true,
-      "threadspin": 3
+      "threadspin": 3,
+      "kwIcons": {
+        "Sin DMG/Power Up": [
+          1
+        ]
+      }
     },
     {
       "name": "To Remain Oneself 【宁作吾】",
@@ -8433,7 +8532,14 @@
       "internalId": 106,
       "release": "2026-03-05",
       "acquired": true,
-      "threadspin": 3
+      "threadspin": 3,
+      "kwIcons": {
+        "Sin DMG/Power Up": [
+          0,
+          3,
+          5
+        ]
+      }
     },
     {
       "name": "Ardor Blossom Star",
@@ -8455,7 +8561,7 @@
       "tier": "ZAYIN",
       "season": "Season, 7, Bokgak",
       "keyword": "Burn, Bleed",
-      "extraKeyword": "Sin Fragility, Sin DMG/Power Up, Unbreakable Coin",
+      "extraKeyword": "Sin Fragility, Unbreakable Coin",
       "internalId": 108,
       "release": "2026-04-30",
       "acquired": true,
@@ -8504,28 +8610,28 @@
     {
       "name": "Hollow",
       "sinner": "Faust",
-      "sin": "Envy",
+      "sin": "Pride",
       "tier": "WAW",
       "season": "Season, 8, BP",
-      "keyword": "",
-      "extraKeyword": null,
+      "keyword": "Charge, Poise, Sinking",
+      "extraKeyword": "Ammo, Attack Power Up, Unbreakable Coin, Offense Level Up, Damage Up, Crit DMG Up",
       "internalId": 115,
       "release": "2026-10-01",
-      "acquired": false,
-      "threadspin": null
+      "acquired": true,
+      "threadspin": 3
     },
     {
       "name": "Hollow",
       "sinner": "Meursault",
-      "sin": "Envy",
+      "sin": "Pride",
       "tier": "WAW",
       "season": "Season, 8, BP",
-      "keyword": null,
-      "extraKeyword": null,
+      "keyword": "Charge, Poise, Sinking",
+      "extraKeyword": "Ammo, Unbreakable Coin, Attack Type Fragility, Power Up, Bind",
       "internalId": 116,
       "release": "2026-10-01",
-      "acquired": false,
-      "threadspin": null
+      "acquired": true,
+      "threadspin": 3
     },
     {
       "name": "Solemn Lament",
@@ -10321,13 +10427,13 @@
       "MC HC",
       "R IS",
       "R RD",
-      "Base SC",
+      "Pwie SC",
       "W OT",
       "AEDD GG",
       "R HC",
       "Rogue IS",
       "Ring RD",
-      "Pinky SC",
+      "Pwie SC",
       "Ring OT",
       "AEDD GG"
     ],
@@ -10607,7 +10713,7 @@
     },
     {
       "name": "Sin DMG/Power Up",
-      "icon": "icons/keyword/wrathDamageUp.webp"
+      "icon": "icons/keyword/wrathDamageUp.webp, icons/keyword/gloomDamageUp.webp, icons/keyword/slothDamageUp.webp, icons/keyword/envyDamageUp.webp, icons/keyword/glutDamageUp.webp, icons/keyword/lustDamageUp.webp, icons/keyword/prideDamageUp.webp"
     },
     {
       "name": "Ammo",
@@ -10872,381 +10978,13 @@
     {
       "name": "Tremor - Conservation",
       "icon": ""
+    },
+    {
+      "name": "Unique Charge",
+      "icon": "icons/keyword/unique-charge.webp, icons/keyword/unique-charge-2.webp, icons/keyword/unique-charge-3.webp, icons/keyword/unique-charge-4.webp, icons/keyword/unique-charge-5.webp, icons/keyword/unique-charge-6.webp, icons/keyword/unique-charge-7.webp, icons/keyword/unique-charge-8.webp"
     }
   ],
   "actionLog": [
-    {
-      "day": "Thurs",
-      "time": "18:49",
-      "date": "2026-07-16",
-      "notes": [],
-      "delta": {
-        "pass": 7.5,
-        "crate": 21,
-        "xp": 120,
-        "lunTotal": 250
-      },
-      "pass": 1304.7,
-      "crate": 1189
-    },
-    {
-      "day": "Fri",
-      "time": "06:28",
-      "date": "2026-07-16",
-      "notes": [],
-      "delta": {
-        "pass": 2.4,
-        "crate": 3,
-        "threads": 54,
-        "xp": 240,
-        "lunTotal": -26
-      },
-      "pass": 1306.1,
-      "crate": 1192
-    },
-    {
-      "day": "Fri",
-      "time": "06:28",
-      "date": "2026-07-16",
-      "notes": [
-        "Yi Sang: +3 shard (1Star) -> 75"
-      ],
-      "delta": {},
-      "pass": 1306.1,
-      "crate": 1192
-    },
-    {
-      "day": "Fri",
-      "time": "06:28",
-      "date": "2026-07-16",
-      "notes": [
-        "Rodion: +15 shard (2Star) -> 21"
-      ],
-      "delta": {},
-      "pass": 1306.1,
-      "crate": 1192
-    },
-    {
-      "day": "Fri",
-      "time": "12:12",
-      "date": "2026-07-17",
-      "notes": [],
-      "delta": {
-        "pass": 3,
-        "crate": 9,
-        "xp": 100
-      },
-      "pass": 1308.1,
-      "crate": 1201
-    },
-    {
-      "day": "Fri",
-      "time": "15:43",
-      "date": "2026-07-17",
-      "notes": [],
-      "delta": {
-        "pass": 8,
-        "crate": 24,
-        "xp": 120,
-        "lunTotal": 250
-      },
-      "pass": 1316.1,
-      "crate": 1225
-    },
-    {
-      "day": "Sat",
-      "time": "06:32",
-      "date": "2026-07-17",
-      "notes": [],
-      "delta": {
-        "pass": 1,
-        "crate": 3,
-        "threads": 54,
-        "xp": 240,
-        "lunTotal": -26
-      },
-      "pass": 1317.1,
-      "crate": 1228
-    },
-    {
-      "day": "Sat",
-      "time": "06:33",
-      "date": "2026-07-17",
-      "notes": [
-        "Yi Sang: +3 shard (1Star) -> 78"
-      ],
-      "delta": {},
-      "pass": 1317.1,
-      "crate": 1228
-    },
-    {
-      "day": "Sat",
-      "time": "06:33",
-      "date": "2026-07-17",
-      "notes": [
-        "Outis: +15 shard (2Star) -> 167"
-      ],
-      "delta": {},
-      "pass": 1317.1,
-      "crate": 1228
-    },
-    {
-      "day": "Sat",
-      "time": "09:49",
-      "date": "2026-07-18",
-      "notes": [],
-      "delta": {
-        "pass": 3,
-        "crate": 9,
-        "xp": 100
-      },
-      "pass": 1320.1,
-      "crate": 1237
-    },
-    {
-      "day": "Sat",
-      "time": "10:18",
-      "date": "2026-07-18",
-      "notes": [
-        "The House of Spiders: The Ring Apprentice: UT -> 3",
-        "000 UT3 from UT1 (100): -100 threads, +40 lunacy"
-      ],
-      "delta": {
-        "threads": -100,
-        "lunTotal": 40
-      },
-      "pass": 1320.1,
-      "crate": 1237
-    },
-    {
-      "day": "Sat",
-      "time": "14:40",
-      "date": "2026-07-18",
-      "notes": [],
-      "delta": {
-        "pass": 9.5,
-        "crate": 27,
-        "xp": 120,
-        "lunTotal": 250
-      },
-      "pass": 1329.6,
-      "crate": 1264
-    },
-    {
-      "day": "Sat",
-      "time": "09:16",
-      "date": "2026-07-19",
-      "notes": [
-        "Gregor: +3 shard (1Star) -> 7"
-      ],
-      "delta": {},
-      "pass": 1329.6,
-      "crate": 1264
-    },
-    {
-      "day": "Sat",
-      "time": "09:16",
-      "date": "2026-07-19",
-      "notes": [
-        "Yi Sang: +3 shard (1Star) -> 81"
-      ],
-      "delta": {},
-      "pass": 1329.6,
-      "crate": 1264
-    },
-    {
-      "day": "Sun",
-      "time": "09:16",
-      "date": "2026-07-19",
-      "notes": [],
-      "delta": {
-        "pass": 1,
-        "crate": 3,
-        "threads": 54,
-        "xp": 240,
-        "lunTotal": -26
-      },
-      "pass": 1330.6,
-      "crate": 1267
-    },
-    {
-      "day": "Sun",
-      "time": "16:44",
-      "date": "2026-07-19",
-      "notes": [
-        "Kurokumo Clan Wakashu: UT -> 3",
-        "000 UT3 from UT1 (100): -100 threads, +40 lunacy"
-      ],
-      "delta": {
-        "threads": -100,
-        "lunTotal": 40
-      },
-      "pass": 1330.6,
-      "crate": 1267
-    },
-    {
-      "day": "Sun",
-      "time": "16:46",
-      "date": "2026-07-19",
-      "notes": [
-        "Acquired EGO: Electric Screaming"
-      ],
-      "delta": {},
-      "pass": 1330.6,
-      "crate": 1267
-    },
-    {
-      "day": "Sun",
-      "time": "16:47",
-      "date": "2026-07-19",
-      "notes": [
-        "Electric Screaming: TS -> 3",
-        "TETH TS3_1: -95 threads"
-      ],
-      "delta": {
-        "threads": -95
-      },
-      "pass": 1330.6,
-      "crate": 1106
-    },
-    {
-      "day": "Sun",
-      "time": "18:37",
-      "date": "2026-07-19",
-      "notes": [
-        "Into The Sunset: TS -> 3",
-        "ZAYIN TS3_1: -80 threads"
-      ],
-      "delta": {
-        "threads": -80
-      },
-      "pass": 1330.6,
-      "crate": 1106
-    },
-    {
-      "day": "Sun",
-      "time": "18:38",
-      "date": "2026-07-19",
-      "notes": [
-        "Red Eyes: TS -> 3",
-        "TETH TS3_1: -95 threads"
-      ],
-      "delta": {
-        "threads": -95
-      },
-      "pass": 1330.6,
-      "crate": 1106
-    },
-    {
-      "day": "Sun",
-      "time": "18:39",
-      "date": "2026-07-19",
-      "notes": [
-        "Rodion: -90 shard (TETH) -> -69",
-        "Rime Shank: TS -> 4",
-        "TETH TS4: -130 threads"
-      ],
-      "delta": {
-        "threads": -130
-      },
-      "pass": 1330.6,
-      "crate": 1106
-    },
-    {
-      "day": "Sun",
-      "time": "18:40",
-      "date": "2026-07-19",
-      "notes": [
-        "Faust: -100 shard (HE) -> -81",
-        "Fluid Sac: TS -> 4",
-        "HE TS4: -150 threads"
-      ],
-      "delta": {
-        "threads": -150
-      },
-      "pass": 1330.6,
-      "crate": 1106
-    },
-    {
-      "day": "Mon",
-      "time": "06:35",
-      "date": "2026-07-19",
-      "notes": [],
-      "delta": {
-        "pass": 2.4,
-        "crate": 9,
-        "threads": 54,
-        "xp": 240,
-        "lunTotal": -26
-      },
-      "pass": 1333,
-      "crate": 1039
-    },
-    {
-      "day": "Mon",
-      "time": "06:35",
-      "date": "2026-07-19",
-      "notes": [
-        "Don Quixote: +3 shard (1Star) -> 65"
-      ],
-      "delta": {},
-      "pass": 1333,
-      "crate": 1039
-    },
-    {
-      "day": "Mon",
-      "time": "06:35",
-      "date": "2026-07-19",
-      "notes": [
-        "Rodion: +3 shard (1Star) -> 3"
-      ],
-      "delta": {},
-      "pass": 1333,
-      "crate": 1039
-    },
-    {
-      "day": "Mon",
-      "time": "12:42",
-      "date": "2026-07-20",
-      "notes": [],
-      "delta": {
-        "pass": 3,
-        "crate": 9,
-        "xp": 100
-      },
-      "pass": 1335,
-      "crate": 1048
-    },
-    {
-      "day": "Mon",
-      "time": "12:44",
-      "date": "2026-07-20",
-      "notes": [
-        "Don Quixote: -50 shard (3SUT4) -> 15",
-        "T Corp. Class 3 Collection Staff: UT -> 4",
-        "000 UT4 (150) +50 Shard: -150 threads"
-      ],
-      "delta": {
-        "threads": -150
-      },
-      "pass": 1335,
-      "crate": 1048
-    },
-    {
-      "day": "Mon",
-      "time": "12:46",
-      "date": "2026-07-20",
-      "notes": [
-        "Firefist Office Survivor: UT -> 3",
-        "000 UT3 from UT1 (100): -100 threads, +40 lunacy"
-      ],
-      "delta": {
-        "threads": -100,
-        "lunTotal": 40
-      },
-      "pass": 1335,
-      "crate": 1048
-    },
     {
       "day": "Mon",
       "time": "12:47",
@@ -14830,6 +14568,361 @@
       },
       "pass": 87.4,
       "crate": 59
+    },
+    {
+      "day": "Tue",
+      "time": "08:43",
+      "date": "2026-09-30",
+      "notes": [
+        "Acquired ID: Haute Couture::Alteration Shop"
+      ],
+      "delta": {},
+      "pass": 87.4,
+      "crate": 59
+    },
+    {
+      "day": "Tue",
+      "time": "08:44",
+      "date": "2026-09-30",
+      "notes": [
+        "Rodion: +3 shard (1Star) -> 63"
+      ],
+      "delta": {},
+      "pass": 87.4,
+      "crate": 59
+    },
+    {
+      "day": "Wed",
+      "time": "08:50",
+      "date": "2026-09-30",
+      "notes": [],
+      "delta": {
+        "pass": 1,
+        "crate": 3,
+        "threads": 54,
+        "xp": 240,
+        "lunTotal": -26
+      },
+      "pass": 88.4,
+      "crate": 62
+    },
+    {
+      "day": "Wed",
+      "time": "10:23",
+      "date": "2026-09-30",
+      "notes": [],
+      "delta": {
+        "pass": 3,
+        "crate": 9,
+        "xp": 100
+      },
+      "pass": 91.4,
+      "crate": 71
+    },
+    {
+      "day": "Wed",
+      "time": "10:25",
+      "date": "2026-09-30",
+      "notes": [
+        "Haute Couture::Alteration Shop: UT -> 3",
+        "000 UT3 from UT1 (100): -100 threads, +40 lunacy"
+      ],
+      "delta": {
+        "threads": -100,
+        "lunTotal": 40
+      },
+      "pass": 91.4,
+      "crate": 71
+    },
+    {
+      "day": "Wed",
+      "time": "23:36",
+      "date": "2026-09-30",
+      "notes": [
+        "Gregor: +3 shard (1Star) -> 19"
+      ],
+      "delta": {},
+      "pass": 91.4,
+      "crate": 47
+    },
+    {
+      "day": "Wed",
+      "time": "05:58",
+      "date": "2026-09-30",
+      "notes": [
+        "Hong Lu: +3 shard (1Star) -> 10"
+      ],
+      "delta": {},
+      "pass": 91.4,
+      "crate": 47
+    },
+    {
+      "day": "Wed",
+      "time": "05:58",
+      "date": "2026-09-30",
+      "notes": [
+        "Yi Sang: +15 shard (2Star) -> 25"
+      ],
+      "delta": {},
+      "pass": 91.4,
+      "crate": 47
+    },
+    {
+      "day": "Thurs",
+      "time": "06:19",
+      "date": "2026-09-30",
+      "notes": [],
+      "delta": {
+        "pass": 3.2,
+        "crate": 9,
+        "threads": 54,
+        "xp": 240,
+        "lunTotal": -26
+      },
+      "pass": 94.6,
+      "crate": 56
+    },
+    {
+      "day": "Thurs",
+      "time": "10:13",
+      "date": "2026-10-01",
+      "notes": [
+        "Acquired EGO: Hollow"
+      ],
+      "delta": {},
+      "pass": 94.6,
+      "crate": 56
+    },
+    {
+      "day": "Thurs",
+      "time": "10:13",
+      "date": "2026-10-01",
+      "notes": [
+        "Acquired EGO: Hollow"
+      ],
+      "delta": {},
+      "pass": 94.6,
+      "crate": 56
+    },
+    {
+      "day": "Thurs",
+      "time": "11:25",
+      "date": "2026-10-01",
+      "notes": [
+        "Meursault: +3 shard (1Star) -> 16"
+      ],
+      "delta": {},
+      "pass": 94.6,
+      "crate": 56
+    },
+    {
+      "day": "Thurs",
+      "time": "11:29",
+      "date": "2026-10-01",
+      "notes": [
+        "Acquired EGO: Hollow"
+      ],
+      "delta": {},
+      "pass": 94.6,
+      "crate": 297
+    },
+    {
+      "day": "Thurs",
+      "time": "11:30",
+      "date": "2026-10-01",
+      "notes": [
+        "Hollow: TS -> 3",
+        "WAW TS3_1: -125 threads"
+      ],
+      "delta": {
+        "threads": -125
+      },
+      "pass": 94.6,
+      "crate": 297
+    },
+    {
+      "day": "Thurs",
+      "time": "09:11",
+      "date": "2026-10-02",
+      "notes": [
+        "Faust: +3 shard (1Star) -> 22"
+      ],
+      "delta": {},
+      "pass": 94.6,
+      "crate": 297
+    },
+    {
+      "day": "Thurs",
+      "time": "09:11",
+      "date": "2026-10-02",
+      "notes": [
+        "Meursault: +3 shard (1Star) -> 40"
+      ],
+      "delta": {},
+      "pass": 94.6,
+      "crate": 297
+    },
+    {
+      "day": "Fri",
+      "time": "09:11",
+      "date": "2026-10-02",
+      "notes": [
+        "Pass rollover 95.6 -> 97: +1 level from decimals (+3 crate)"
+      ],
+      "delta": {
+        "pass": 2.4,
+        "crate": 6,
+        "threads": 54,
+        "xp": 240,
+        "lunTotal": -26
+      },
+      "pass": 97,
+      "crate": 303
+    },
+    {
+      "day": "Fri",
+      "time": "09:12",
+      "date": "2026-10-02",
+      "notes": [],
+      "delta": {
+        "pass": 7.5,
+        "crate": 21,
+        "xp": 120,
+        "lunTotal": 250
+      },
+      "pass": 104.5,
+      "crate": 324
+    },
+    {
+      "day": "Fri",
+      "time": "11:52",
+      "date": "2026-10-02",
+      "notes": [],
+      "delta": {
+        "pass": 8,
+        "crate": 24,
+        "xp": 120,
+        "lunTotal": 250
+      },
+      "pass": 110.5,
+      "crate": 416
+    },
+    {
+      "day": "Fri",
+      "time": "12:32",
+      "date": "2026-10-02",
+      "notes": [
+        "Rodion: -50 shard (3SUT4) -> 38",
+        "Haute Couture::Alteration Shop: UT -> 4",
+        "000 UT4 (150) +50 Shard: -150 threads"
+      ],
+      "delta": {
+        "threads": -150
+      },
+      "pass": 111.3,
+      "crate": 512
+    },
+    {
+      "day": "Fri",
+      "time": "09:40",
+      "date": "2026-10-03",
+      "notes": [
+        "Hong Lu: +3 shard (1Star) -> 41"
+      ],
+      "delta": {},
+      "pass": 111.3,
+      "crate": 512
+    },
+    {
+      "day": "Fri",
+      "time": "09:40",
+      "date": "2026-10-03",
+      "notes": [
+        "Gregor: +3 shard (1Star) -> 28"
+      ],
+      "delta": {},
+      "pass": 111.3,
+      "crate": 512
+    },
+    {
+      "day": "Sat",
+      "time": "09:44",
+      "date": "2026-10-03",
+      "notes": [],
+      "delta": {
+        "pass": 1,
+        "crate": 3,
+        "threads": 54,
+        "xp": 240,
+        "lunTotal": -26
+      },
+      "pass": 112.3,
+      "crate": 515
+    },
+    {
+      "day": "Sat",
+      "time": "10:49",
+      "date": "2026-10-03",
+      "notes": [],
+      "delta": {
+        "pass": 9.5,
+        "crate": 27,
+        "xp": 120,
+        "lunTotal": 250
+      },
+      "pass": 121.8,
+      "crate": 542
+    },
+    {
+      "day": "Sat",
+      "time": "10:50",
+      "date": "2026-10-03",
+      "notes": [
+        "Acquired EGO: Hollow"
+      ],
+      "delta": {},
+      "pass": 121.8,
+      "crate": 542
+    },
+    {
+      "day": "Sat",
+      "time": "10:54",
+      "date": "2026-10-03",
+      "notes": [
+        "Hollow: TS -> 3",
+        "WAW TS3_1: -125 threads"
+      ],
+      "delta": {
+        "threads": -125
+      },
+      "pass": 121.8,
+      "crate": 542
+    },
+    {
+      "day": "Sat",
+      "time": "11:16",
+      "date": "2026-10-03",
+      "notes": [
+        "Lunacy > Enkephalin #1: -26 lunacy"
+      ],
+      "delta": {
+        "lunTotal": -26
+      },
+      "pass": 121.8,
+      "crate": 600
+    },
+    {
+      "day": "Sat",
+      "time": "11:16",
+      "date": "2026-10-03",
+      "notes": [
+        "Lunacy > Enkephalin #2: -52 lunacy"
+      ],
+      "delta": {
+        "lunTotal": -52
+      },
+      "pass": 121.8,
+      "crate": 600
     }
   ],
   "ifss": {
@@ -15248,7 +15341,7 @@
             null
           ],
           "keyword": [
-            "Charge Rupture ?",
+            "",
             null,
             null,
             null,
@@ -15258,31 +15351,31 @@
         {
           "sinner": "Faust",
           "actual": [
-            "Hex Nail NC EG",
+            "",
             "",
             null,
             "WAW BP",
             null
           ],
           "keyword": [
-            "Bleed ?",
+            "",
             "",
             null,
-            null,
+            "Charge Poise Sinking",
             null
           ]
         },
         {
           "sinner": "Don Quixote",
           "actual": [
-            null,
+            "Brand Manager Le Noir",
             null,
             null,
             null,
             null
           ],
           "keyword": [
-            null,
+            "Charge Tremor",
             null,
             null,
             null,
@@ -15292,7 +15385,7 @@
         {
           "sinner": "Ryoshu",
           "actual": [
-            "Le Noir",
+            "Footwear Hall Le Noir",
             null,
             null,
             null,
@@ -15317,40 +15410,40 @@
           ],
           "keyword": [
             "Poise Bleed ?",
+            "Charge Poise Sinking ?",
             null,
-            null,
-            null,
+            "Charge Poise Sinking",
             null
           ]
         },
         {
           "sinner": "Hong Lu",
           "actual": [
-            "Cavernous Wailing NC EG",
+            "",
             null,
             null,
             "ZAYIN BP",
             null
           ],
           "keyword": [
-            "Tremor ?",
+            "",
             null,
             null,
-            null,
+            "Charge",
             null
           ]
         },
         {
           "sinner": "Heathcliff",
           "actual": [
-            "Binds NC EG",
+            "",
             "? Walp X",
             null,
             "",
             null
           ],
           "keyword": [
-            "Tremor Sinking ?",
+            "",
             null,
             null,
             null,
@@ -15360,7 +15453,7 @@
         {
           "sinner": "Ishmael",
           "actual": [
-            "Rogue",
+            "Botique Le Rouge",
             null,
             null,
             "",
@@ -15377,7 +15470,7 @@
         {
           "sinner": "Rodion",
           "actual": [
-            "Le Noir",
+            "Alt Shop Le Noir",
             null,
             null,
             "TETH BP",
@@ -15387,21 +15480,21 @@
             "Charge Tremor",
             null,
             null,
-            null,
+            "Poise Tremor",
             null
           ]
         },
         {
           "sinner": "Sinclair",
           "actual": [
-            "Lantern NC EG",
+            "Pwie Le Rouge",
             null,
             null,
             null,
             null
           ],
           "keyword": [
-            "Rupture ?",
+            "Charge Bleed ?",
             null,
             null,
             null,
@@ -15648,5 +15741,25 @@
       ]
     }
   },
-  "lastDailyDate": "2026-09-29"
+  "lastDailyDate": "2026-10-03",
+  "lunacySchedule": {
+    "daily": [
+      {
+        "key": "enk",
+        "count": 1
+      },
+      {
+        "key": "mthlyFLunacy",
+        "count": 1
+      }
+    ],
+    "weekly": [
+      {
+        "key": "f300Lunacy",
+        "count": 1
+      }
+    ],
+    "dailyRanFor": "2026-10-03",
+    "weeklyRanFor": "2026-10-01"
+  }
 }
