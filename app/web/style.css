@@ -222,6 +222,7 @@ table.editlist tr.owned:hover td { background: #28391b; }
   border-radius: 3px; padding: 0 3px; }
 .mdtype.h { background: #5a1a1a; color: #ffb3b3; }
 .mdtype.n { background: #1a2a5a; color: #b3c6ff; }
+.mdtype.r { background: #1a4a22; color: #b3ffc0; }
 .mdtype.day { background: #2a2a2a; color: #b8b8b8; }
 .mdtype.patch { background: #4a3a12; color: var(--gold); }
 

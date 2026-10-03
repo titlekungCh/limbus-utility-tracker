@@ -536,7 +536,7 @@ function renderForecast() {
         <div class="body" style="padding:0;">
           <table class="sheet">
             <thead><tr><th>N</th><th style="white-space:nowrap">After N Daily</th><th style="white-space:nowrap">after N MD</th></tr></thead>
-            <tbody>${mf.rows.map((r) => `<tr><td class="num">${r.n}</td><td class="num">${dayGlyph(r.n)}${fmt(r.afterDaily)}${lvlGlyph(r.dailyLevels)}</td><td class="num"><span class="mdtype ${r.mdHard ? "h" : "n"}" title="${r.mdHard ? "Hard MD (+120)" : "Normal/Rental MD (+100)"}">${r.mdHard ? "H" : "N"}</span> ${fmt(r.afterMD)} <span class="count">(+${r.cumMD})</span>${lvlGlyph(r.mdLevels)}</td></tr>`).join("")}</tbody>
+            <tbody>${mf.rows.map((r) => `<tr><td class="num">${r.n}</td><td class="num">${dayGlyph(r.n)}${fmt(r.afterDaily)}${lvlGlyph(r.dailyLevels)}</td><td class="num"><span class="mdtype ${r.mdType.toLowerCase()}" title="${{ H: "Hard MD (+120)", N: "Normal MD (+100)", R: "Rental MD (+100)" }[r.mdType]}">${r.mdType}</span> ${fmt(r.afterMD)} <span class="count">(+${r.cumMD})</span>${lvlGlyph(r.mdLevels)}</td></tr>`).join("")}</tbody>
           </table>
         </div>
         <div class="body"><div class="kv">${kv([["Current XP", s.manager.currentXP], ["Next Level XP", mf.nextLevelXP], ["Next Lvl Enkephalin", mf.enk]])}</div></div>

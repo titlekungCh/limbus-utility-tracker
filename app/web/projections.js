@@ -17,10 +17,10 @@ export const rentalWeekFlag = (iso) => (isRentalWeek(weeksFromAnchor(iso)) ? 0 :
 // as Normal) on rental weeks. "H" = Hard (+120 XP), "N"/"R" = +100 XP.
 const weekTypes = (rental) => (rental ? ["H", "H", "H", "N", "N", "N", "R"] : ["H", "H", "H", "N", "N", "N"]);
 
-// The next `count` Mirror Dungeon runs (true = Hard), rolled up from the first
+// The next `count` Mirror Dungeon runs ("H" / "N" / "R"), rolled up from the first
 // run not yet done this week (read off the Mirror Dungeon card) and continuing
 // into following weeks (rental alternates). Week starts Thursday.
-export function mdSchedule(s, count = 7) {
+export function mdScheduleTypes(s, count = 7) {
   const md = s.md;
   const w0 = weeksFromAnchor(s.lunacy && s.lunacy.currentDate);
   const rental0 = isRentalWeek(w0);
@@ -32,8 +32,10 @@ export function mdSchedule(s, count = 7) {
   if (start < 0) start = pending.length;            // all done -> start next week
   const types = weekTypes(rental0).slice(start);
   for (let k = 1; types.length < count; k++) types.push(...weekTypes(isRentalWeek(w0 + k)));
-  return types.slice(0, count).map((t) => t === "H");
+  return types.slice(0, count);
 }
+// same schedule as booleans (true = Hard)
+export function mdSchedule(s, count = 7) { return mdScheduleTypes(s, count).map((t) => t === "H"); }
 export function nextMDIsHard(s) { return mdSchedule(s, 1)[0]; }
 
 // Manager XP forecast: two independent projections from the current XP. "After N
@@ -44,16 +46,16 @@ export function managerForecast(s) {
   const daily = s.constants.dailyManagerXP;
   const cur = s.manager.currentXP;
   const nextXP = s.manager.nextLevelXP;
-  const sched = mdSchedule(s, 7);
+  const sched = mdScheduleTypes(s, 7);
   const rows = [];
   let cumMD = 0;
   for (let i = 1; i <= 7; i++) {
-    const hard = sched[i - 1];
+    const mdType = sched[i - 1], hard = mdType === "H";
     cumMD += hard ? 120 : 100;
     const afterDaily = round2(cur + daily * i);
     const afterMD = round2(cur + cumMD);   // MD-only projection from current XP (independent of dailies)
     rows.push({
-      n: i, afterDaily, afterMD, mdHard: hard, cumMD,
+      n: i, afterDaily, afterMD, mdHard: hard, mdType, cumMD,
       dailyLevels: afterDaily >= nextXP, mdLevels: afterMD >= nextXP,
     });
   }
