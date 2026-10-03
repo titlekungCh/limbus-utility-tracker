@@ -1022,27 +1022,6 @@ function renderActions() {
   aplBtn.innerHTML = `${icoTag(RESOURCE_ICON.lunacy)}Add Paid Lunacy`;
   r.append(aplBtn);
 
-  // Daily Lunacy Consumption — Extractions (Lunacy) buttons auto-pressed once
-  // per day / per patch week (runLunacySchedule on launch + Day Update).
-  b = panel("Daily Lunacy Consumption");
-  const sched = state.lunacySchedule || (state.lunacySchedule = { daily: [], weekly: [] });
-  const schedOpts = [...Object.keys(LUNACY_ACTIONS).map((k) => [k, LUNACY_ACTIONS[k].label]), ["enk", ENK_REFILL.label]];
-  const schedList = (title, listKey, ranFor) => {
-    const list = Array.isArray(sched[listKey]) ? sched[listKey] : (sched[listKey] = []);
-    b.appendChild(el(`<div class="subhead">${esc(title)}${ranFor ? ` — last run ${esc(ranFor)}` : ""}</div>`));
-    list.forEach((it, i) => {
-      const node = el(`<div class="field sched-row"><select>${schedOpts.map(([k, lab]) => `<option value="${esc(k)}"${k === it.key ? " selected" : ""}>${esc(lab)}</option>`).join("")}</select><input type="number" class="qty" min="1" value="${Number(it.count) || 1}" title="times per ${listKey === "daily" ? "day" : "week"}"/><button class="reset" title="remove">✕</button></div>`);
-      node.querySelector("select").addEventListener("change", (e) => { it.key = e.target.value; autosave(); });
-      node.querySelector("input").addEventListener("change", (e) => { it.count = Math.max(1, Math.floor(Number(e.target.value) || 1)); e.target.value = it.count; autosave(); });
-      node.querySelector("button").addEventListener("click", () => { list.splice(i, 1); renderActions(); autosave(); });
-      b.appendChild(node);
-    });
-    r = row(b);
-    r.append(btn("+ Add", () => { list.push({ key: schedOpts[0][0], count: 1 }); renderActions(); autosave(); }));
-  };
-  schedList("Daily", "daily", sched.dailyRanFor);
-  schedList("Weekly", "weekly", sched.weeklyRanFor);
-
   // Pulls — tag each with the resource the pull would currently consume
   b = panel("Pulls");
   r = row(b);
@@ -1146,6 +1125,27 @@ function renderActions() {
     ? log.slice().reverse().map((e) => `<div class="logrow"><span class="logwhen">${esc(e.day || "")} ${esc(e.time || "")}</span> ${fmtDelta(e.delta) || '<span class="dlt">(no change)</span>'}${e.pass != null ? ` <span class="logtot">= ${fmt(e.pass)} pass / ${fmt(e.crate)} crate</span>` : ""} <span class="lognote">${esc((e.notes || []).join("; "))}</span></div>`).join("")
     : `<div class="hint">No actions logged yet — press a Quick Button. Each entry shows the day, the value changes, and what happened.</div>`;
   b.appendChild(logBox);
+
+  // Daily Lunacy Consumption — Extractions (Lunacy) buttons auto-pressed once
+  // per day / per patch week (runLunacySchedule on launch + Day Update).
+  b = panel("Daily Lunacy Consumption");
+  const sched = state.lunacySchedule || (state.lunacySchedule = { daily: [], weekly: [] });
+  const schedOpts = [...Object.keys(LUNACY_ACTIONS).map((k) => [k, LUNACY_ACTIONS[k].label]), ["enk", ENK_REFILL.label]];
+  const schedList = (title, listKey, ranFor) => {
+    const list = Array.isArray(sched[listKey]) ? sched[listKey] : (sched[listKey] = []);
+    b.appendChild(el(`<div class="subhead">${esc(title)}${ranFor ? ` — last run ${esc(ranFor)}` : ""}</div>`));
+    list.forEach((it, i) => {
+      const node = el(`<div class="field sched-row"><select>${schedOpts.map(([k, lab]) => `<option value="${esc(k)}"${k === it.key ? " selected" : ""}>${esc(lab)}</option>`).join("")}</select><input type="number" class="qty" min="1" value="${Number(it.count) || 1}" title="times per ${listKey === "daily" ? "day" : "week"}"/><button class="reset" title="remove">✕</button></div>`);
+      node.querySelector("select").addEventListener("change", (e) => { it.key = e.target.value; autosave(); });
+      node.querySelector("input").addEventListener("change", (e) => { it.count = Math.max(1, Math.floor(Number(e.target.value) || 1)); e.target.value = it.count; autosave(); });
+      node.querySelector("button").addEventListener("click", () => { list.splice(i, 1); renderActions(); autosave(); });
+      b.appendChild(node);
+    });
+    r = row(b);
+    r.append(btn("+ Add", () => { list.push({ key: schedOpts[0][0], count: 1 }); renderActions(); autosave(); }));
+  };
+  schedList("Daily", "daily", sched.dailyRanFor);
+  schedList("Weekly", "weekly", sched.weeklyRanFor);
 }
 
 // ---------- colour helpers (from xlsx conditional formatting) ----------
