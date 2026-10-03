@@ -1,4 +1,4 @@
-import { ACTIONS, run, recompute, maybeWeeklyReset } from "./logic.js";
+import { ACTIONS, run, recompute, maybeWeeklyReset, maybeLunacySchedule, enkUsedToday } from "./logic.js";
 import {
   UPTIE, THREADSPIN, SPINCHAIN, SHARD_DELTA, UPTIE_LEVEL, TS_STEP_LEVEL, LUNACY_ACTIONS, TICKET_ACTIONS, GACHA_TIERS, PULL,
   SINNER_ORDER, SINNER_COLORS, LEVEL_FILL, LEVEL_FILL_DEFAULT, SCALE_STOPS,
@@ -6,7 +6,7 @@ import {
   EVENT_ITEM_FILL, EVENT_REWARD_FILL, SIN_ORDER, SIN_FILL,
   STATUS_ORDER, STATUS_FILL, FACTION_COLORS, SCALE_MAX5, SEASON_FILL, TIER_FILL,
   SEASON_NUMBER_FILL, KEYWORD_FILL, KEYWORD_ORDER, DAYS, INVENTORY_FILL, LUNACY_FILL,
-  DAILY_LEFT_FILL, WEEKLY_LEFT_FILL, RESOURCE_ICON, SINNER_SHARD_ICON, EVENT_ITEM_ICON, EXTRA_KEYWORD_ALL,
+  DAILY_LEFT_FILL, WEEKLY_LEFT_FILL, RESOURCE_ICON, SINNER_SHARD_ICON, EVENT_ITEM_ICON, EXTRA_KEYWORD_ALL, ENK_REFILL,
 } from "./constants.js";
 import { OPTION_ICONS, GRADE_GLYPH } from "./icons-map.js";
 
@@ -271,6 +271,15 @@ function logAction(s, lines, before) {
   const hhmm = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
   a.push({ day: s.currentDay, time: hhmm, date: now.toISOString().slice(0, 10), notes: lines, delta, pass: after.pass, crate: after.crate });
   if (a.length > 300) a.splice(0, a.length - 300); // keep the last 300
+}
+// Press the scheduled Extractions (Lunacy) buttons if a new day / patch week has
+// started (see maybeLunacySchedule); logs what ran. Returns true if state changed.
+function runLunacySchedule() {
+  const before = logSnap(state);
+  let r;
+  const lines = run(state, (s) => { r = maybeLunacySchedule(s); });
+  if (r.ran.length) logAction(state, [`Scheduled ${r.ran.join(" + ")} lunacy`, ...lines], before);
+  return r.changed;
 }
 function act(fn) {
   const before = logSnap(state);
@@ -973,7 +982,7 @@ function renderActions() {
   b = panel("Sinner Gacha Result");
   const qaBtn = (n, tier) => {
     const ac = state.sinners.find((x) => x.name === n)?.acronym || n;
-    const bn = btn(ac, () => act((s) => ACTIONS.gachaTierFor(s, tier, n)), "qa-sinner");
+    const bn = btn(ac, () => act((s) => { ACTIONS.gachaTierFor(s, tier, n); if (s.gacha.consumePaid) ACTIONS.lunacy(s, "freePull"); }), "qa-sinner");
     const ico = optIcon("sinner", n);
     if (ico) bn.innerHTML = ico;   // sinner icon (w/ inverted-colour shadow) instead of text
     bn.title = `${n} — +${tier} shard`;
@@ -990,17 +999,49 @@ function renderActions() {
     blk.append(grid, tag);
     b.appendChild(blk);
   });
+  // when on, every sinner button above also presses "Daily Paid Pull"
+  const cpTog = el(`<label class="count qa-toggle" title="Each sinner button also triggers ${esc(LUNACY_ACTIONS.freePull.label)}"><input type="checkbox"${state.gacha.consumePaid ? " checked" : ""}/> Consume paid lunacy</label>`);
+  cpTog.querySelector("input").addEventListener("change", (e) => { state.gacha.consumePaid = e.target.checked; autosave(); });
+  b.appendChild(cpTog);
 
   // Extractions / Lunacy (each button tagged with the lunacy icon)
   b = panel("Extractions (Lunacy)");
   r = row(b);
   Object.keys(LUNACY_ACTIONS).forEach((k) => { const bn = btn(LUNACY_ACTIONS[k].label, () => act((s) => ACTIONS.lunacy(s, k))); bn.innerHTML = `${icoTag(RESOURCE_ICON.lunacy)}${esc(LUNACY_ACTIONS[k].label)}`; r.append(bn); });
+  // Lunacy > Enkephalin: escalating daily refill (26, 52, ... up to 10 a day)
+  const enkUsed = enkUsedToday(state);
+  const enkBtn = btn(ENK_REFILL.label, () => act(ACTIONS.lunacyToEnk));
+  enkBtn.title = `${ENK_REFILL.label} — use ${Math.min(enkUsed + 1, ENK_REFILL.max)} of ${ENK_REFILL.max} today (free lunacy first, then paid)`;
+  enkBtn.innerHTML = `${icoTag(RESOURCE_ICON.lunacy)}›&nbsp;${icoTag(RESOURCE_ICON.enkephalin)}${enkUsed >= ENK_REFILL.max ? "" : `-${ENK_REFILL.step * (enkUsed + 1)} `}(${enkUsed}/${ENK_REFILL.max})`;
+  enkBtn.disabled = enkUsed >= ENK_REFILL.max;
+  r.append(enkBtn);
   const cpl = el(`<div class="field"><label>Custom</label><input type="number" class="qty" id="cpl" placeholder="paid"/></div>`);
   b.appendChild(cpl);
   r = row(b);
   const aplBtn = btn("Add Paid Lunacy", () => act((s) => ACTIONS.customPaidLunacy(s, $("#cpl").value)));
   aplBtn.innerHTML = `${icoTag(RESOURCE_ICON.lunacy)}Add Paid Lunacy`;
   r.append(aplBtn);
+
+  // Daily Lunacy Consumption — Extractions (Lunacy) buttons auto-pressed once
+  // per day / per patch week (runLunacySchedule on launch + Day Update).
+  b = panel("Daily Lunacy Consumption");
+  const sched = state.lunacySchedule || (state.lunacySchedule = { daily: [], weekly: [] });
+  const schedOpts = [...Object.keys(LUNACY_ACTIONS).map((k) => [k, LUNACY_ACTIONS[k].label]), ["enk", ENK_REFILL.label]];
+  const schedList = (title, listKey, ranFor) => {
+    const list = Array.isArray(sched[listKey]) ? sched[listKey] : (sched[listKey] = []);
+    b.appendChild(el(`<div class="subhead">${esc(title)}${ranFor ? ` — last run ${esc(ranFor)}` : ""}</div>`));
+    list.forEach((it, i) => {
+      const node = el(`<div class="field sched-row"><select>${schedOpts.map(([k, lab]) => `<option value="${esc(k)}"${k === it.key ? " selected" : ""}>${esc(lab)}</option>`).join("")}</select><input type="number" class="qty" min="1" value="${Number(it.count) || 1}" title="times per ${listKey === "daily" ? "day" : "week"}"/><button class="reset" title="remove">✕</button></div>`);
+      node.querySelector("select").addEventListener("change", (e) => { it.key = e.target.value; autosave(); });
+      node.querySelector("input").addEventListener("change", (e) => { it.count = Math.max(1, Math.floor(Number(e.target.value) || 1)); e.target.value = it.count; autosave(); });
+      node.querySelector("button").addEventListener("click", () => { list.splice(i, 1); renderActions(); autosave(); });
+      b.appendChild(node);
+    });
+    r = row(b);
+    r.append(btn("+ Add", () => { list.push({ key: schedOpts[0][0], count: 1 }); renderActions(); autosave(); }));
+  };
+  schedList("Daily", "daily", sched.dailyRanFor);
+  schedList("Weekly", "weekly", sched.weeklyRanFor);
 
   // Pulls — tag each with the resource the pull would currently consume
   b = panel("Pulls");
@@ -2104,6 +2145,7 @@ function migrateConstants(s) {
   state.md.rentalWeek = rentalWeekFlag(state.lunacy.currentDate); // derived from the rental anchor, not stored/toggled
   const weekReset = maybeWeeklyReset(state); // reset MDs once per patch-week (deterministic, not tied to daily lux)
   migrateConstants(state);
+  const schedRan = runLunacySchedule();      // scheduled lunacy buttons, once per day / patch-week
   recompute(state);
   $("#dashboard").addEventListener("change", dashboardEdit); // once; #dashboard persists across re-renders
   initCustomSelects(); // one-time delegated wiring for the custom icon dropdowns
@@ -2115,5 +2157,5 @@ function migrateConstants(s) {
   renderEditableGrid("teams", "teams");
   renderIFSS7();
   renderMDTeams();
-  if (weekReset) autosave(); else markSaved(); // persist weekResetFor (and any boundary reset)
+  if (weekReset || schedRan) autosave(); else markSaved(); // persist weekResetFor (and any boundary reset)
 })();

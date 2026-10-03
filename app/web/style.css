@@ -445,3 +445,8 @@ table.sheet td .acell:not(:focus-within) > input { color: transparent; }
 .kwi-ico .opt-ico { width: 22px; height: 22px; margin: 0; }
 .kwi-ico:hover { border-color: var(--line); }
 .kwi-ico.on { border-color: var(--gold); background: #ffffff12; }
+
+/* Quick Buttons: one-line gacha toggle + lunacy schedule rows */
+.qa-toggle { display: flex; align-items: center; gap: 6px; margin-top: 8px; cursor: pointer; }
+.sched-row .qty { width: 56px; }
+button.act:disabled { opacity: .4; cursor: default; }

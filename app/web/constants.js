@@ -72,6 +72,10 @@ export const LUNACY_ACTIONS = {
   monthlyPL:    { label: "650 Paid Lunacy",                paid: 650, total: 650 },
 };
 
+// "Lunacy > Enkephalin" daily refill: the Nth use of the day costs N * step
+// lunacy, up to `max` uses per day.
+export const ENK_REFILL = { step: 26, max: 10, label: "Lunacy > Enkephalin" };
+
 // Ticket-grant menu.
 export const TICKET_ACTIONS = {
   free10Pulls: { label: "Free Deca Ticket (+1)",       deca: 1 },

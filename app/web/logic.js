@@ -2,7 +2,7 @@
 // (the same shape as data.json) exactly as the spreadsheet's Apps Script did.
 import {
   DAYS, SHARD_DELTA, UPTIE, THREADSPIN, LUNACY_ACTIONS, TICKET_ACTIONS,
-  PULL, SINNER_ORDER, SPINCHAIN, SPINCHAIN_PER_THREAD, TS_STEP_LEVEL, UPTIE_LEVEL,
+  PULL, SINNER_ORDER, SPINCHAIN, SPINCHAIN_PER_THREAD, TS_STEP_LEVEL, UPTIE_LEVEL, ENK_REFILL,
 } from "./constants.js";
 import { rentalWeekFlag } from "./projections.js";
 
@@ -127,6 +127,32 @@ export function maybeWeeklyReset(s) {
   if (!first) weeklyMDReset(s);
   return true;
 }
+// Lunacy > Enkephalin uses so far today (the stored count only counts for its own date)
+export function enkUsedToday(s) { return s.lunacy.enkDate === todayISO() ? (s.lunacy.enkCount || 0) : 0; }
+
+// One Extractions (Lunacy) button press by schedule key (a LUNACY_ACTIONS key or "enk").
+function lunacyPress(s, key) {
+  if (key === "enk") ACTIONS.lunacyToEnk(s);
+  else if (LUNACY_ACTIONS[key]) ACTIONS.lunacy(s, key);
+}
+// Scheduled lunacy buttons (s.lunacySchedule.daily / .weekly = [{key, count}]):
+// the daily list is pressed once per local day, the weekly list once per patch
+// week. Like maybeWeeklyReset, the first run only adopts the current day/week.
+// Returns { changed, ran: ["daily" | "weekly"] } so the caller can log + persist.
+export function maybeLunacySchedule(s) {
+  const sc = s.lunacySchedule || (s.lunacySchedule = { daily: [], weekly: [] });
+  const out = { changed: false, ran: [] };
+  const pass = (list, label) => {
+    const rows = (list || []).filter((r) => r && r.key && r.count > 0);
+    if (!rows.length) return;
+    rows.forEach((r) => { for (let i = 0; i < r.count; i++) lunacyPress(s, r.key); });
+    out.ran.push(label);
+  };
+  const today = todayISO(), wk = patchWeekISO();
+  if (sc.dailyRanFor !== today) { if (sc.dailyRanFor != null) pass(sc.daily, "daily"); sc.dailyRanFor = today; out.changed = true; }
+  if (sc.weeklyRanFor !== wk) { if (sc.weeklyRanFor != null) pass(sc.weekly, "weekly"); sc.weeklyRanFor = wk; out.changed = true; }
+  return out;
+}
 function normalCheck(s, t) {
   const n = s.md.normal;
   if (t === "1") {            // uncheck first checked
@@ -181,7 +207,7 @@ function chkManLvlUp(s, type) {
   const dThreadC = s.constants.dailyThreads;
   switch (type) {
     case "dailyXP":
-      manualXPLux(s, "normal"); threadAdd(s, dThreadC); limPassAdd(s, 1, 1); wLPXP(s, "normal"); fLCH(s, -26); break;
+      manualXPLux(s, "normal"); threadAdd(s, dThreadC); limPassAdd(s, 1, 1); wLPXP(s, "normal"); break;
     case "normalMDXP":
       limPassAdd(s, 3, 1); s.md.normalLeftTotal -= 1; normalCheck(s, "1"); break;
     case "weeklyMDXP":
@@ -191,7 +217,7 @@ function chkManLvlUp(s, type) {
       else if (s.md.hard[2]) { limPassAdd(s, 9.5, 0); crateAdd(s, 27); s.md.hard[2] = false; }
       break;
     case "undoDaily":
-      manualXPLux(s, "undo"); threadAdd(s, -dThreadC); limPassAdd(s, -1, 1); wLPXP(s, "undo"); fLCH(s, 26); break;
+      manualXPLux(s, "undo"); threadAdd(s, -dThreadC); limPassAdd(s, -1, 1); wLPXP(s, "undo"); break;
     case "undoNormal":
       limPassAdd(s, -3, 1); s.md.normalLeftTotal += 1; normalCheck(s, "0"); break;
     case "undoWeekly":
@@ -225,7 +251,11 @@ export const ACTIONS = {
   undowNormal:  (s) => { manXPAdd(s, -100); chkManLvlUp(s, "uwnormal"); },
 
   // --- Day updates ---
-  cmenuDayUpdate: (s) => { updateWeekDay(s); updateCurrentDate(s); maybeWeeklyReset(s); note(`Day -> ${s.currentDay}`); },
+  cmenuDayUpdate: (s) => {
+    updateWeekDay(s); updateCurrentDate(s); maybeWeeklyReset(s); note(`Day -> ${s.currentDay}`);
+    const r = maybeLunacySchedule(s);
+    if (r.ran.length) note(`Scheduled ${r.ran.join(" + ")} lunacy`);
+  },
   newSeason: (s) => { s.weekTilSeasonEnd = 24; note("New season: 24 weeks to season end"); },
 
   // --- Lunacy / tickets (generic, driven by constants) ---
@@ -239,6 +269,19 @@ export const ACTIONS = {
     const a = TICKET_ACTIONS[key];
     if (a.deca) s.lunacy.decaTickets += a.deca;
     if (a.ext) s.lunacy.extTickets += a.ext;
+  },
+  // Lunacy > Enkephalin refill: Nth use today costs N*26, max 10/day. Free
+  // lunacy is spent first; paid covers whatever free can't.
+  lunacyToEnk: (s) => {
+    const used = enkUsedToday(s);
+    if (used >= ENK_REFILL.max) { note(`${ENK_REFILL.label}: already used ${ENK_REFILL.max}/${ENK_REFILL.max} today`); return; }
+    const cost = ENK_REFILL.step * (used + 1);
+    if (s.lunacy.total < cost) { note(`${ENK_REFILL.label}: not enough lunacy (need ${cost})`); return; }
+    const fromPaid = Math.max(0, cost - Math.max(0, freeLunacy(s)));
+    if (fromPaid) pLCH(s, -fromPaid);
+    fLCH(s, -(cost - fromPaid));
+    s.lunacy.enkDate = todayISO(); s.lunacy.enkCount = used + 1;
+    note(`${ENK_REFILL.label} #${used + 1}: -${cost} lunacy${fromPaid ? ` (${fromPaid} paid)` : ""}`);
   },
   customPaidLunacy: (s, amount) => { pLCH(s, Number(amount) || 0); },
   customTickets: (s, amount) => { s.lunacy.extTickets += Number(amount) || 0; },

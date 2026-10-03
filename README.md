@@ -68,6 +68,12 @@ IF SS, MD Teams, Data.**
   Tickets, Uptying, Thread Spinning (TS4 shows its EGO-shard cost), Season.
   A diagnostic **Action Log** at the bottom records each press with its day and
   the pass/crate/XP/etc. deltas.
+  Beyond the sheet: ID/EGO pickers list by Internal ID; a **Consume paid
+  lunacy** toggle makes each Sinner Gacha Result button also press Daily Paid
+  Pull; **Lunacy > Enkephalin** is an escalating refill (26, 52, … max 10 a
+  day, free lunacy first) — Daily Luxcavation itself no longer spends lunacy;
+  **Daily Lunacy Consumption** auto-presses chosen Lunacy buttons once per day /
+  per patch week (on launch or Day Update; the first run only adopts the date).
 - **Event Shop** — the Intervallo planner: editable shop items (cost / total /
   bought → remaining + currency-to-finish, icon-labelled), one-time rewards
   (cost / claimed) with the ID/EGO cost following the icon-labelled Reward
