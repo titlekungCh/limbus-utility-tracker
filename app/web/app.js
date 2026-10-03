@@ -247,6 +247,14 @@ async function fetchIconTo(url, name) {
   return j.path;
 }
 
+// [item, arrayIndex] pairs of an ID/EGO list (optionally filtered) ordered by
+// Internal ID (blank last; ties keep array order) — the order every ID/EGO
+// picker lists its options in. Values stay array indices.
+const byIID = (arr, filter) => arr.map((x, i) => [x, i]).filter(([x]) => !filter || filter(x))
+  .sort((a, b) => ((a[0].internalId ?? 1e9) - (b[0].internalId ?? 1e9)) || (a[1] - b[1]));
+// index of the first (lowest-IID) row passing `filter`, or -1
+const firstByIID = (arr, filter) => { const r = byIID(arr, filter); return r.length ? r[0][1] : -1; };
+
 // Run a logic action, then refresh + autosave.
 // snapshot of the diagnostically-relevant tracked values (for the action log)
 const logSnap = (s) => ({
@@ -624,8 +632,8 @@ function renderForecast() {
 function renderIdLeveling() {
   if (idLevelSel.idx == null && state.ids.length) {
     // default to a leveled, owned ID; else first owned (the list is owned-only)
-    let i = state.ids.findIndex((x) => x.acquired && x.level);
-    if (i < 0) i = state.ids.findIndex((x) => x.acquired);
+    let i = firstByIID(state.ids, (x) => x.acquired && x.level);
+    if (i < 0) i = firstByIID(state.ids, (x) => x.acquired);
     idLevelSel.idx = i >= 0 ? i : 0;
   }
   const res = idLeveling(state, idLevelSel.idx, idLevelSel.target);
@@ -671,7 +679,7 @@ function renderIdLeveling() {
   body.innerHTML = `
     <div class="field"><label>ID</label>
       ${cselHtml(
-        `<select id="idlevel-name" style="${selSt}">${state.ids.map((x, i) => [x, i]).filter(([x]) => x.acquired).map(([x, i]) => `<option value="${i}"${i === idLevelSel.idx ? " selected" : ""}${optStyle(sinnerColor(x.sinner))} data-sinner="${esc(x.sinner)}">[${esc(x.name)}] ${esc(x.sinner)}</option>`).join("")}</select>`,
+        `<select id="idlevel-name" style="${selSt}">${byIID(state.ids, (x) => x.acquired).map(([x, i]) => `<option value="${i}"${i === idLevelSel.idx ? " selected" : ""}${optStyle(sinnerColor(x.sinner))} data-sinner="${esc(x.sinner)}">[${esc(x.name)}] ${esc(x.sinner)}</option>`).join("")}</select>`,
         "sinner", selId ? `[${selId.name}] ${selId.sinner}` : "", selId ? sinnerColor(selId.sinner) : null, selId ? optIcon("sinner", selId.sinner) : "")}</div>
     <div class="field"><label>Target Lv</label>
       <input type="number" id="idlevel-target" class="qty" min="1" max="100" value="${idLevelSel.target}" style="${tgtSt}"/>
@@ -701,7 +709,7 @@ function renderIdLeveling() {
 
 function renderEgoThreadspin() {
   if (egoTSel.idx == null && state.egos.length) {
-    const i = state.egos.findIndex((x) => x.acquired);
+    const i = firstByIID(state.egos, (x) => x.acquired);
     egoTSel.idx = i >= 0 ? i : 0;
   }
   const res = egoThreadspin(state, egoTSel.idx, egoTSel.target);
@@ -714,7 +722,7 @@ function renderEgoThreadspin() {
   body.innerHTML = `
     <div class="field"><label>EGO</label>
       ${cselHtml(
-        `<select id="egots-name" style="${selSt}">${state.egos.map((x, i) => [x, i]).filter(([x]) => x.acquired).map(([x, i]) => `<option value="${i}"${i === egoTSel.idx ? " selected" : ""}${optStyle(sinnerColor(x.sinner))} data-sinner="${esc(x.sinner)}">[${esc(x.name)}] ${esc(x.sinner)}</option>`).join("")}</select>`,
+        `<select id="egots-name" style="${selSt}">${byIID(state.egos, (x) => x.acquired).map(([x, i]) => `<option value="${i}"${i === egoTSel.idx ? " selected" : ""}${optStyle(sinnerColor(x.sinner))} data-sinner="${esc(x.sinner)}">[${esc(x.name)}] ${esc(x.sinner)}</option>`).join("")}</select>`,
         "sinner", selEgo ? `[${selEgo.name}] ${selEgo.sinner}` : "", selEgo ? sinnerColor(selEgo.sinner) : null, selEgo ? optIcon("sinner", selEgo.sinner) : "")}</div>
     <div class="field"><label>Target TS</label>
       <input type="number" id="egots-target" class="qty" min="1" max="${selEgo && selEgo.ts5 ? 5 : 4}" value="${egoTSel.target}"/></div>
@@ -886,7 +894,7 @@ function renderActions() {
   // picks which rows are listed; `onPick(index)` gets the chosen array index.
   const idPicker = (label, arr, curIdx, filter, onPick) => {
     const cur = arr[curIdx];
-    const sel = `<select>${arr.map((x, i) => [x, i]).filter(([x]) => filter(x)).map(([x, i]) => `<option value="${i}"${i === curIdx ? " selected" : ""}${optStyle(sinnerColor(x.sinner))} data-sinner="${esc(x.sinner)}">[${esc(x.name)}] ${esc(x.sinner)}</option>`).join("")}</select>`;
+    const sel = `<select>${byIID(arr, filter).map(([x, i]) => `<option value="${i}"${i === curIdx ? " selected" : ""}${optStyle(sinnerColor(x.sinner))} data-sinner="${esc(x.sinner)}">[${esc(x.name)}] ${esc(x.sinner)}</option>`).join("")}</select>`;
     const node = el(`<div class="field"><label>${esc(label)}</label>${cselHtml(sel, "sinner", cur ? `[${cur.name}] ${cur.sinner}` : "", cur ? sinnerColor(cur.sinner) : null, cur ? optIcon("sinner", cur.sinner) : "")}</div>`);
     node.querySelector("select").addEventListener("change", (e) => onPick(+e.target.value));
     return node;
@@ -896,7 +904,7 @@ function renderActions() {
   const isLimited = (x) => /Event|Reward|Bokgak|BP/i.test(x.season || "");
   const isExtractible = (x) => !x.acquired && x.name && !isLimited(x);
   const isShardNeeded = (x) => !x.acquired && x.name && isLimited(x);
-  const firstIdx = (arr, f) => { const i = arr.findIndex(f); return i >= 0 ? i : 0; };
+  const firstIdx = (arr, f) => { const i = firstByIID(arr, f); return i >= 0 ? i : 0; };
 
   // Daily + Gacha Gained stacked in one column
   const dailyStack = el(`<div class="panel-stack"></div>`);
@@ -1024,7 +1032,7 @@ function renderActions() {
 
   // Uptie
   b = panel("Uptying (sets the ID's UT level)");
-  if (state.uptie.idIdx == null) { const i = state.ids.findIndex((x) => x.acquired); state.uptie.idIdx = i >= 0 ? i : 0; }
+  if (state.uptie.idIdx == null) { const i = firstByIID(state.ids, (x) => x.acquired); state.uptie.idIdx = i >= 0 ? i : 0; }
   b.appendChild(idPicker("ID", state.ids, state.uptie.idIdx, isOwned, (i) => { state.uptie.idIdx = i; setSelection("uptie.sinner", state.ids[i].sinner); }));
   r = row(b);
   // show only the UT options that match the ID's rarity AND still advance it
@@ -1046,7 +1054,7 @@ function renderActions() {
 
   // Thread spinning
   b = panel("Thread Spinning (sets the EGO's TS level)");
-  if (state.uptie.egoIdx == null) { const i = state.egos.findIndex((x) => x.acquired); state.uptie.egoIdx = i >= 0 ? i : 0; }
+  if (state.uptie.egoIdx == null) { const i = firstByIID(state.egos, (x) => x.acquired); state.uptie.egoIdx = i >= 0 ? i : 0; }
   b.appendChild(idPicker("EGO", state.egos, state.uptie.egoIdx, isOwned, (i) => { state.uptie.egoIdx = i; setSelection("uptie.sinner", state.egos[i].sinner); }));
   // only show the grade matching the selected EGO
   const egoGrade = state.egos[state.uptie.egoIdx]?.tier;
