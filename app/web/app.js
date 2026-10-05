@@ -1311,7 +1311,16 @@ function renderEditableList(viewId, arrayName, columns, searchKeys, makeBlank) {
     if (col.cellColor) return `<span class="tag" style="${styleAttr(col.cellColor(tags))}">${tags.length ? esc(tags.join(", ")) : "—"}</span>`;
     // Keyword / Extra Keyword: icon-only summary (icon if one exists, else the name)
     if (col.iconCat === "keyword") return tags.length ? tags.map((t) => kwIco(item, t) || esc(t)).join(" ") : "—";
-    if (col.tagColor) return tags.length ? tags.map((t) => optIcon(col.iconCat, t) + chipHtml(col.tagColor, t)).join(" ") : "—";
+    if (col.tagColor) {
+      // Season: Walpurgisnaught + a number = that Walpurgis Night — its own icon
+      // (icons/walpurgis/w-N.webp) on the number, none on the Walpurgisnaught tag.
+      const walpN = col.iconCat === "season" && tags.includes("Walpurgisnaught") && tags.some((t) => /^\d+$/.test(t));
+      const ico = (t) => (!walpN ? optIcon(col.iconCat, t)
+        : t === "Walpurgisnaught" ? ""
+        : /^\d+$/.test(t) ? icoTag(`icons/walpurgis/w-${t}.webp`)
+        : optIcon(col.iconCat, t));
+      return tags.length ? tags.map((t) => ico(t) + chipHtml(col.tagColor, t)).join(" ") : "—";
+    }
     if (col.iconCat) return tags.length ? tags.map((t) => optIcon(col.iconCat, t) || esc(t)).join(" ") : "—";
     return tags.length ? esc(tags.join(", ")) : "—";
   };
@@ -1854,9 +1863,10 @@ function renderData() {
     state.extraKeywords = EXTRA_KEYWORD_ALL.map((name) => ({ name, icon: (OPTION_ICONS.keyword || {})[name] || "" }));
   // Extra Keyword manager: name + icon source (a local path or an image URL the
   // server downloads into icons/keyword/). Drives the IDs/EGOs pickers.
+  const ekwPreview = (k) => (k.icon ? splitIcons(k.icon).map((p) => icoTag(p)).join("") : '<span class="hint">—</span>');
   const ekwRows = () => state.extraKeywords.map((k, i) =>
     `<tr data-i="${i}">
-      <td style="text-align:left;min-width:34px;max-width:84px">${k.icon ? splitIcons(k.icon).map((p) => icoTag(p)).join("") : '<span class="hint">—</span>'}</td>
+      <td style="text-align:left;min-width:34px;max-width:84px">${ekwPreview(k)}</td>
       <td><input class="ekw-name" data-i="${i}" value="${esc(k.name ?? "")}"/></td>
       <td><input class="ekw-icon" data-i="${i}" value="${esc(k.icon ?? "")}" placeholder="icons/keyword/… or https://… (comma-separate for alternates)" style="width:100%"/></td>
       <td style="text-align:center"><button class="act ekw-fetch" data-i="${i}" title="download the icon URL(s) for offline use">⤓</button></td>
@@ -2013,14 +2023,21 @@ function renderData() {
   const ekwBody = $("#ekw-body");
   ekwBody.addEventListener("change", (e) => {
     const i = +e.target.dataset.i; const k = state.extraKeywords[i]; if (!k) return;
-    if (e.target.classList.contains("ekw-name")) { k.name = e.target.value.trim(); redrawEkw(); }
-    else if (e.target.classList.contains("ekw-icon")) { k.icon = e.target.value.trim(); redrawEkw(); }
+    // update in place — rebuilding the rows here would swallow a click that
+    // blurred this field (e.g. typing a URL then clicking Fetch straight away)
+    if (e.target.classList.contains("ekw-name")) k.name = e.target.value.trim();
+    else if (e.target.classList.contains("ekw-icon")) {
+      k.icon = e.target.value.trim();
+      e.target.closest("tr").cells[0].innerHTML = ekwPreview(k);
+    } else return;
+    renderIDs(); renderEGOs(); autosave();
   });
   ekwBody.addEventListener("click", async (e) => {
     const btn = e.target.closest("button"); if (!btn) return;
     const i = +btn.dataset.i; const k = state.extraKeywords[i]; if (!k) return;
     if (btn.classList.contains("ekw-del")) { state.extraKeywords.splice(i, 1); redrawEkw(); return; }
     if (btn.classList.contains("ekw-fetch")) {
+      k.icon = btn.closest("tr").querySelector(".ekw-icon").value.trim();   // whatever is typed right now
       if (!splitIcons(k.icon).some(isUrl)) { toast(["Put an http(s) image URL in the icon field first"]); return; }
       btn.disabled = true; btn.textContent = "…";
       const r = await fetchIconList(k.icon, k.name);
