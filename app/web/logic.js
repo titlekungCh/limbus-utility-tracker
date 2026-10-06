@@ -184,7 +184,9 @@ function wLPXP(s, t) {
     case "Fri":   weeklyModule(s, "noCrate", 5, 1, 1.4, 6, x); break;
     case "Sat":   weeklyModule(s, "onlyDaily", 4, 1, 0, 0, x); break;
     case "Sun":   weeklyModule(s, "onlyDaily", 3, 1, 0, 0, x); break;
-    case "Mon":   weeklyModule(s, "full", 2, 0, 1.4, 6, x); break;
+    // Mon = the last weekly mission only (+0.4, no crates) on top of the daily's +1.
+    // Was 1.4 / 6 crates (Code.gs) — a full level too many vs the game.
+    case "Mon":   weeklyModule(s, "noCrate", 2, 0, 0.4, 0, x); break;
     case "Tue":   weeklyModule(s, "onlyDaily", 1, 0, 0, 0, x); break;
     case "Wed":   weeklyModule(s, "dailyWeekly", 7, 5, 0, 0, x); s.weekTilSeasonEnd += -1 * x; break;
   }
