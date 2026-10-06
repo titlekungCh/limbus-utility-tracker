@@ -180,12 +180,13 @@ function weeklyModule(s, t, d, w, l, c, n) {
 function wLPXP(s, t) {
   const x = t === "normal" ? 1 : t === "undo" ? -1 : 0;
   switch (s.currentDay) {
-    case "Thurs": updateCurrentDate(s); weeklyModule(s, "full", 6, 2, 2.2, 6, x); break;
-    case "Fri":   weeklyModule(s, "noCrate", 5, 1, 1.4, 6, x); break;
+    // Weekly missions are +0.4 pass each on top of the daily's +1: Thu clears 3
+    // (+1.2, its whole level = 3 crates), Fri 1 (+0.4), Mon the last 1 (+0.4).
+    // Code.gs had 2.2/6, 1.4, 1.4/6 — a full level too many each vs the game.
+    case "Thurs": updateCurrentDate(s); weeklyModule(s, "full", 6, 2, 1.2, 3, x); break;
+    case "Fri":   weeklyModule(s, "noCrate", 5, 1, 0.4, 0, x); break;
     case "Sat":   weeklyModule(s, "onlyDaily", 4, 1, 0, 0, x); break;
     case "Sun":   weeklyModule(s, "onlyDaily", 3, 1, 0, 0, x); break;
-    // Mon = the last weekly mission only (+0.4, no crates) on top of the daily's +1.
-    // Was 1.4 / 6 crates (Code.gs) — a full level too many vs the game.
     case "Mon":   weeklyModule(s, "noCrate", 2, 0, 0.4, 0, x); break;
     case "Tue":   weeklyModule(s, "onlyDaily", 1, 0, 0, 0, x); break;
     case "Wed":   weeklyModule(s, "dailyWeekly", 7, 5, 0, 0, x); s.weekTilSeasonEnd += -1 * x; break;
