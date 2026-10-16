@@ -17,12 +17,13 @@ function currentPatchISO() {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 import {
-  managerForecast, resourceForecast, shardPlanRows, idLeveling, applyIdLeveling, adjustTicketUse, TICKET_OVERSHOOT, ticketXpMap, levelForTotalXP, SHARD_TYPES,
+  managerForecast, resourceForecast, shardPlanRows, idLeveling, applyIdLeveling, adjustTicketUse, TICKET_OVERSHOOT, ticketXpMap, levelForTotalXP, maxSeasonalLv, SHARD_TYPES,
   eventShop, REWARD_TYPES, egoThreadspin, rentalWeekFlag,
 } from "./projections.js";
 
 // persists across dashboard re-renders (idx into state.ids / state.egos)
-let idLevelSel = { idx: null, target: 65 };
+let idLevelSel = { idx: null, target: null }; // target null = Max Seasonal LV (Data page)
+const idTarget = () => idLevelSel.target ?? maxSeasonalLv(state);
 let egoTSel = { idx: null, target: 4 };
 
 let state = null;
@@ -645,12 +646,12 @@ function renderIdLeveling() {
     if (i < 0) i = firstByIID(state.ids, (x) => x.acquired);
     idLevelSel.idx = i >= 0 ? i : 0;
   }
-  const res = idLeveling(state, idLevelSel.idx, idLevelSel.target);
+  const res = idLeveling(state, idLevelSel.idx, idTarget());
   const body = $("#idlevel-body");
   if (!body) return;
   // Editable ticket breakdown (starts at the greedy default). Reset whenever the
   // ID, target or current level changes so it tracks the live calculation.
-  const useKey = res ? `${idLevelSel.idx}:${idLevelSel.target}:${res.current}` : null;
+  const useKey = res ? `${idLevelSel.idx}:${idTarget()}:${res.current}` : null;
   if (!res || res.xpNeeded <= 0) { idLevelSel.useCounts = null; }
   else if (idLevelSel.useKey !== useKey || !idLevelSel.useCounts) { idLevelSel.useCounts = { ...res.need }; }
   idLevelSel.useKey = useKey;
@@ -661,7 +662,7 @@ function renderIdLeveling() {
   const selId = state.ids[idLevelSel.idx];
   const selSt = styleAttr(selId ? sinnerColor(selId.sinner) : null);   // ID dropdown -> sinner colour
   const lvlSt = res ? styleAttr(levelColor(res.current)) : "";          // current level -> bracket
-  const tgtSt = styleAttr(levelColor(idLevelSel.target));
+  const tgtSt = styleAttr(levelColor(idTarget()));
   const ticketRows = (res && counts) ? ["IV", "III", "II", "I"].map((tier) => {
     const st = styleAttr(fillColor(INVENTORY_FILL["tickets." + tier]));
     const left = (owned[tier] || 0) - (counts[tier] || 0);
@@ -675,7 +676,7 @@ function renderIdLeveling() {
   let resultRows = "";
   if (res && counts) {
     const covered = ["IV", "III", "II", "I"].reduce((a, t) => a + (counts[t] || 0) * tx[t], 0);
-    const fin = levelForTotalXP(state, res.atCur + res.levelExtra + covered);
+    const fin = levelForTotalXP(state, res.atCur + res.levelExtra + covered, maxSeasonalLv(state));
     const short = Math.max(0, res.xpNeeded - covered);
     const finSt = styleAttr(levelColor(fin.level));
     resultRows = `<div class="kv" style="margin-top:6px;">
@@ -691,7 +692,7 @@ function renderIdLeveling() {
         `<select id="idlevel-name" style="${selSt}">${byIID(state.ids, (x) => x.acquired).map(([x, i]) => `<option value="${i}"${i === idLevelSel.idx ? " selected" : ""}${optStyle(sinnerColor(x.sinner))} data-sinner="${esc(x.sinner)}">[${esc(x.name)}] ${esc(x.sinner)}</option>`).join("")}</select>`,
         "sinner", selId ? `[${selId.name}] ${selId.sinner}` : "", selId ? sinnerColor(selId.sinner) : null, selId ? optIcon("sinner", selId.sinner) : "")}</div>
     <div class="field"><label>Target Lv</label>
-      <input type="number" id="idlevel-target" class="qty" min="1" max="100" value="${idLevelSel.target}" style="${tgtSt}"/>
+      <input type="number" id="idlevel-target" class="qty" min="1" max="100" value="${idTarget()}" style="${tgtSt}"/>
       <button class="act primary" id="idlevel-apply"${res && res.xpNeeded > 0 && affordable ? "" : " disabled"} title="${res && res.xpNeeded <= 0 ? "Already at/above target" : !affordable ? "Not enough EXP tickets for this breakdown" : "Spend the tickets below and level this ID (stops ~1 Tier I short, no XP wasted)"}">Use Tickets</button></div>
     <div class="kv" style="margin-top:6px;">
       <div class="k" style="${lvlSt}">Current Level</div><div class="v" style="${lvlSt}">${res ? fmt(res.current) : "—"}</div>
@@ -703,13 +704,13 @@ function renderIdLeveling() {
   $("#idlevel-name").addEventListener("change", (e) => { idLevelSel.idx = +e.target.value; renderIdLeveling(); });
   $("#idlevel-target").addEventListener("change", (e) => { idLevelSel.target = Number(e.target.value) || 1; renderIdLeveling(); });
   body.querySelectorAll(".tk-step").forEach((b) => b.addEventListener("click", () => {
-    const lv = idLeveling(state, idLevelSel.idx, idLevelSel.target);
+    const lv = idLeveling(state, idLevelSel.idx, idTarget());
     const next = adjustTicketUse(state, idLevelSel.useCounts, b.dataset.tier, +b.dataset.dir, lv ? lv.xpNeeded : null);
     if (next) { idLevelSel.useCounts = next; renderIdLeveling(); }
   }));
   const applyBtn = $("#idlevel-apply");
   if (applyBtn) applyBtn.addEventListener("click", () => {
-    const r = applyIdLeveling(state, idLevelSel.idx, idLevelSel.target, idLevelSel.useCounts);
+    const r = applyIdLeveling(state, idLevelSel.idx, idTarget(), idLevelSel.useCounts);
     if (!r) return;
     renderDashboard();   // refresh calculator + Inventory ticket counts
     renderIDs();         // reflect the new level / level-extra on the IDs page
@@ -1885,6 +1886,7 @@ function renderData() {
   const DAILY_CONSTS = [
     ["xpLux", "XP Lux"], ["dailyManagerXP", "Daily Manager XP"], ["threadLuxSkip", "Thread Lux Skip"],
     ["skipThread", "Skip Thread"], ["dailyThreads", "Daily Threads"],
+    ["maxSeasonalLv", "Max Seasonal LV"],
   ];
   const dailyKeys = new Set(DAILY_CONSTS.map(([k]) => k));
   const dailyInput = (k) => COMPUTED_SCALARS.includes(k)
@@ -2116,6 +2118,8 @@ function migrateConstants(s) {
     else if (c.dailyThreads != null) c.skipThread = (Number(c.dailyThreads) || 0) / 3;
   }
   delete c.skipThread5;
+  // ID level cap for the season — ID Leveling's default target + where tickets stop
+  if (c.maxSeasonalLv == null) c.maxSeasonalLv = 65;
   if (Array.isArray(c.shardTable))
     c.shardTable.forEach((r) => { if (!r.color) r.color = SHARD_TYPE_FILL[r.type] || ""; });
   if (!Array.isArray(c.tickets)) {

@@ -186,10 +186,14 @@ export function adjustTicketUse(s, counts, tier, dir, xpNeeded) {
   return next;
 }
 // Highest curve level whose cumulative totalXP is <= xp, plus the partial XP past it.
-export function levelForTotalXP(s, xp) {
+// Season level cap (Data page "Max Seasonal LV"; default 65).
+export const maxSeasonalLv = (s) => Number(s.constants && s.constants.maxSeasonalLv) || 65;
+// `cap` (optional): reaching it stops there with 0 extra — XP past the cap is lost.
+export function levelForTotalXP(s, xp, cap) {
   const curve = s.constants.idLevelCurve;
   let best = curve[0];
   for (const r of curve) { if (r.totalXP <= xp) best = r; else break; }
+  if (cap != null && best.level >= cap) return { level: cap, extra: 0 };
   return { level: best.level, extra: round2(xp - best.totalXP) };
 }
 export function idLeveling(s, idx, target) {
@@ -236,7 +240,7 @@ export function applyIdLeveling(s, idx, target, counts) {
     owned[tier] = (owned[tier] || 0) - used[tier];
   }
   const newTotal = res.atCur + (id.levelExtra || 0) + appliedXP;
-  const { level, extra } = levelForTotalXP(s, newTotal);
+  const { level, extra } = levelForTotalXP(s, newTotal, maxSeasonalLv(s));
   id.level = level;
   id.levelExtra = extra;
   return { name: id.name, used, appliedXP, fromLevel: res.current, newLevel: level, newExtra: extra, target };
