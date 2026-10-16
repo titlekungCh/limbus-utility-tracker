@@ -17,7 +17,7 @@ function currentPatchISO() {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 import {
-  managerForecast, resourceForecast, shardPlanRows, idLeveling, applyIdLeveling, adjustTicketUse, ticketXpMap, levelForTotalXP, SHARD_TYPES,
+  managerForecast, resourceForecast, shardPlanRows, idLeveling, applyIdLeveling, adjustTicketUse, TICKET_OVERSHOOT, ticketXpMap, levelForTotalXP, SHARD_TYPES,
   eventShop, REWARD_TYPES, egoThreadspin, rentalWeekFlag,
 } from "./projections.js";
 
@@ -668,7 +668,7 @@ function renderIdLeveling() {
     const lowerXP = (tier === "I") ? 0 : ["IV", "III", "II", "I"].slice(["IV", "III", "II", "I"].indexOf(tier) + 1).reduce((a, t) => a + (counts[t] || 0) * tx[t], 0);
     const adj = (tier === "I")
       ? `<span class="tk-adj"><button class="tk-step" data-tier="I" data-dir="-1"${(counts.I || 0) <= 0 ? " disabled" : ""} title="Use one fewer Ticket I — result level drops (use when short on Ticket I)">&lt;</button><button class="tk-step" data-tier="I" data-dir="1"${(counts.I || 0) >= (owned.I || 0) ? " disabled" : ""} title="Use one more Ticket I (up to owned)">&gt;</button></span>`
-      : `<span class="tk-adj"><button class="tk-step" data-tier="${tier}" data-dir="-1"${(counts[tier] || 0) <= 0 ? " disabled" : ""} title="Use one fewer Ticket ${tier} — lower tiers fill in">&lt;</button><button class="tk-step" data-tier="${tier}" data-dir="1"${lowerXP < tx[tier] ? " disabled" : ""} title="Use one more Ticket ${tier} — pulled back from lower tiers">&gt;</button></span>`;
+      : `<span class="tk-adj"><button class="tk-step" data-tier="${tier}" data-dir="-1"${(counts[tier] || 0) <= 0 ? " disabled" : ""} title="Use one fewer Ticket ${tier} — lower tiers fill in">&lt;</button><button class="tk-step" data-tier="${tier}" data-dir="1"${(TICKET_OVERSHOOT.has(tier) ? (counts[tier] || 0) >= (owned[tier] || 0) && lowerXP < tx[tier] : lowerXP < tx[tier]) ? " disabled" : ""} title="Use one more Ticket ${tier} — pulled back from lower tiers${TICKET_OVERSHOOT.has(tier) ? "; past that it overshoots the target (up to owned)" : ""}">&gt;</button></span>`;
     return `<div class="k" style="${st}">${icoTag(RESOURCE_ICON[tier])}Ticket ${tier}${adj}</div><div class="v" style="${st}">${fmt(counts[tier] || 0)} <span class="count${left < 0 ? " shard-low" : ""}">(${fmt(left)} left)</span></div>`;
   }).join("") : "";
   // level the ID actually lands on with the planned tickets (differs from Target if Ticket I is lowered)
@@ -703,7 +703,8 @@ function renderIdLeveling() {
   $("#idlevel-name").addEventListener("change", (e) => { idLevelSel.idx = +e.target.value; renderIdLeveling(); });
   $("#idlevel-target").addEventListener("change", (e) => { idLevelSel.target = Number(e.target.value) || 1; renderIdLeveling(); });
   body.querySelectorAll(".tk-step").forEach((b) => b.addEventListener("click", () => {
-    const next = adjustTicketUse(state, idLevelSel.useCounts, b.dataset.tier, +b.dataset.dir);
+    const lv = idLeveling(state, idLevelSel.idx, idLevelSel.target);
+    const next = adjustTicketUse(state, idLevelSel.useCounts, b.dataset.tier, +b.dataset.dir, lv ? lv.xpNeeded : null);
     if (next) { idLevelSel.useCounts = next; renderIdLeveling(); }
   }));
   const applyBtn = $("#idlevel-apply");

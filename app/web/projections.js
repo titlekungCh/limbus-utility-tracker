@@ -153,7 +153,12 @@ const TICKET_ORDER = ["IV", "III", "II", "I"];
 // All ticket XP values are exact multiples of the smaller ones, so the greedy
 // refill always lands exactly. Tier I has nothing below it: it is a free +/-1
 // override (0..owned) that changes the total XP covered, e.g. when short on Tier I.
-export function adjustTicketUse(s, counts, tier, dir) {
+// Tier II may also go past what the lower tiers can give back (up to owned),
+// overshooting the target to spend Tier II tickets; Tier I then drops to 0.
+// `xpNeeded` (optional) caps the refill on the way back down so lowering an
+// overshot tier returns to the no-waste breakdown instead of overfilling Tier I.
+export const TICKET_OVERSHOOT = new Set(["II"]);
+export function adjustTicketUse(s, counts, tier, dir, xpNeeded) {
   const xp = ticketXpMap(s);
   const lower = TICKET_ORDER.slice(TICKET_ORDER.indexOf(tier) + 1);
   if (!lower.length) {
@@ -167,10 +172,16 @@ export function adjustTicketUse(s, counts, tier, dir) {
     if ((next[tier] || 0) <= 0) return null;
     next[tier] -= 1;
   } else {
-    if (lowerXP < xp[tier]) return null;                // not enough below to give back
-    next[tier] += 1;
+    const canOvershoot = TICKET_OVERSHOOT.has(tier) && (next[tier] || 0) < (s.inventory.tickets[tier] || 0);
+    if (lowerXP < xp[tier] && !canOvershoot) return null; // not enough below to give back
+    next[tier] = (next[tier] || 0) + 1;
   }
-  let remaining = lowerXP + (dir < 0 ? xp[tier] : -xp[tier]);
+  let remaining = Math.max(0, lowerXP + (dir < 0 ? xp[tier] : -xp[tier]));
+  if (dir < 0 && xpNeeded != null) {
+    // XP the lower tiers still need to cover, given this tier and everything above it
+    const upper = TICKET_ORDER.slice(0, TICKET_ORDER.indexOf(tier) + 1).reduce((a, t) => a + (next[t] || 0) * xp[t], 0);
+    remaining = Math.min(remaining, Math.max(0, xpNeeded - upper));
+  }
   for (const t of lower) { next[t] = Math.floor(remaining / xp[t]); remaining -= next[t] * xp[t]; }
   return next;
 }
