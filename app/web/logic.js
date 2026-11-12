@@ -296,8 +296,9 @@ export const ACTIONS = {
     else note("Not enough for a single pull");
   },
   pull10Pulls: (s) => {
-    if (s.lunacy.decaTickets >= PULL.deca.deca) { s.lunacy.decaTickets -= PULL.deca.deca; note("10 pulls via Deca Ticket"); }
-    else if (s.lunacy.extTickets >= PULL.deca.ext) { s.lunacy.extTickets -= PULL.deca.ext; note("10 pulls via 10 Ext Tickets"); }
+    // 10 single tickets first, then a Deca Ticket, then 1300 lunacy
+    if (s.lunacy.extTickets >= PULL.deca.ext) { s.lunacy.extTickets -= PULL.deca.ext; note("10 pulls via 10 Ext Tickets"); }
+    else if (s.lunacy.decaTickets >= PULL.deca.deca) { s.lunacy.decaTickets -= PULL.deca.deca; note("10 pulls via Deca Ticket"); }
     else if (freeLunacy(s) >= PULL.deca.lunacy) { fLCH(s, -PULL.deca.lunacy); note("10 pulls via 1300 Lunacy"); }
     else note("Not enough for a 10-pull");
   },

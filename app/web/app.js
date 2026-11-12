@@ -1030,8 +1030,8 @@ function renderActions() {
   const free = state.lunacy.total - state.lunacy.paid;
   const singleIco = state.lunacy.extTickets >= PULL.single.ext ? RESOURCE_ICON.extraction
     : free >= PULL.single.lunacy ? RESOURCE_ICON.lunacy : null;
-  const decaIco = state.lunacy.decaTickets >= PULL.deca.deca ? RESOURCE_ICON.deca
-    : state.lunacy.extTickets >= PULL.deca.ext ? RESOURCE_ICON.extraction
+  const decaIco = state.lunacy.extTickets >= PULL.deca.ext ? RESOURCE_ICON.extraction
+    : state.lunacy.decaTickets >= PULL.deca.deca ? RESOURCE_ICON.deca
     : free >= PULL.deca.lunacy ? RESOURCE_ICON.lunacy : null;
   const singlePull = btn("Single Pull", () => act(ACTIONS.pull1Pull));
   if (singleIco) singlePull.innerHTML = `Single Pull ${icoTag(singleIco)}`;
